@@ -1,0 +1,20 @@
+
+	body .deviceWidth {width:320px!important; padding: 0px 0px 0px 0px!important;}
+	body .innerWidth {width:280px!important;  padding: 0px 0px 0px 0px!important;}
+	body .mobile15px {width:15px!important;}
+	body .mobile20px {width:20px!important;}
+	body .mobile115px {width:115px!important; font-size:11pt; line-height: 120%!important;}
+	body .mobile130px {width:130px!important;}
+	body .mobile150px {width:150px!important;}
+	body .hideOnMobile {display: none !important;}
+	body .showOnMobile {display: inline-block !important;}
+	table[id=bottom_menu_home] {width:280px!important; font-size:10pt!important;}
+	div[id=body_wrapper] {width:280px!important; padding: 20px 20px 20px 20px!important;}
+	img[id=hideOnMobile] {display: none !important;}
+	img[id=showOnMobile] {display: inline-block !important;}
+	div[id=hideOnMobile] {display: none !important;}
+	div[id=showOnMobile] {display: inline-block !important;}
+	table[id=hideOnMobile] {display: none !important;}
+	table[id=showOnMobile] {display: inline-block !important;}
+	span[id=hideOnMobile] {display: none !important;}
+	span[id=showOnMobile] {display: inline-block !important;}

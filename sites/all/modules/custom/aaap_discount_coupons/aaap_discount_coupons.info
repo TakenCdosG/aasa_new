@@ -1,0 +1,13 @@
+name = AAAP Discount Coupons
+description = Allow administrators to manage store coupons on registration events
+dependencies[] = uc_cart
+dependencies[] = uc_coupon
+package = AAAP
+core = 7.x
+
+
+; Information added by drupal.org packaging script on 2012-04-15
+version = "7.x-2.1-alpha7"
+core = "7.x"
+project = "aaap_discount_coupons"
+datestamp = "1334511105"

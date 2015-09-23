@@ -1,0 +1,2614 @@
+@font-face {
+    font-family: 'InterstateRegular';
+    src: url('fonts/font-s/interstate-regular-webfont.eot');
+    src: url('fonts/font-s/interstate-regular-webfont.eot?#iefix') format('embedded-opentype'),
+        url('fonts/font-s/interstate-regular-webfont.woff') format('woff'),
+        url('fonts/font-s/interstate-regular-webfont.ttf') format('truetype'),
+        url('fonts/font-s/interstate-regular-webfont.svg#InterstateRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+body {
+    padding: 0px;
+    width: 970px;
+    margin: 0 auto;
+    font-family: 'allerregular';
+    color: #6c6963;
+}
+
+body.admin-menu {
+    margin-top: 29px !important;
+}
+
+ul.primary.tabs {
+    margin: 8px 0px;
+    padding: 0px;
+}
+
+.tabs, div.messages {
+    float: left;
+    width: 95%;
+    padding-left: 4%;
+    padding-right: 1%;
+    margin: 0;
+    border: 0px;
+}
+
+.container {
+    float: left;
+}
+
+.node p {
+    line-height: 26px;
+}
+
+#main-wrapper {
+    width: 100%;
+    float: left;
+}
+
+/*HEADER*/
+
+#header {
+    background: #007490;
+    height: 36px;
+}
+
+#header_left {
+    float: left;
+}
+
+#header_left a {
+    float: left;
+    color: #fff;
+    font-family: Georgia;
+    font-size: 17px;
+    height: 36px;
+    padding-left: 11px;
+    padding-top: 10px;
+    width: 405px;
+}
+
+#header_left span {
+    font-style: italic;
+}
+
+#header_right {
+    color: #fff;
+    float: left;
+    margin-top: 10px;
+}
+
+#header_right a, #header_right .region {
+    float: left;
+
+}
+
+#button_join, #header_right .region {
+    margin-left: 40px;
+}
+
+.page-user-register #button_join {
+    display: none;
+}
+
+a {
+    font-family: 'allerbold';
+    color: #41738D;
+    font-size: 16px;
+    text-decoration: none;
+    line-height: 16px;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+#body_event a {
+    text-decoration: underline;
+}
+
+#header_top {
+    width: 100%;
+}
+
+/*HEADER MENU*/
+
+#block-menu-menu-menu {
+    margin: 0 auto;
+}
+
+#header-bottom {
+    margin: 0 auto;
+    float: left;
+}
+
+#main-logo {
+    height: 118px;
+    width: 121px;
+    float: left;
+}
+
+.region-header {
+    float: left;
+    margin-top: 50px;
+}
+
+.region-header .content {
+    float: left;
+    margin-top: 6px;
+    padding-left: 2px;
+    margin: 0px;
+}
+
+.region-header .content ul li, .region-header .content ul li.expanded, .region-header .content ul {
+    list-style: none;
+}
+
+.region-header .content ul li a {
+    text-decoration: none;
+    color: #1f4770;
+    font-size: 14px;
+    font-family: InterstateRegular;
+    padding: 0px 4px;
+}
+
+ul.menu {
+    margin: 0px;
+}
+
+#block-menu-menu-menu > div.content > ul > li.last.leaf {
+    background: none;
+}
+
+.region-header .content > ul > li {
+    float: left;
+    margin: 0;
+    vertical-align: middle;
+    padding-right: 0;
+    padding-top: 0;
+    border-right: 2px solid #4097AA;
+    border-top: 1px solid white;
+}
+
+.region-header .content > ul > li.active-trail {
+    border-bottom: 1px solid #BFDCE3;
+    border-top: 1px solid #BFDCE3;
+    border-left: none;
+    border-right: 1px solid #BFDCE3;
+
+}
+
+.region-header .content > ul > li.active-trail a {
+    color: white;
+    background: #007490;
+}
+
+.region-header .content > ul > li a {
+    color: #231f20;
+    float: left;
+    font-size: 14px;
+    height: 34px;
+    padding-left: 6px;
+    padding-right: 0;
+    padding-top: 3px;
+    position: relative;
+    width: 107px;
+}
+
+#block-menu-menu-menu > div.content > ul > li.last.leaf {
+    background: none;
+    border-right: none;
+}
+
+#block-menu-menu-menu ul li ul {
+    display: none;
+    padding: 0px 0px 5px 0px;
+    position: absolute;
+    background-color: #BFCFDF;
+    z-index: 1000;
+    margin-top: 40px;
+}
+
+#block-menu-menu-menu ul li ul li {
+    padding: 0px;
+    margin: 0px 3px;
+    border-bottom: #fff;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+}
+
+#block-menu-menu-menu ul li ul li a {
+    padding: 0px;
+}
+
+#block-menu-menu-menu ul li ul li:hover a {
+    color: white;
+}
+
+#block-menu-menu-menu ul li ul li.last {
+    border-bottom: none;
+}
+
+/**** HEADER RIGHT*****/
+#block-user-login {
+    margin-right: 0px;
+
+}
+
+.text_login {
+    display: block;
+    font-weight: normal;
+    color: #fff;
+    font-size: 11px;
+    margin-top: 3px;
+    float: right;
+    text-decoration: underline;
+    font-family: 'allerregular'
+}
+
+.form-item, .form-actions {
+    margin-top: 0em;
+    margin-bottom: 0em;
+}
+
+.form-checkboxes .form-type-checkbox, .form-radios .form-type-radio {
+    margin-top: 0em;
+    margin-bottom: 0em;
+}
+
+#edit-field-current-position {
+    margin-bottom: 25px;
+    margin-top: 25px;
+}
+
+#header .form-type-password, #header .form-item-name {
+    display: inline-block;
+}
+
+#header #edit-name,
+#header #edit-pass {
+    width: 107px;
+}
+
+form#user-pass #edit-name {
+    width: 210px;
+}
+
+#edit-name {
+    background: #231f20;
+    width: 110px;
+    height: 15px;
+    border: 0px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    padding-left: 6px;
+    padding-top: 4px;
+}
+
+#edit-pass {
+    background: #231f20;
+    width: 110px;
+    height: 15px;
+    border: 0px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    padding-left: 6px;
+    padding-top: 4px;
+}
+
+.page-user #edit-name,
+.page-user #edit-pass {
+    background: none repeat scroll 0 0 white;
+    border: 1px solid #000000;
+    color: black;
+    font-family: "allerregular";
+    font-weight: normal
+}
+
+#user-login-form .item-list {
+    display: none;
+}
+
+#user-login-form label {
+    display: none;
+}
+
+#user-login .form-item {
+    margin-bottom: 10px;
+}
+
+.header_user_links a {
+    font-size: 12px;
+    color: #fff;
+}
+
+#header_right .user_name {
+    font-weight: bold;
+    font-size: 14px;
+    margin-top: 17px;
+    display: block;
+    color: #FFF;
+}
+
+.logged-in #header_right,
+.logged-in #header_right .user_name {
+    margin-top: 0;
+}
+
+.logged-in #header_right {
+    float: right;
+    margin-right: 20px;
+}
+
+#link_profile {
+    margin-right: 8px;
+}
+
+#link_logout {
+    margin-left: 8px;
+}
+
+#header_right #user-login-form #edit-submit, #header_right #user-login-form #edit-submit--2 {
+    width: 78px;
+}
+
+#header_right #user-login-form #edit-actions, #header_right #user-login-form #edit-actions--2, #header_right #user-login-form #edit-actions--3 {
+    display: inline-block;
+    width: 62px;
+}
+
+/** HOME **/
+#home_right {
+    float: left;
+    width: 228px;
+}
+
+.widget-items a {
+    color: #007490;
+    font-family: Georgia;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.widget-items .div_a {
+    margin-bottom: 8px;
+}
+
+#widget-updates {
+    margin-bottom: 30px;
+}
+
+.widget-title {
+    font-family: InterstateRegular;
+    color: #231f20;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+#home_left {
+    float: left;
+    width: 722px;
+}
+
+.fotorama__dot {
+    border-color: #BFBFBF;
+}
+
+.fotorama__dot {
+    width: 8px;
+    height: 8px;
+    background: #BFBFBF;
+}
+
+.fotorama__nav__frame.fotorama__active .fotorama__dot {
+    width: 10px;
+    height: 10px;
+    border: initial;
+    background: #235383;
+}
+
+.fotorama__arr {
+    display: none !important;
+}
+
+#home_left > div.fotorama.fotorama1396283358664 > div > div.fotorama__stage {
+    height: 448px;
+}
+
+.fotorama__nav--dots .fotorama__nav__frame {
+    padding-right: 20px;
+}
+
+.fotorama__nav, .fotorama__nav__frame {
+    margin-bottom: -3px;
+}
+
+/** EVENTS WIDGET **/
+
+#events_widget {
+    float: left;
+    width: 213px;
+    background: #EDE9E1;
+    height: 440px;
+    padding: 16px;
+}
+
+.view-display-id-block_1 .views-field-title a, .view-display-id-block_1 .views-field-field-date a {
+
+    line-height: 20px;
+    color: #245383;
+    font-size: 14px;
+    font-family: 'allerbold';
+    padding-bottom: 3px;
+    text-decoration: none;
+
+}
+
+.view-display-id-block_1 .views-field-title a {
+    font-family: 'allerregular'
+}
+
+.view-display-id-block_1 .views-row {
+    padding-top: 20px;
+}
+
+.view-display-id-block_1 .view-eventes {
+    line-height: 22px;
+}
+
+.view-display-id-block_1 .views-field-field-link-widget-view a {
+    color: #245383;
+    font-size: 14px;
+    text-decoration: underline;
+
+}
+
+.view-display-id-block_1 .views-field-body p {
+    margin: 0px;
+    color: #245383;
+    font-size: 14px;
+}
+
+#widget_internal {
+    float: left;
+    margin-top: 26px;
+    margin-bottom: 11px;
+}
+
+.page-user-edit.page-user .region-content {
+    padding: 40px;
+    width: 921px;
+}
+
+.page-user .tabs {
+    display: none;
+}
+
+.region-content {
+    float: right;
+    padding: 10px;
+}
+
+#title_slider {
+    color: #00738F;
+    font-size: 20px;
+    font-family: Georgia;
+    font-weight: bold;
+}
+
+#text_slider {
+    color: #231f20;
+    font-family: Georgia;
+    font-size: 16px;
+    padding-top: 4px;
+    width: 650px;
+}
+
+.fotorama__dot {
+    display: none !important;
+}
+
+.fotorama__nav__frame--dot {
+    border-radius: 6px;
+    margin-right: 6px !important;
+    width: 12px !important;
+    height: 12px !important;
+    background-color: #7f7f7f;
+    padding: 0 !important;
+}
+
+.fotorama__nav--dots .fotorama__active {
+    background-color: #00738D;
+}
+
+.fotorama__nav-wrap {
+    margin-left: 3px;
+}
+
+#widget_color_home {
+    width: 100%;
+    float: left;
+    background: #ADA9A1;
+}
+
+#title_widget_home {
+    padding-bottom: 9px;
+    margin-top: -13px;
+}
+
+#title_widget_home a {
+    font-family: 'allerbold';
+    color: #245383;
+    font-size: 26px;
+
+}
+
+#title_widget_events {
+    color: #245383;
+    font-size: 20px;
+    font-family: 'allerbold';
+}
+
+#body_widget_home {
+    font-family: 'allerbold';
+    color: #fff;
+    font-size: 18px;
+    line-height: 24px;
+    width: 271px;
+    height: 123px;
+}
+
+#link_widget_home {
+    color: #efeadc;
+    font-size: 13px;
+    text-transform: uppercase;
+}
+
+.widget0 {
+    width: 303px;
+    background: url('../image/widget_line.fw.png') right no-repeat;
+}
+
+.widget1 {
+    width: 302px;
+    background: url('../image/widget_line.fw.png') right no-repeat;
+    padding-left: 26px;
+}
+
+.widget2 {
+    width: 283px;
+    padding-left: 17px;
+}
+
+#widget_home {
+    margin-top: 20px;
+    margin-bottom: 25px;
+    float: left;
+    margin-left: 20px;
+}
+
+#footer_bottom {
+    color: #66625a;
+    width: 100%;
+    float: left;
+    padding-top: 35px;
+    margin-left: 24px;
+    font-size: 14px;
+    padding-bottom: 78px;
+}
+
+.social {
+    display: block;
+    float: left;
+    margin-left: 16px;
+    padding-right: 16px;
+    margin-top: 3px;
+}
+
+#line_social {
+    float: left;
+    background: url('../image/line_menu_footer.png');
+    width: 2px;
+    height: 16px;
+    margin-top: 6px;
+}
+
+#social_icons {
+    height: 19px;
+    width: 142px;
+    margin-top: 4px;
+    float: left;
+}
+
+#image_slider {
+    position: relative;
+}
+
+.flexlider_background {
+    height: 92px;
+    left: 374px;
+    padding: 17px 14px 20px;
+    position: absolute;
+    top: 191px;
+    width: 268px;
+    background-color: white;
+    opacity: 0.87;
+}
+
+#text_slider p {
+    line-height: 21px;
+}
+
+#image_background {
+    margin-top: -92px;
+    margin-left: 9px;
+}
+
+#body_widget_home p {
+    margin: 0px;
+}
+
+#widget_home a {
+    text-decoration: none;
+}
+
+::-webkit-input-placeholder {
+
+    color: white;
+    font-size: 12px;
+
+}
+
+::-moz-placeholder {
+    color: white;
+    font-size: 12px;
+
+}
+
+:-ms-input-placeholder {
+    color: white;
+    font-size: 12px;
+
+}
+
+/* ie */
+input:-moz-placeholder {
+    color: white;
+    font-size: 12px;
+
+}
+
+#body_internal_page > ul {
+    padding-left: 18px;
+}
+
+#body_internal_page li {
+    margin-bottom: 20px;
+}
+
+.page-event-registration .button_event_action {
+    float: none;
+}
+
+/****** FOOTER ******/
+
+#footer {
+    float: left;
+    width: 100%;
+    margin-top: 42px;
+}
+
+#menu_footer {
+    float: left;
+    margin-top: 6px;
+    text-transform: uppercase;
+    margin: 0px;
+    width: 100%;
+}
+
+#menu_footer .content ul li, #menu_footer .content ul li.expanded, #menu_footer .content ul {
+    list-style: none;
+    padding: 0;
+}
+
+#menu_footer ul li.leaf {
+    margin: 0;
+}
+
+#menu_footer .content > ul > li {
+    float: left;
+    background: url('../img/footer-menu-separator.jpg') right no-repeat;
+    padding: 0px 15px 0px 6px;
+}
+
+#menu_footer .content > ul > li.first {
+    padding-left: 0;
+}
+
+#menu_footer .content > ul > li.last {
+    background: none;
+}
+
+#edit-search-block-form--2 {
+    width: 167px;
+    height: 23px;
+    border: none;
+    margin-right: 6px;
+}
+
+#search-block-form > div > div {
+    width: 302px;
+    float: left;
+}
+
+#button_join .button_join_us {
+    background: url(../img/button_join_us.png) no-repeat;
+    width: 56px;
+    height: 17px;
+}
+
+#block-menu-menu-menu-footer {
+    width: 705px;
+    overflow: hidden;
+    float: left;
+}
+
+#block-search-form {
+    width: 300px;
+    overflow: hidden;
+    float: left;
+    margin-left: 49px;
+}
+
+#menu_footer .content ul li a {
+    color: #007490;
+    text-decoration: none;
+    margin-right: 8px;
+    margin-left: 8px;
+    font-family: Arial;
+    font-size: 10px;
+    font-weight: Bold;
+}
+
+/*
+* User Registration Form Styles
+*/
+
+/*
+* General Layout of form
+* Common Styles for Fields & Fieldsets
+*/
+.page-user .heading_title {
+    font-size: 27px;
+    color: #00748e;
+    font-style: Italic;
+    font-family: Georgia;
+    margin-top: 0px;
+    margin-bottom: 40px;
+}
+
+.page-user .heading_text {
+    width: 530px;
+    height: auto;
+    font-family: Georgia;
+    color: #00748e;
+    line-height: 25px;
+    text-align: justify;
+    margin-bottom: 40px;
+}
+
+.page-user #edit-account .description {
+    display: none;
+}
+
+.page-user #user_user_form_group_persona_information {
+    float: left;
+}
+
+.page-user #user_user_form_group_persona_information .fieldset-wrapper {
+    width: 440px;
+}
+
+.just_password #user_user_form_group_persona_information, .just_password .form-type-password {
+    float: inherit;
+}
+
+.page-user .form-type-password-confirm {
+    margin-top: 6px;
+}
+
+.page-user #user_user_form_group_professional_information {
+    width: 473px;
+    float: left;
+}
+
+.page-user #user_user_form_group_membership_information {
+    width: 542px;
+
+}
+
+.page-user #edit-field-to-whom-do-you-report {
+    margin-top: 30px;
+}
+
+.page-user #edit-field-to-whom-do-you-report-und-0 > div > div,
+.page-user #edit-field-head-admin-info-und-0 > div > div {
+    display: inline-block;
+}
+
+.page-user #edit-field-head-admin-info-und-0 {
+    padding-top: 0;
+}
+
+.page-user #edit-field-head-admin-info-und-0 legend {
+    display: none;
+}
+
+.page-user #edit-field-to-whom-do-you-report-und-0-field-name-report-und-0-value,
+.page-user #edit-field-head-admin-info-und-0-field-name-head-admin-und-0-value {
+    margin-right: 10px;
+}
+
+.page-user fieldset {
+    border: none;
+    padding: 0px;
+}
+
+.page-user #edit-field-no-attach {
+    margin-bottom: 10px;
+}
+
+.form-item-picture-delete .description {
+    margin-left: 0;
+    margin-bottom: 10px;
+}
+
+#edit-field-office-telephone-und-0-value,
+#edit-field-mobile-telephone-und-0-value {
+    width: 100px;
+}
+
+#edit-field-ext-und-0-value {
+    width: 40px;
+}
+
+#edit-field-fax-und-0-value {
+    width: 80px;
+}
+
+#edit-field-office-telephone,
+#edit-field-ext,
+#edit-field-fax {
+    float: left;
+    margin-right: 10px;
+}
+
+#edit-field-mobile-telephone {
+    clear: left;
+}
+
+.page-user fieldset legend, .page-user fieldset .custom_legend {
+    color: #00748E;
+    font-family: Georgia;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.page-user #field-to-whom-do-you-report-add-more-wrapper fieldset {
+    padding-top: 12px;
+}
+
+.page-user #field-to-whom-do-you-report-add-more-wrapper legend {
+    color: #474747;
+    font-size: 16px;
+    margin-bottom: 4px;
+    font-weight: normal;
+    text-transform: none;
+    font-family: allerregular;
+}
+
+.page-user #edit-picture legend {
+    display: none;
+}
+
+#user_user_form_group_persona_information {
+    margin-bottom: 28px;
+}
+
+.form-item label, .password-strength-title {
+    color: black;
+    font-family: Arial;
+    font-size: 12px;
+}
+
+.page-user .form-text {
+    width: 223px;
+    height: 12px;
+    border: 1px #6C6963 solid;
+    padding: 2px;
+}
+
+#edit-field-highest-edu-degree,
+#edit-field-certifications,
+#edit-field-mgma-member,
+#edit-field-apa-member {
+    margin-bottom: 24px;
+}
+
+.page-user .form-wrapper,
+.page-user .form-item-current-pass,
+.page-user .form-item-mail,
+.page-user .form-item-pass-pass1,
+.page-user .form-item-pass-pass2 {
+    margin-bottom: 18px;
+}
+
+#user-profile-form #edit-actions {
+    clear: left;
+}
+
+.page-user #edit-field-others-organizations {
+    margin-bottom: 10px;
+}
+
+.password-strength {
+    width: 229px;
+    float: inherit;
+    margin-bottom: 18px;
+}
+
+.page-user .form-item.headin-form-item {
+    margin-bottom: 8px;
+}
+
+.field-name-field-choose-payment-method, .fieldset-contact-information {
+    clear: left;
+}
+
+.question-field-attach {
+    display: none;
+}
+
+.page-user input.form-checkbox, input.form-radio {
+    vertical-align: middle;
+    margin-top: -3px;
+}
+
+.page-user label.option {
+    margin-left: -5px;
+}
+
+.page-user #edit-field-others-organizations .form-type-radio {
+    display: block;
+}
+
+.page-user #user_user_form_group_membership_information {
+    width: 100%;
+    border-top: solid 1px #C9C9C9;
+    clear: left;
+}
+
+#user_user_form_group_membership_information legend {
+    padding-right: 20px;
+}
+
+.department_institution_information {
+    height: 900px;
+}
+
+.page-user .custom_legend {
+    display: none;
+}
+
+.page-user fieldset {
+    padding-top: 38px;
+    width: 390px;
+    float: left;
+    margin-bottom: 0 !important;
+}
+
+#edit-timezone {
+    display: none;
+}
+
+/*
+* Hack to hide the labels of certain fields in the form
+* Hide the main label of field but show the labels of the options
+*/
+.page-user #edit-field-institution-type label,
+.page-user #edit-field-no-attach label,
+.page-user #edit-field-attach label,
+.page-user #edit-field-new-or-renewal label,
+.page-user #edit-field-letter-attachment label,
+.page-user #edit-field-other-organization label {
+    display: none;
+}
+
+.page-user #edit-field-institution-type-und label,
+.page-user #edit-field-no-attach-und label,
+.page-user #edit-field-attach-und label,
+.page-user #edit-field-new-or-renewal-und label,
+.page-user #edit-field-letter-attachment-und label,
+.page-user #edit-field-other-organization-und label {
+    display: inline;
+}
+
+/***** VIEW MEMBER PROFILE *****/
+
+.page-user .region-content {
+    padding: 23px;
+    width: 938px;
+    padding-left: 40px;
+}
+
+.user_custom_profile {
+    margin: 0px;
+}
+
+.user_custom_profile .user_name {
+    font-size: 34px;
+    color: #007490;
+    margin-bottom: 40px;
+    width: 100%;
+    clear: both;
+}
+
+.user_custom_profile .col {
+    float: left;
+}
+
+.profile .user-picture {
+    float: inherit;
+    margin: 0px;
+}
+
+.user_custom_profile .col.picture {
+    width: 168px;
+    margin-right: 24px;
+}
+
+.user_custom_profile .block {
+    background-color: #F3F1EB;
+    padding: 15px;
+    width: 330px;
+}
+
+.user_custom_profile .block.one {
+    margin-right: 12px;
+}
+
+.field_custom_profile.address.one {
+    margin-top: 25px;
+}
+
+.field_custom_profile.address label, .field_custom_profile.request label, .field_custom_profile.request .value_custom_profile {
+    display: block;
+}
+
+.field_custom_profile.request {
+    margin-top: 15px;
+}
+
+.field_custom_profile, .value_custom_profile {
+    color: #474747;
+    font-size: 16px;
+    line-height: 21px;
+}
+
+.field_custom_profile label {
+    font-family: 'allerbold';
+    margin-right: 5px;
+}
+
+.field_custom_profile label, .field_custom_profile .value_custom_profile {
+    display: inline-block;
+}
+
+.value_custom_profile.group_fields {
+    display: block;
+}
+
+.page-user #edit-picture {
+    padding-top: 5px;
+}
+
+#user-login .description {
+    width: 300px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    display: none;
+}
+
+a.button_request {
+    text-decoration: none;
+    color: #245383;
+}
+
+/**** CONTENT HEADER ****/
+#image_header {
+    height: 322px;
+    position: relative;
+    z-index: 0;
+}
+
+#title_header {
+    font-size: 34px;
+    color: #fff;
+    padding-left: 34px;
+    margin-top: -78px;
+    background-image: url('../image/background_image_internal.png');
+    height: 48px;
+    position: relative;
+    z-index: 1;
+    padding-top: 30px;
+}
+
+/***** CONTENT ****/
+
+.node > .content {
+    margin: 0px auto;
+    padding-bottom: 20px;
+    padding-top: 20px;
+}
+
+/***** Directors ****/
+
+.table-directors td {
+    vertical-align: top;
+    padding-top: 38px;
+    width: 476px;
+}
+
+.table-directors .field-director-picture {
+    float: left;
+    margin-right: 22px;
+    height: 100px;
+}
+
+.table-directors .field-director-picture .field-content {
+    height: 100px;
+}
+
+.table-directors .field-director-name a {
+    font-family: 'allerbold';
+    color: #41738D;
+    font-size: 16px;
+    text-decoration: none;
+}
+
+.table-directors .field-director-title a {
+    font-style: italic;
+    color: #41738D;
+    font-size: 16px;
+    text-decoration: none;
+}
+
+.table-directors .field-director-description {
+    text-align: justify;
+}
+
+.table-directors td {
+    padding-right: 0px;
+    padding-left: 13px;
+}
+
+.table-directors td.odd {
+    padding-right: 12px;
+    padding-left: 0px;
+}
+
+.table-directors .field-director-readmore a {
+    font-family: 'allerbold';
+    color: #41738D;
+    font-size: 16px;
+    text-decoration: none;
+}
+
+.node-directors-item .field-name-field-director-picture {
+    float: left;
+    margin-right: 15px;
+}
+
+/**** MEMBERSHIP DIRECTORY *****/
+.view-membership-directory, .view-all-membership-directory {
+    padding-bottom: 25px;
+    width: 952px;
+    margin: 0px auto;
+}
+
+.view-membership-directory table, .view-all-membership-directory table {
+    width: 100%;
+}
+
+.view-membership-directory th, .view-all-membership-directory th {
+    border: none;
+    text-align: left;
+    color: #007490;
+    font-family: Georgia;
+    font-size: 18px;
+    padding-bottom: 8px;
+}
+
+tbody {
+    border-bottom: none;
+    border-color: transparent;
+    border-spacing: 0px;
+}
+
+.view-membership-directory td, .view-all-membership-directory td {
+    background: none;
+    border: none;
+    padding-bottom: 5px;
+    padding-right: 30px;
+}
+
+tr.even, tr.odd {
+    border: none;
+    background: none;
+}
+
+.title_blue_one, .title_blue_two {
+    color: #007490;
+    font-family: Georgia;
+    font-size: 27px;
+    font-style: italic;
+}
+
+.node-type-directors-item .title_blue_one {
+    padding-left: 0;
+}
+
+.view-membership-directory .title_blue_one, .view-all-membership-directory .title_blue_one {
+    margin-bottom: 30px;
+}
+
+.view-membership-directory .title_blue_two, .view-all-membership-directory .title_blue_two {
+    margin-top: 26px;
+    margin-bottom: 15px;
+}
+
+.view-membership-directory .view-header, .view-all-membership-directory .view-header {
+    margin-bottom: 26px;
+}
+
+#edit-submit-membership-directory,
+#edit-submit-all-membership-directory,
+.button_profile_action,
+.button_event_action,
+.event-webform #edit-submit--3,
+.event-webform #edit-submit--4,
+.event-webform #edit-submit--2,
+#edit-reset {
+    background-color: #007490;
+    background-image: none;
+    border: 0 none;
+    border-radius: 5px;
+    color: #ffffff;
+    cursor: pointer;
+    font-family: Georgia;
+    font-size: 14px;
+    height: 24px;
+    width: 80px;
+}
+
+/*#uc-cart-checkout-form #edit-actions input{
+    background-color: #007490;
+    border: 0 none;
+    border-radius: 5px;
+    color: #ffffff;
+    cursor: pointer;
+    font-family: Georgia;
+    font-size: 14px;
+    height: 24px;
+    width: 80px;
+}*/
+.button_profile_action {
+    height: 22px;
+    text-decoration: none;
+    display: block;
+    float: left;
+    padding-top: 2px;
+    line-height: 20px;
+    padding-left: 10px;
+    margin-top: 14px;
+    clear: both;
+    width: 225px !important;
+}
+
+.view-membership-directory .views-exposed-form label, .view-all-membership-directory .views-exposed-form label {
+    font-weight: normal;
+    font-family: InterstateRegular;
+    color: #231f20;
+}
+
+.view-membership-directory a, .view-all-membership-directory a {
+    text-decoration: none;
+    font-family: allerregular;
+}
+
+.views-field-mail a {
+    font-family: allerregular;
+}
+
+.view-membership-directory .views-field-mail a {
+    color: #6c6963;
+}
+
+.view-membership-directory .view-filters, .view-all-membership-directory .view-filters {
+    margin-bottom: 24px;
+    border-bottom: 1px solid #BFCFDF;
+    padding-bottom: 15px;
+}
+
+.view-all-membership-directory .views-field-edit-node {
+    padding-right: 0px;
+}
+
+.view-all-membership-directory .views-field-view-user, .view-membership-directory .views-field-view-user {
+    width: 160px;
+}
+
+.view-all-membership-directory .views-field-field-office-telephone, .view-membership-directory .views-field-field-office-telephone {
+    width: 156px;
+}
+
+.item-list .pager li {
+    padding: 4px;
+    font-size: 16px;
+    margin: 0px;
+}
+
+.item-list .pager li.pager-current {
+    color: #235383;
+    text-decoration: underline;
+}
+
+/***** UBERCART *****/
+.cart-review {
+    width: 100%;
+}
+
+#customer-pane {
+    display: none;
+}
+
+/***** BUTTONS *****/
+
+#user-login-form #edit-submit,
+#edit-submit--2,
+#edit-submit--3 {
+    background: url(../img/btn_login.jpg) no-repeat;
+    width: 56px;
+    height: 29px;
+    border: 0px;
+    color: transparent;
+    font-size: 0px;
+
+    cursor: pointer;
+}
+
+.page-cart #block-user-login,
+.page-cart .text_login {
+    display: none;
+}
+
+/***** HEADER RIGHT SPECIAL PAGES ********/
+
+.page-user-register #header_right .text_login, .page-user-password #header_right .text_login, .page-user-reset #header_right .text_login, .page-user #header_right .text_login {
+    display: none;
+}
+
+#user-login .text_login {
+    font-family: 'allerregular';
+    color: #6c6963;
+
+    margin: 0px 0px 10px 0px;
+    width: 100%;
+}
+
+/**** PASSWORD *****/
+
+#user-pass .form-item-name {
+    margin-bottom: 20px;
+}
+
+/***** INTERNAL PAGE *****/
+
+.node > .content.short {
+    float: left;
+    width: 661px;
+    margin-left: 35px;
+}
+
+.node-internal-page #events_widget {
+    margin-top: 9px;
+    margin-left: 40px;
+}
+
+/***** EVENT *****/
+
+#title_event {
+    margin: 0px auto 25px auto;
+}
+
+#header_event {
+    background-color: #EFEFEF;
+    padding: 20px;
+    float: left;
+    width: 100%;
+    font-family: 'allerbold';
+}
+
+#header_event img {
+    float: left;
+    margin-right: 30px;
+}
+
+#date_event, #location_event {
+    font-size: 18px;
+    /*color: #235383;*/
+    color: #007490;
+    line-height: 24px;
+}
+
+#is_open_text_event {
+    line-height: 24px;
+}
+
+#short_description_event a, .view-eventes.view-display-id-page .views-field-field-short-description a {
+    color: #235383;;
+}
+
+#short_description_event {
+    font-family: 'allerregular';
+}
+
+#short_description_event {
+    /* color: #235383;*/
+    color: #007490;
+}
+
+.blue_link_underline a {
+    text-decoration: underline;
+}
+
+#body_event {
+    padding-top: 19px;
+    clear: both;
+    position: relative;
+    display: block;
+}
+
+.node-event {
+    padding-bottom: 25px;
+    padding-top: 25px;
+}
+
+.node-event > .content {
+    margin: 0px;
+    padding: 0px;
+    float: left;
+}
+
+#header_event .button_event_action {
+    text-decoration: none;
+    padding: 5px;
+    line-height: 20px;
+    font-family: 'allerregular';
+}
+
+.title_blue_one {
+    /*padding-left: 22px;*/
+    padding-top: 25px;
+}
+
+.page-events .title_blue_one {
+    padding-left: 22px;
+}
+
+.page-event-registration .title_blue_one {
+    padding-left: 34px;
+}
+
+.node-type-internal-page .title_blue_one {
+    /*padding-left: 13px;*/
+    padding-left: 0px;
+}
+
+/****** EVENT REGISTRATION FORM ****/
+.event-webform {
+    width: 912px;
+    margin: 0px auto 25px auto;
+}
+
+.event-webform .description {
+    font-size: 14px;
+    width: 568px;
+}
+
+.event-webform label {
+    padding-left: 2px;
+    margin-top: 5px;
+}
+
+.event-webform .form-text {
+    width: 240px;
+}
+
+.event-webform .webform-component-radios,
+.event-webform #webform-component-enter-pediatrics {
+    margin-top: 32px;
+    margin-bottom: 35px;
+}
+
+.event-webform .form-item.form-type-radio {
+    display: inline-block;
+}
+
+.event-webform #webform-component-select-membership-type .form-item.form-type-radio {
+    display: block;
+
+}
+
+.event-webform #webform-component-select-membership-type {
+    margin-bottom: 35px;
+}
+
+.event-webform #webform-component-please-complete {
+    font-family: 'allerbold';
+}
+
+.page-node-done .links {
+    display: none;
+}
+
+.webform-component-hidden {
+    display: none;
+}
+
+/**** MEMBER TOOLKIT LANDINGPAGE *****/
+
+.table-member-toolkit td {
+    vertical-align: top;
+    padding-top: 38px;
+}
+
+.table-member-toolkit .field-member-toolkit-title a {
+    font-family: 'allerregular';
+    color: #6c6963;
+}
+
+.table-member-toolkit .field-member-toolkit-description {
+    text-align: justify;
+}
+
+.table-member-toolkit td {
+    padding-right: 0px;
+    padding-left: 13px;
+}
+
+.table-member-toolkit td.odd {
+    padding-right: 12px;
+    padding-left: 0px;
+}
+
+.table-member-toolkit .field-member-toolkit-readmore a {
+    font-family: 'allerbold';
+    color: #007490;
+    font-size: 16px;
+    text-decoration: none;
+    line-height: 16px;
+}
+
+.field-member-toolkit-picture {
+    margin-bottom: 15px;
+}
+
+/*
+* CUSTOM CART STYLES
+*/
+
+#review-instructions p {
+    font-family: "allerbold";
+    color: #235383;
+    text-decoration: none;
+}
+
+/**** VIEWS ADMINISTER *****/
+
+.view-administers .views-table {
+    width: 100%;
+}
+
+.view-administers td.views-field.views-field-title {
+    width: 341px;
+}
+
+.view-administers td.views-field {
+    width: 160px;
+}
+
+/*
+* BASIC PAGE
+*/
+
+.node-page .region-content {
+    padding: 0;
+    width: 976px;
+}
+
+#search-block-form .form-submit {
+    background: url(../img/search.png) no-repeat;
+    width: 57px;
+    height: 18px;
+    margin-top: 2px;
+    margin-left: 4px;
+    border: 0px;
+    color: transparent;
+    font-size: 0px;
+    padding-top: 13px;
+    cursor: pointer;
+}
+
+#edit-search-block-form--2 {
+    width: 226px;
+    height: 17px;
+    border: 0px;
+    background: url(../img/text-search.png) no-repeat;
+    font-size: 12px;
+    font-family: Arial;
+    color: #fff;
+    padding-left: 3px;
+    padding-top: 2px;
+}
+
+.page-node-107 .title_blue_one,
+.page-node-118 .title_blue_one {
+    display: none;
+}
+
+/*
+* MEMBERS ADMIN VIEW
+*/
+
+/*.view-id-all_membership_directory #edit-field-city-value-wrapper{
+    width: 238px;
+}*/
+
+.view-id-all_membership_directory .views-submit-button {
+    clear: left;
+}
+
+.view-all-membership-directory #edit-field-city-value-wrapper,
+.view-all-membership-directory #edit-field-type-of-member-value-wrapper {
+    clear: left;
+}
+
+#node-1 .fotorama__stage {
+    height: 367px !important;
+}
+
+#node-1 .fotorama__active .fotorama__dot,
+#node-1 .fotorama__nav__frame .fotorama__dot {
+    width: 12px !important;
+    height: 12px !important;
+}
+
+#node-1 .fotorama__nav--dots .fotorama__nav__frame {
+    width: 0;
+}
+
+#node-1 .fotorama__nav {
+    text-align: left;
+}
+
+/*
+STYLES FOR WEBFORMS
+*/
+
+.webform-client-form label {
+    color: #2A2A2A;
+    font-family: Georgia;
+    font-size: 16px;
+    font-weight: normal;
+    margin-bottom: 6px;
+}
+
+.webform-component {
+    margin-bottom: 13px;
+}
+
+.webform-component-textarea textarea {
+    height: 200px;
+    width: 420px;
+}
+
+.webform-component-email input,
+.webform-component-textfield input {
+    width: 270px;
+}
+
+.submitted {
+    display: none;
+}
+
+.node-webform .title_blue_one {
+    color: #00738D;
+    font-family: Georgia;
+    font-size: 27px;
+    font-style: italic;
+}
+
+.node-webform .field-name-body {
+    color: #00738F;
+    font-family: Georgia;
+    font-size: 16px;
+}
+
+.node-webform .field-name-body a {
+    color: #00738F;
+    font-family: Georgia;
+    font-size: 16px;
+    text-decoration: underline;
+}
+
+.webform-component-markup {
+    color: #00738F;
+    font-family: Georgia;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 26px;
+}
+
+/***** Vote webform ****/
+
+#node-540 .webform-client-form label{
+    font-family: 'allerregular';
+}
+
+#node-540  .webform-client-form .webform-component > label{
+    font-weight: bold;
+}
+
+/*****MAIN EVENTS *****/
+
+.main_events .view-eventes {
+    width: 711px;
+}
+
+.main_events .view-content, .main_events .view-empty {
+    background-color: #EFEFEF;
+    padding: 13px;
+    float: left;
+    width: 685px;
+    font-family: 'allerbold';
+    margin-bottom: 35px;
+}
+
+.main_events .title_blue_one {
+    color: #00738D;
+    font-size: 27px;
+    padding-left: 0px;
+    display: block;
+    padding-bottom: 48px;
+    padding-top: 0px;
+}
+
+.main_events .view-header .title_blue_one {
+    font-weight: bold;
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #41738D;
+    padding: 0px;
+    padding-left: 13px;
+    float: left;
+
+}
+
+.main_events .views-field {
+    float: left;
+    color: #464646;
+    font-family: 'allerregular';
+}
+
+.main_events .views-field-nothing {
+    font-family: 'allerbold';
+    font-size: 16px;
+}
+
+.main_events a {
+    color: #41738D;
+    font-size: 11px;
+}
+
+.main_events .views-field-title a, .main_events .views-field-title {
+    font-size: 20px;
+    color: #00738F;
+    font-family: 'allerregular';
+}
+
+.page-node-143 .region-sidebar-first, .node-type-event .region-sidebar-first {
+    display: none;
+}
+
+.node-type-event #custom_text, .node-type-event #date_event {
+    display: none;
+}
+
+/*********** National conference******/
+
+.main_events .view-display-id-national_conference_block .views-field {
+    float: left;
+    width: 440px;
+}
+
+.main_events .view-display-id-national_conference_block .views-field-field-imagen-event {
+    margin-right: 35px;
+    width: 210px;
+}
+
+
+
+/*********** Regional Retreats******/
+
+.main_events .view-display-id-regional_retreats_block .views-row, .main_events .view-display-id-webinars_block .views-row {
+    float: left;
+    width: 317px;
+}
+
+.main_events .view-display-id-regional_retreats_block .views-row.views-row-odd, .main_events .view-display-id-webinars_block .views-row.views-row-odd {
+    padding-right: 25px;
+    border-right: solid #00738D 1px;
+}
+
+.main_events .view-display-id-regional_retreats_block .views-row.views-row-even, .main_events .view-display-id-webinars_block .views-row.views-row-even {
+    padding-left: 25px;
+}
+
+.main_events .view-display-id-regional_retreats_block .views-field, .main_events .view-display-id-webinars_block .views-field {
+    width: 100%;
+}
+
+.main_events .view-display-id-regional_retreats_block .views-field-view-node a, .main_events .view-display-id-webinars_block .views-field-view-node a {
+    font-size: 11px;
+    color: #00738D;
+}
+
+/*****SPONSORS ****/
+
+.sponsors {
+    float: left;
+    padding-left: 13px;
+}
+
+.sponsors .title {
+    color: #41738D;
+    font-size: 20px;
+    font-family: Georgia;
+    font-style: italic;
+    font-weight: bold;
+
+}
+
+/****** block-menu-block-1* **/
+
+#block-menu-block-1 h2 {
+    display: none;
+}
+
+.region-sidebar-first {
+    float: left;
+    width: 239px;
+}
+
+.region-sidebar-first ul {
+    margin-right: 40px;
+    padding: 0px;
+    margin-top: 95px;
+}
+
+.region-sidebar-first li, .region-sidebar-first ul li.leaf {
+    list-style: none;
+    text-align: right;
+    padding: 0px;
+    margin: 0px;
+}
+
+.region-sidebar-first li a {
+    font-size: 10px;
+    text-transform: uppercase;
+    font-family: InterstateRegular;
+    font-weight: bold;
+
+}
+
+#content.sidebar-first .region-content {
+    width: 711px;
+}
+
+/******EVENTS FULL VIEW *****/
+
+.node-event {
+    width: 711px;
+}
+
+.node-event #short_description_event {
+    width: 711px;
+}
+
+.node-event #short_description_event {
+    color: #6c6963;
+    line-height: 22px;
+    float: left;
+
+}
+
+.node-event #date_event, .node-event #custom_text, .node-event #city_state {
+    font-size: 20px;
+    color: #00738F;
+    line-height: 24px;
+    font-family: Georgia;
+    font-weight: bold;
+}
+
+/*****************EVENTS VIEWS *********************/
+
+.page-national-conference .region-content,
+.page-regional-retreats .region-content,
+.page-webinars .region-content {
+    width: 711px;
+}
+
+.page-national-conference .views-field-field-imagen-event.views-field,
+.page-regional-retreats .views-field-field-imagen-event.views-field,
+.page-webinars .views-field-field-imagen-event.views-field {
+    width: 210px;
+    margin-right: 20px;
+}
+
+.page-national-conference .views-row,
+.page-regional-retreats .views-row,
+.page-webinars .views-row {
+    float: left;
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #EFEFEF;
+}
+
+.page-national-conference .views-field,
+.page-regional-retreats .views-field,
+.page-webinars .views-field {
+    float: left;
+    width: 440px;
+}
+
+.page-national-conference .button_event_action,
+.page-national-conference .views-field-views-conditional-1 a,
+.page-regional-retreats .button_event_action,
+.page-regional-retreats .views-field-views-conditional-1 a,
+.page-webinars .button_event_action,
+.page-webinars .views-field-views-conditional-1 a {
+    width: 96px;
+    padding: 0 0 0 5px;
+    background-color: transparent;
+    color: #41738D;
+    font-family: 'allerbold';
+    text-transform: uppercase;
+    font-size: 11px;
+}
+
+.page-national-conference .view-header,
+.page-regional-retreats .view-header,
+.page-webinars .view-header {
+    padding-bottom: 30px;
+}
+
+/**** INVOICES *****/
+#view-invoices {
+    padding-bottom: 25px;
+    width: 952px;
+    margin: 0px auto;
+}
+
+#view-invoices table {
+    width: 100%;
+}
+
+#view-invoices th {
+    border: none;
+    text-align: left;
+    color: #235383;
+    font-size: 18px;
+    padding-bottom: 8px;
+}
+
+#view-invoices tbody {
+    border-bottom: none;
+    border-color: transparent;
+    border-spacing: 0px;
+}
+
+#view-invoices td {
+    background: none;
+    border: none;
+    padding-bottom: 5px;
+    padding-right: 30px;
+}
+
+#view-invoices tr.even, #view-invoices tr.odd {
+    border: none;
+    background: none;
+}
+
+#view-invoice-detail label {
+    display: inline-block;
+}
+
+#view-invoice-detail .content_item {
+    display: inline-block;
+    line-height: 27px;
+}
+
+#block-search-form {
+    display: none;
+}
+
+/******* Cuttin Edge *****/
+
+li a.active, li a.active-trail {
+    color: #000;
+}
+
+.block_cutting {
+    width: 100%;
+    background-color: #EFEFEF;
+    float: left;
+    margin-bottom: 10px;
+    height: 241px;
+}
+
+#body_cutting {
+    float: left;
+    width: 100%;
+}
+
+#image_block {
+    float: left;
+}
+
+#description_block {
+    float: left;
+    padding: 25px 20px 0px 20px;
+    width: 311px;
+}
+
+.node-cutting-edge a.block_cutting {
+    font-family: 'allerregular';
+    color: #6c6963;
+    line-height: 20px;
+}
+
+#title_block {
+    font-size: 20px;
+    color: #00738F;
+    font-family: 'allerregular';
+}
+
+#description_block ul {
+    padding-left: 20px;
+    margin: 0px;
+}
+
+#description_block li {
+    padding: 0px;
+    margin: 0px;
+}
+
+#widgets_cutting {
+    float: left;
+    margin-bottom: 50px;
+}
+
+#widgets_cutting a {
+    float: left;
+    width: 320px;
+    font-size: 20px;
+    color: #00738F;
+    font-family: 'allerregular';
+    background-color: #EFEFEF;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+#widgets_cutting img {
+    float: left;
+    margin-bottom: 15px;
+}
+
+.title_link {
+    float: left;
+    width: 320px;
+    padding-left: 8px;
+}
+
+#description_text_block p {
+    line-height: 12px;
+}
+
+#widgets_cutting .even {
+    margin-right: 10px;
+
+}
+
+/********  New Code *******/
+
+#widgets_sponsorhip a {
+    border: 2px solid #C0C0C0;
+    padding: 4px;
+    display: inline-block;
+    margin-right: 5px;
+    margin-top: 5px;
+}
+
+/* mass email*/
+#aaap-mass-form #edit-message-format, #aaap-mass-form .wysiwyg-toggle-wrapper {
+    display: none;
+}
+
+#aaap-mass-form .form-item, #aaap-mass-form #edit-attach {
+    margin-bottom: 20px;
+}
+
+.page-mass-email #content .content {
+    width: 500px;
+}
+
+.page-mass-email .title_blue_one {
+    padding-bottom: 25px;
+    padding-top: 0;
+}
+
+#aaap-mass-form {
+    padding-top: 20px;
+
+}
+
+.margin-close{
+    margin-top: -26px!important;
+    margin-bottom: 40px!important;
+}
+
+.field-name-field-renewing.field-widget-options-select{
+    margin-top: 32px!important;
+}
+
+.field-name-field-please-specify-if-someone{
+    margin-bottom: 32px!important;
+}
+
+#block-ajax-register-ajax-register-block{
+    display: none;
+}
+
+//  +=============================+
+//  | Modulo <aaap_conference>    |
+//  +=============================+
+
+
+.mod-info a {
+    color: #444444;
+    text-decoration: none;
+}
+
+.btn {
+    display: inline-block;
+    margin-bottom: 0;
+    font-weight: normal;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    border-radius: 4px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    box-shadow: none;
+    border: none;
+}
+
+.btn-sm{
+    padding: 5px 10px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px;  
+    box-shadow: none;
+    border: 1px solid #333333;
+}
+
+.btn-xs{
+    padding: 1px 5px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px;
+}
+
+.btn-danger {
+    color: #ffffff;
+    background-color: #db3c35;
+    border-color: #d12d25;
+}
+
+.btn-danger .txt-btn{
+    color: #ffffff; 
+}
+
+.btn-danger .txt-btn{
+    color: #ffffff; 
+}
+
+.btn-success {
+    color: #ffffff;
+    background-color: #5cb85c;
+    border-color: #4cae4c;
+}
+
+.btn-default {
+    color: #333333;
+    background-color: #ffffff;
+    border-color: #cccccc;
+}
+
+.btn-info {
+    color: #ffffff;
+    background-color: #4584ba;
+    border-color: #3e77a7;
+}
+
+.panel-title{
+    border: none;
+    text-align: left;
+    color: #235383;
+    font-size: 18px;
+    padding-bottom: 8px;
+}
+
+.col-lg-12 {
+    width: 100%;
+    float: left;
+}
+
+.mod-info {
+    border: 1px solid #e6e4dd;
+    margin-bottom: 15px;
+    margin-top: 15px;
+}
+
+.titulo-box {
+    background-color: #f7f5ef;
+    padding: 0 10px;
+    display: block;
+    height: auto;
+    overflow: hidden;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #e6e4dd;
+}
+
+.titulo-box h2 {
+    float: left;
+    margin: 0px;
+    padding: 13px 0 0px 0;
+    display: block;
+    font-family: 'allerbold';
+    color: #41738D;
+    font-size: 16px;
+    text-decoration: none;
+    line-height: 16px;
+}
+
+.titulo-box .botones .btn .txt-btn {
+    display: inline;
+    margin-left: 5px;
+}
+
+.titulo-box .botones {
+    float: right;
+}
+
+.titulo-box .botones .btn {
+    margin: 8px 0 8px 10px;
+}
+
+.break {
+    border-left: 1px solid #fcfcfc;
+    border-right: 1px solid #ddd;
+    margin: -12px 10px -10px 10px;
+    padding: 12px 0px 22px 0px;
+}
+
+.content-box {
+    margin: 15px;
+    display: block;
+    height: auto;
+    overflow: hidden;
+}
+
+.content-box h3 {
+    font-size: 16px;
+    line-height: 18px;
+}
+
+.mod-info hr {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border: 0;
+    border-top: 1px solid #eeeeee;
+}
+
+.mod-info .alert-warning{
+    background-color: #f7f7f9;
+    border: 1px solid #e1e1e8;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+
+.content-box .img-left {
+    float: left;
+    margin-right: 5px;
+    margin-left: -10px;
+}
+
+.content-box .img-left {
+    width: 20%;
+    text-align: center;
+}
+
+.content-box .info-right {
+    width: 80%;
+    float: left;
+}
+
+.content-box .img-left .btn {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.content-box p {
+    font-size: 13px;
+    line-height: 16px;
+}
+
+.mod-info img {
+    vertical-align: middle;
+}
+
+.mod-info b, .mod-info strong {
+    font-weight: bold;
+    font-weight: bold;
+    color: #444444;
+}
+
+.mod-info .glyphicon-signal{
+    width: 32px;
+    height: 32px;
+    background: url('../img/icon-event.png') right no-repeat;
+    float: left;
+    background-position-y: -7px;
+}
+
+.mod-info .glyphicon-pencil{
+    width: 19px;
+    height: 19px;
+    background: url('../img/icon-edit.png') right no-repeat;
+    float: left;
+}
+
+#user-register-form fieldset.captcha{
+    clear: both;
+    width: 100%;
+    margin-bottom: 20px!important;
+    padding: 0px 15px 15px 15px;
+    background-color: #F9F9F9;
+    max-width: 480px;
+    display: block;
+    position: relative;
+    margin-left: 0px;
+}
+
+#user-register-form fieldset.captcha legend{
+    top: 19px;
+    display: block;
+    position: relative;
+}
+
+#user-register-form fieldset.captcha .fieldset-description{
+    float: left;
+    margin-left: 86px;
+    margin-top: 5px;
+    margin-bottom: 7px;
+    color: black;
+    font-family: Arial;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+#user-register-form fieldset.captcha img{
+    clear: both;
+    display: block;
+}
+
+#user-register-form #edit-actions, #user-register-form .form-actions{
+    clear: both; 
+}
+
+#user-register-form  .form-item-captcha-response{
+    clear: both;
+    width: 100%;
+}
+
+.field_sidebar_left_links_class{
+    width: 100%;
+    position: relative;
+    clear: both;
+}
+
+.field_sidebar_left_links_class #title_event{
+    margin: 0px auto 25px auto;
+    display: block;
+    clear: both;
+    width: 100%;
+    padding-left: 230px;
+}
+
+.page-conference .field_sidebar_left_links_class #title_event{
+    margin: 0px 0px 25px 0px;
+    display: block;
+    clear: both;
+    width: 100%;
+    padding-left: 0px;
+}
+
+.field_sidebar_left_links_class .sidebar_left_links{
+    position: relative;
+    display: inline-block;
+    width: 200px;
+    margin-right: 30px;
+    vertical-align: top;
+}
+
+.field_sidebar_left_links_class .sidebar_left_links ul,
+.field_sidebar_left_conference_class .content-left ul{
+    list-style: none;    
+}
+
+.field_sidebar_left_links_class .sidebar_left_links ul li,
+.field_sidebar_left_conference_class .content-left ul li{
+    list-style: none;
+    text-align: right;
+}
+
+.field_sidebar_left_links_class .sidebar_left_links ul li a,
+.field_sidebar_left_conference_class .content-left ul li a{
+    font-size: 10px;
+    text-transform: uppercase;
+    font-family: InterstateRegular;
+    font-weight: bold;
+}
+
+.field_sidebar_left_links_class #header_event {
+    background-color: #EFEFEF;
+    padding: 20px;
+    width: auto;
+    font-family: 'allerbold';
+    min-width: 635px;
+    float: none;
+    display: inline-block;
+}
+
+.field_sidebar_left_links_class .content {
+    display: block;
+    clear: both;
+    position: relative;
+    margin-left: 230px;
+}
+
+.field_sidebar_left_links_class .content #body_event {
+    padding-top: 0px;
+}
+
+.field_sidebar_left_conference_class{
+
+}
+
+.field_sidebar_left_conference_class .title_blue_one{
+    padding-left: 230px;
+}
+
+.field_sidebar_left_conference_class .content-left{
+    position: relative;
+    display: inline-block;
+    width: 200px;
+    margin-right: 30px;
+    vertical-align: top;
+}
+
+.field_sidebar_left_conference_class .content{
+    width: 635px;
+    min-width: 635px;
+    float: none;
+    display: inline-block;
+}
+
+.node-type-conference #short_description_event a{
+    color: #007490;
+}
+
+
+.view-display-id-national_conference_block{
+    font-size: 18px!important;
+    color: #007490!important;
+}
+
+.view-display-id-national_conference_block a{
+    font-size: 17px!important;
+    color: #007490!important;
+    line-height: 45px;
+}
+.view-display-id-national_conference_block p{
+    font-size: 17px!important; 
+    margin-bottom: 0px;
+}
+
+a.bold-link{
+    font-size: 18px!important; 
+    font-weight: normal!important; 
+    color: #007490!important; 
+    line-height: 24px!important; 
+}
+
+.page-event #title_event.title_blue_one {
+    margin: 0px auto 25px auto;
+    padding-left: 0px;
+}
+
+#short_description_event a.button_event_action{
+    background-color: #007490;
+    background-image: none;
+    border: 0 none;
+    border-radius: 5px;
+    color: #ffffff;
+    cursor: pointer;
+    font-family: Georgia;
+    font-size: 14px;
+    height: 24px;
+    width: 80px;
+    color: #ffffff!important;
+    text-decoration: none;
+    padding: 5px;
+    line-height: 20px;
+    font-family: 'allerregular'
+}
+
+.node-conference #content_header_event a.button_event_action{
+    font-size: 17px!important;
+}
+
+.event-webform .messages_status{
+    background: #007490;
+    padding: 10px;
+    color: #fff;
+    font-family: Georgia;
+    font-size: 17px;
+    font-weight: 300;
+}

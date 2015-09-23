@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the AASA Conference - Features feature.
+ */
+
+include_once 'aasa_conference_features.features.inc';

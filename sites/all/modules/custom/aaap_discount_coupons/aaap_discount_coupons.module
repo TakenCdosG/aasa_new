@@ -1,0 +1,237 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function aaap_discount_coupons_menu(){
+    
+    $items['discount_code/apply'] = array(
+      'title' => 'Add Discount Code',
+      'access arguments' => array('access content'),
+      'page callback' => 'aaap_discount_coupons_apply',
+      'access callback' => TRUE,
+      'type' => MENU_CALLBACK,
+    );  
+    
+    $items['discount_code/remove'] = array(
+      'title' => 'Remove Discount Code',
+      'access arguments' => array('access content'),
+      'page callback' => 'aaap_discount_coupons_remove',
+      'access callback' => TRUE,
+      'type' => MENU_CALLBACK,
+    );  
+
+    return $items;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function aaap_discount_coupons_block_info() {
+    $blocks = array();
+    $blocks['aaap_discount_coupons'] = array(
+      'info' => t('Coupon discount form'),
+    );
+    return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function aaap_discount_coupons_block_view($delta) {
+    
+    if ($delta == 'aaap_discount_coupons') {
+        
+      if (is_numeric(arg(1))) {
+          $nid = arg(1);
+          drupal_add_js(array('aaap_discount_coupons' => array('nid'=> $nid)),'setting'); 
+      }
+      
+      $coupons = _uc_coupon_options_list(uc_coupon_session_validate(), TRUE);
+      $coupon_code = array();
+      foreach ($coupons as $code => $title) {
+          $coupon_code[] = $code;
+      }
+      
+      drupal_add_js(drupal_get_path('module', 'aaap_discount_coupons') . "/js/aaap_discount_coupons.js", array('scope' => 'footer', 'weight' => 5));
+      drupal_add_css(drupal_get_path('module', 'aaap_discount_coupons') . "/css/aaap_discount_coupons.css");
+      
+      $block = array(
+        'subject' => t('Coupon discount'),
+        'content' => theme('aaap_discount_coupons_form', array('codes' => $coupon_code)),//drupal_get_form('aaap_discount_coupons_form'),
+      );
+      return $block;
+    }
+}
+
+/**
+ * Implements hook_theme().
+ * 
+ *
+ * @param $context
+ *     Where the form is to appear: 'cart', 'block' or 'checkout'
+ * @param $ajax
+ *     The #ajax array to be applied to all buttons, or FALSE for a non-ajax-enabled form.
+ */
+function aaap_discount_coupons_theme($existing, $type, $theme, $path) {
+  return array(
+    'aaap_discount_coupons_form' => array(
+      'variables' => array('codes' => NULL),
+      'template' => 'templates/aaap-discount-coupons-form',
+    ), 
+  );
+}
+
+/*
+ *  Submit handler for the aaap_discount_coupons form.
+ */
+function aaap_discount_coupons_apply(){
+    
+    $code = strtoupper(trim(check_plain($_POST['code'])));
+    $nid = check_plain($_POST['nid']);
+
+    // Create Response
+    $response = new stdClass();
+    $response->status = FALSE;
+    $response->message = NULL;
+    $response->message = '';
+    $validation = TRUE;
+  
+    if (!empty($code) && !empty($nid)) {
+        
+        $order = new stdClass();
+        $order->products = uc_cart_get_contents();
+      
+        if(!(count($order->products)>0)){
+            
+            $node_discount_code = new stdClass();
+            $node_discount_code->type = 'discount_code';
+            $node_discount_code->status = 1;
+            $node_discount_code->title = "Temporal Node For Discount Code";
+            $node_discount_code->price = 0;
+            $node_discount_code->sell_price = 0;
+            node_save($node_discount_code);
+            //-> Empties a cart of its contents.
+            uc_cart_empty(uc_cart_get_id());
+            //-> Adds an item to a user's cart.
+            uc_cart_add_item($node_discount_code->nid, $qty = 1, $data = array(), $cid = NULL, $msg = FALSE, $check_redirect = TRUE, $rebuild = TRUE);
+            
+        }
+        $coupon = uc_coupon_validate($code, $order = NULL, $account = NULL); //  Validate a coupon, and optionally calculate the order discount.
+        if ($coupon->valid) {
+            // Process valid coupons.
+            if(!is_already_applied($code)){
+                uc_coupon_session_add($code, 'submit');
+                //$mockup = '<div class="messages status"> <h2 class="element-invisible">Status message</h2>The '.$code.' code has been applied to your order.<br/><small><a class="red discount-coupon-remove" id="discount-coupon-remove" href="javascript:void(0);"> Remove Discount Code of this order.</a></small></div>'; 
+                $mockup = '<div class="box-coupon" id="box-coupon-'.$code.'">Discount Code '.$code.' <small><a class="red discount-coupon-remove" id="discount-coupon-remove" data-code="'.$code.'" href="javascript:void(0);"> Remove</a></small></div>';
+                $response->message = $mockup;
+                $response->status = TRUE;
+           }else{
+                $mockup = '<div class="messages error"> <h2 class="element-invisible">Error message</h2>This discount code is already applied to your order.</div>';
+                $response->message = $mockup; 
+           }
+        }else{
+            
+            if(isset($node_discount_code->nid)){
+                node_delete($node_discount_code->nid);
+            }  
+            // Process invalid coupons.
+            // For new coupon submissions, just issue an error and remove from session.
+            //drupal_set_message($coupon->message, 'error');
+            $mockup = '<div class="messages error"> <h2 class="element-invisible">Error message</h2>'.$coupon->message.'</div>';
+            $response->message = $mockup;
+            uc_coupon_session_clear($code);
+        }
+        
+    }else{
+       $mockup = '<div class="messages error"> <h2 class="element-invisible">Error message</h2>Please enter a valid code</div>';
+       $response->message = $mockup;
+    }
+    
+    echo drupal_json_encode($response);
+
+}
+
+
+function aaap_discount_coupons_remove(){
+    
+    $code = strtoupper(trim(check_plain($_POST['code'])));
+    $nid = check_plain($_POST['nid']);
+    
+    // Create Response
+    $response = new stdClass();
+    $response->status = FALSE;
+    $response->hide_info = FALSE;
+    $response->message = '';
+    $validation = TRUE;
+    
+    $coupons = _uc_coupon_options_list(uc_coupon_session_validate(), TRUE);
+    $count_coupons = count($coupons);
+    if($count_coupons>0){
+        if($count_coupons>1){
+            $coupon_code = $code;
+            uc_coupon_session_clear($coupon_code);
+            module_invoke_all('uc_coupon_remove', uc_coupon_find($coupon_code));
+            $response->status = TRUE;
+            $response->message = 'Discount Code has been removed from your order';
+        }else{
+            $order = new stdClass();
+            $order->products = uc_cart_get_contents();
+            if(count($order->products)>0){
+                foreach ($order->products as $delta => $product) {
+                    if($product->data["module"] == "uc_product"){
+                        $nid_to_remove[] = $product->nid;
+                    }elseif($product->data["module"] == "uc_coupon"){
+                        $coupon_code = $product->data["code"];
+                        uc_coupon_session_clear($coupon_code);
+                        module_invoke_all('uc_coupon_remove', uc_coupon_find($coupon_code));
+                    }
+                }
+                if(count($nid_to_remove)>0){
+                    foreach ($nid_to_remove as $key => $nid) {
+                           $query = db_select('node', 'n');
+                           $result = $query->fields('n', array('type'))->condition('nid', $nid, '=')->range(0, 1)->execute();
+                           foreach ($result as $row) {
+                               $type = $row->type;
+                               if($type == 'discount_code'){
+                                    node_delete($nid);
+                               }
+                           }
+                    }
+                }
+            }
+            $coupons = _uc_coupon_options_list(uc_coupon_session_validate(), TRUE);
+            if(count($coupons)>0){
+                $response->message = 'Error removing discount code';
+            }else{
+               $response->message = 'Discount Code has been removed from your order';
+               $response->status = TRUE;
+               $response->hide_info = TRUE;
+            }
+        }
+    }else{
+       $response->message = 'Discount Code has been removed from your order';
+       $response->status = TRUE;
+    }
+ 
+    echo drupal_json_encode($response);
+    
+}
+
+/*
+ *  Function to check if an coupon is alreay applied
+ */
+function is_already_applied($validate_code = ""){
+      if(empty($validate_code)){
+          return FALSE;
+      }else{
+            $coupons = _uc_coupon_options_list(uc_coupon_session_validate(), TRUE);
+            $coupon_code = "";
+            foreach ($coupons as $code => $title) {
+                if($validate_code == $code){
+                    return TRUE;
+                }
+            }   
+      }
+      return FALSE;
+}

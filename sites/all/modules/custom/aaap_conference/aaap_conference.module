@@ -1,0 +1,3674 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function aaap_conference_menu() {
+    $items['conference/%/registration'] = array(
+        'page callback' => '_render_conference_webform',
+        'page arguments' => array(1),
+        'access callback' => TRUE,
+        'title' => 'Event Report'
+    );
+
+    $items['conference/%/registration/%/edit'] = array(
+        'page callback' => '_conference_webform_submission_page',
+        'page arguments' => array(1, 3, 'form'),
+        'access callback' => TRUE,
+        'title' => 'Event Registration Edit'
+    );
+
+    $items['view/conference'] = array(
+        'page callback' => '_conference_view_edit_registration',
+        'access callback' => TRUE,
+        'title callback' => t('View/Edit National Conference Registration'),
+        'type' => MENU_CALLBACK,
+    );
+
+    $items['view/%/conference/%'] = array(
+        'page callback' => '_conference_view_edit_individual_registration',
+        'access callback' => TRUE,
+        'page arguments' => array(1, 3),
+        'title callback' => t('View/Edit National Conference Registration'),
+        'type' => MENU_CALLBACK,
+    );
+
+    $items['admin/manage-conferences'] = array(
+        'page callback' => '_conference_manage_conferences',
+        'access callback' => TRUE,
+        'title callback' => t('Manage Conferences Registration'),
+        'type' => MENU_CALLBACK,
+    );
+
+    $items['admin/conference/%/report'] = array(
+        'page callback' => '_conference_reports',
+        'page arguments' => array(2),
+        'access callback' => TRUE,
+        'title callback' => t('Manage Conferences Registration'),
+        'type' => MENU_CALLBACK,
+    );
+
+    $items['admin/conference/%/csv'] = array(
+        'page callback' => '_conference_export_submissions_to_csv',
+        'page arguments' => array(2),
+        'access callback' => TRUE,
+        'title callback' => t('Manage Conferences Registration'),
+        'type' => MENU_CALLBACK,
+    );
+
+    return $items;
+}
+
+/*
+ * Function to custom validate of webform
+ */
+
+function aaap_conference_webform_client_form_validate($form, &$form_state) {
+    module_load_include('inc', 'webform', 'includes/webform.submissions');
+    if (isset($form_state["values"]["submitted"]["i_want_to_add_a_free_membership"]["i_want_to_add_a_free_membership"])) {
+
+        $i_want_to_add_a_free_membership = $form_state["values"]["submitted"]["i_want_to_add_a_free_membership"]["i_want_to_add_a_free_membership"];
+        $user_validation = FALSE;
+        if (is_string($i_want_to_add_a_free_membership)) {
+            if ($i_want_to_add_a_free_membership == "i_want_to_add_a_free_membership") {
+                $user_validation = TRUE;
+            }
+        }
+
+        if ($user_validation) {
+            $email_address = $form_state["values"]["submitted"]["email_address"];
+            $user_load_by_mail = user_load_by_mail($email_address);
+            if ($user_load_by_mail == FALSE) {
+                //-> Sucess.
+            } else {
+                form_set_error('street_address', 'Free Membership Application Request: This email is already associated with a membership account.');
+                return;
+            }
+        }
+    }
+
+    if (isset($form_state["values"]["submitted"]["email_address"]) && isset($form["#node"])) {
+        $node = $form["#node"];
+        if ($node->type == "conference") {
+            $email_address = $form_state["values"]["submitted"]["email_address"];
+            $nid = $node->nid;
+            //-> Query the required submission data.
+            $query = "SELECT `nid` nid, `sid` sid " .
+                    "FROM `webform_submitted_data` " .
+                    "WHERE `nid` = '$nid' " .
+                    "AND `cid` = 7 " .
+                    "AND `data` LIKE '$email_address' " .
+                    "LIMIT 1";
+            $result = db_query($query);
+            $row = $result->fetchObject();
+            $already_submitted = FALSE;
+
+            if (isset($row->sid) && isset($row->nid)) {
+                $nid = $row->nid;
+                $sid = $row->sid;
+                $submission = webform_get_submission($nid, $sid, $reset = FALSE);
+                $completed_submission = $submission->data[70][0];
+                if ($completed_submission == "FALSE") {
+                    //remove incomplete submission.
+                    webform_submission_delete($node, $submission);
+                    //-> Remove products nodes of this submission;
+                    $query = new EntityFieldQuery;
+                    $products_nodes = $query->entityCondition('entity_type', 'node')
+                            ->fieldCondition('field_nid', 'nid', $nid, '=')
+                            ->fieldCondition('field_sid', 'value', $sid, '=')
+                            ->entityCondition('bundle', 'national_conference_add_ons')
+                            ->execute();
+                    $nid_to_delete = array();
+                    foreach ($products_nodes as $key => $tmpNode) {
+                        $nid_to_delete[] = $tmpNode->nid;
+                    }
+                    if (count($nid_to_delete) > 0) {
+                        node_delete_multiple($nid_to_delete);
+                    }
+                    //-> Empties a cart of its contents.
+                    uc_cart_empty(uc_cart_get_id());
+                } else {
+                    $already_submitted = TRUE;
+                }
+            }
+
+            if ($already_submitted) {
+                //form_set_error('email_address', 'The value '.$email_address.' has already been submitted once for the Email Address field. You may have already submitted this form, or you need to use a different value.');
+                //return;
+            }
+        }
+    }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function aaap_conference_form_alter(&$form, &$form_state, $form_id) {
+
+
+    if (isset($form['#node']->type) && isset($form['submitted'])) {
+        if ($form['#node']->type == "conference") {
+            $webform_client_form_validate = $form['#validate'][0];
+            $form['#validate'] = array();
+            $form['#validate'][] = 'aaap_conference_webform_client_form_validate';
+            $form['#validate'][] = $webform_client_form_validate;
+            $sid = arg(1);
+            //die(var_dump($sid));
+            $edit = false;
+            if (isset($form["#submission"]->sid)) {
+                $edit = true;
+            }
+
+            hide($form['submitted']['completed_submission']);
+            hide($form['submitted']['total_paid']);
+
+            //  +==============================================+
+            //  | Hide Free membership || Hide Discount Codes  |
+            //  +==============================================+
+            if (isset($form['#node']->field_hide_free_membership['und'][0]['value'])) {
+                $field_hide_free_membership = $form['#node']->field_hide_free_membership['und'][0]['value'];
+                if ($field_hide_free_membership == "1") {
+                    hide($form['submitted']['i_want_to_add_a_free_membership']);
+                }
+            }
+
+            if (isset($form['#node']->field_hide_discount_codes['und'][0]['value'])) {
+                $field_hide_discount_codes = $form['#node']->field_hide_discount_codes['und'][0]['value'];
+                if ($field_hide_discount_codes == "1") {
+                    hide($form['submitted']['discount_codes']);
+                }
+            }
+
+            //dpm($form);
+            //-> Todo: Validar que sea tambien un usuario activo.
+            $user_is_logged_in = user_is_logged_in();
+            $user_is_active_member = user_is_active_member(true);
+            $user_is_admin = user_is_admin();
+            $non_members = TRUE;
+            $members = FALSE;
+            if ($user_is_logged_in && $user_is_active_member) {
+                $non_members = FALSE;
+            }
+
+            if ($user_is_logged_in && $user_is_active_member && !$user_is_admin) {
+                $members = TRUE;
+            }
+
+            $messages_status = '';
+            $membership_form = TRUE;
+            if ($user_is_active_member || $user_is_admin) {
+                $membership_form = FALSE;
+            }
+
+            //hide($form['submitted']['completed_submission']);
+            //  +===========================================+
+            //  | Lock form to lock the form if necessary   |
+            //  +===========================================+
+            if (isset($form['#submission']->sid) && isset($form['#submission']->nid)) {
+                $sid = $form['#submission']->sid;
+                $nid = $form['#submission']->nid;
+
+                hide($form['submitted']['discount_codes']);
+
+
+                if ($members) {
+                    $lock_form = FALSE;
+                    //  +========================================================+
+                    //  | Looking for Services to be Removed on status Pending.  |
+                    //  +========================================================+
+                    $type = "national_conference_add_ons";
+                    $conference_nid = $nid;
+                    $submission_sid = $sid;
+                    //$field_transaction_type = "remove";
+                    $field_confirmed = "not-confirmed";
+                    $query = new EntityFieldQuery();
+                    $query->entityCondition('entity_type', 'node')
+                            ->entityCondition('bundle', $type)
+                            //->fieldCondition('field_transaction_type', 'value', $field_transaction_type, '=')
+                            ->fieldCondition('field_confirmed', 'value', $field_confirmed, '=')
+                            ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+                            ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+                            ->propertyOrderBy('created', 'DESC')
+                            ->range(0, 1);
+                    $result = $query->execute();
+                    if (isset($result['node'])) {
+                        $nids = array_keys($result['node']);
+                        $tmp_nid = $nids[0];
+                        $lock_form = TRUE;
+                    }
+                    $lock_form = FALSE;
+                    if ($lock_form) {
+                        //-> Lock the form.
+                        $form['submitted']['first_name']['#attributes']['disabled'] = 'disabled';
+                        $form['submitted']['last_name']['#attributes']['disabled'] = 'disabled';
+                        $form['submitted']['credentials']['#attributes']['disabled'] = 'disabled';
+                        $form['submitted']['title']['#attributes']['disabled'] = 'disabled';
+                        $form['submitted']['organization']['#attributes']['disabled'] = 'disabled';
+                        $form['submitted']['street_address']['#attributes']['disabled'] = 'disabled';
+                        $form['submitted']['city_state_zip']['#attributes']['disabled'] = 'disabled';
+                        $form['submitted']['email_address']['#attributes']['disabled'] = 'disabled';
+                        $form['submitted']['phone_number']['#attributes']['disabled'] = 'disabled';
+                        $form['submitted']['preferred_name_on_badge']['#attributes']['disabled'] = 'disabled';
+                        $form['submitted']['i_am_a_veteran_attendee_and_am_willing_to_serve_as_an_aasa_buddy_to_new_attendee']['#attributes']['disabled'] = 'disabled';
+                        $form['submitted']['i_am_a_first_time_attendee_and_wish_to_be_paired_with_an_aasa_buddy']['#attributes']['disabled'] = 'disabled';
+                        $form['submitted']['hot_topics']['#attributes']['disabled'] = 'disabled';
+                        $form['submitted']['general_sessions']['#attributes']['disabled'] = 'disabled';
+                        $form['submitted']['precourse']['#attributes']['disabled'] = 'disabled';
+                        $form['submitted']['networking_events_celia_king_dinner']['#attributes']['disabled'] = 'disabled';
+                        $form['submitted']['networking_events_celia_king_dinner_guest']['#attributes']['disabled'] = 'disabled';
+                        $form['submitted']['networking_events_dinner_groups']['#attributes']['disabled'] = 'disabled';
+                        $form['submitted']['networking_events_golf_outing']['#attributes']['disabled'] = 'disabled';
+                        $form['submitted']['mentoring_program']['#attributes']['disabled'] = 'disabled';
+                        $form['submitted']['dietary_restrictions']['#attributes']['disabled'] = 'disabled';
+                        $form['submitted']['guest_name']['#attributes']['disabled'] = 'disabled';
+                        $form['submitted']['guest_dietary_restrictions']['#attributes']['disabled'] = 'disabled';
+                        $form['submitted']['payment_method']['#attributes']['disabled'] = 'disabled';
+                        $form['actions']['submit']['#attributes']['disabled'] = 'disabled';
+                        hide($form['actions']['submit']);
+
+                        $messages_status = '<div class="messages_status bg-warning">Notice: While you have current changes pending, you will not be able to edit your registration form.</div>';
+                        $messages_status .= '<h4 class="section_title">Background Information</h4>';
+                    }
+                }
+            }
+
+            //  +=====================================+
+            //  | Confirmed                           |
+            //  +=====================================+
+            if (!$user_is_admin) {
+                //HIDE CONFIRMED FIELD TO NORMAL USERS
+                hide($form['submitted']['confirmed']);
+            }
+
+            $path_to_css = drupal_get_path('module', 'aaap_conference') . '/css/webform.css';
+            $path_to_js = drupal_get_path('module', 'aaap_conference') . '/js/webform.js';
+            $hr = '<div><hr/></div>';
+
+            $form['#attached']['css'][1] = $path_to_css;
+            $form['#attached']['js'][1] = $path_to_js;
+            $form['#attributes']['class'][] = "formulario-conferencias";
+            if (empty($messages_status)) {
+                $messages_status = '<div class="messages_status">For Members: Remember to sign-in before completing registration to ensure that you receive the discounted member registration rate.</div>';
+                $messages_status .= '<h4 class="section_title">Background Information</h4>';
+            }
+
+            $form['submitted']['first_name']['#prefix'] = $messages_status . '<div class="row"><div class="col-md-6">';
+            $form['submitted']['organization']['#suffix'] = '</div><div class="col-md-6">';
+            $form['submitted']['preferred_name_on_badge']['#suffix'] = '</div></div>';
+            // $form['submitted']['i_am_a_first_time_attendee_and_wish_to_be_paired_with_an_aasa_buddy']['#suffix'] = $hr;
+            $form['submitted']['hot_topics']['#prefix'] = '<div><hr/></div>' . '<p><span class="dark_blue">Hot Topics </span>(select one via radio buttons)</p>';
+            $form['submitted']['hot_topics']['#suffix'] = '<div><hr/></div>';
+            hide($form['submitted']['hot_topics']);
+
+            //  +=====================================+
+            //  | General Sessions                    |
+            //  +=====================================+
+            $event_fee = 0;
+            $early_bird_date_over = $form['#node']->field_early_bird_date_over["und"][0]["value"];
+            //  | Check if early_bird_date is expired
+            $now = new DateTime();
+            $expiryDate = new DateTime($early_bird_date_over);
+            $isExpired = $now > $expiryDate;
+
+            $members_price = 0;
+            $non_members_price = 0;
+            if ($isExpired) {
+                $members_price = $form['#node']->field_member_registration_fee["und"][0]["value"];
+                $non_members_price = $form['#node']->field_non_member_registration_fe["und"][0]["value"];
+                $members_only_descripcion = "Early bird registration is available for a limited time. Register before August 17 to take advantage of your discount.<br/>";
+                $non_members_descripcion = "Non-member attendees are eligible for discounted registration for a limited time. Register before August 17 to enjoy your discounted rate.<br/>";
+            } else {
+                $members_price = $form['#node']->field_member_reg_early_bird_fee["und"][0]["value"];
+                $non_members_price = $form['#node']->field_non_member_early_bird_fee["und"][0]["value"];
+                $members_only_descripcion = "Early bird registration is available for a limited time. Register before August 17 to take advantage of your discount.<br/> <i>The members only rate will increase to $625 after August 17</i>";
+                $non_members_descripcion = "Non-member attendees are eligible for discounted registration for a limited time. Register before August 17 to enjoy your discounted rate.<br/> <i> The non-member  rate will increase to $750 after August 17</i>";
+            }
+
+            $members_only_price = "<span class='select_price'>$$members_price.00</span>";
+            $members_only_copy = "<div class='members_only_wrappers'><div class='members_only_copy select_copy'>" . $members_only_price . $members_only_descripcion . "</div></div>";
+
+            $non_members_only_price = "<span class='select_price'>$$non_members_price.00</span>";
+            $non_members_only_copy = "<div class='non_members_only_wrappers'><div class='non_members_only_copy select_copy'>" . $non_members_only_price . $non_members_descripcion . "</div></div>";
+
+            if ($user_is_admin) {
+                $form['submitted']['general_sessions']['#prefix'] = "<div class='box'>";
+                $form['submitted']['general_sessions']['#suffix'] = $members_only_copy . $non_members_only_copy;
+                $form['submitted']['confirmed']['#prefix'] = "<div class='highlight'>";
+                //$form['submitted']['confirmed']['#suffix'] =  "</div></div>".$hr; 
+                $form['submitted']['confirmed_email']['#suffix'] = "</div></div>" . $hr;
+                $form['submitted']['confirmed_email']['#title'] = "";
+            } else {
+
+                $form['submitted']['general_sessions']['#prefix'] = '<div><hr/></div>';
+                $form['submitted']['general_sessions']['#suffix'] = $members_only_copy . $non_members_only_copy . $hr;
+            }
+            if ($non_members) {
+                $form['submitted']['general_sessions']['#attributes']['disabled'] = TRUE;
+            } else {
+                $form['submitted']['general_sessions']['#default_value'] = 'members_only';
+                $form['submitted']['general_sessions']['#attributes']['disabled'] = TRUE;
+            }
+
+            //  +=====================================+
+            //  | Field Precourse                     |
+            //  +=====================================+
+
+            $precourse_price_value = $form['#node']->field_precourse_naw_price['und'][0]['value'];
+            if (empty($precourse_price_value)) {
+                $precourse_price_value = 0;
+            }
+
+            $precourse_price = "<span class='select_price'>$$precourse_price_value.00</span>";
+            $field_precourse_naw_descripcion = $form['#node']->field_precourse_naw_descripcion['und'][0]['value'];
+            $precourse_copy = "<div class='precourse_wrappers'><div class='precourse_copy select_copy'>" . $precourse_price . $field_precourse_naw_descripcion . "</div></div>";
+
+
+            if ($user_is_admin) {
+                $form['submitted']['precourse']['#prefix'] = "<div class='box'>";
+                $form['submitted']['precourse']['#suffix'] = $precourse_copy;
+                $form['submitted']['confirmed_new_administrator_workshop']['#prefix'] = "<div class='highlight'>";
+                //$form['submitted']['confirmed_remove_new_administrator_workshop']['#suffix'] = "</div></div>".$hr; 
+                $form['submitted']['confirmed_new_administrator_workshop_email']['#title'] = "";
+                $form['submitted']['confirmed_new_administrator_workshop_email']['#suffix'] = "</div></div>" . $hr;
+                //$form['submitted']['confirmed_new_administrator_workshop']['#suffix'] = $hr;  
+            } else {
+                $form['submitted']['precourse']['#suffix'] = $precourse_copy . $hr;
+            }
+
+            //-> Check - If is need to disable
+            //  +=====================================+
+            //  | Field Networking Events             |
+            //  +=====================================+
+            //$form['submitted']['networking_events_celia_king_dinner']['#prefix'] = $hr;  
+            $form['submitted']['networking_events_celia_king_dinner']['#title'] = $form['#node']->field_networking_ckd_label['und'][0]['value'];
+            $celia_king_dinner_price = "<span class='select_price'><i>" . $form['#node']->field_networking_ckd_top_label['und'][0]['value'] . "</i></span>";
+            $field_networking_ckd_descripcion = $form['#node']->field_networking_ckd_descripcion['und'][0]['value'];
+            $celia_king_dinner_copy = "<div class='celia_king_dinner_wrappers'><div class='celia_king_dinner_copy select_copy'>" . $celia_king_dinner_price . $field_networking_ckd_descripcion . "</div></div>";
+            $form['submitted']['networking_events_celia_king_dinner']['#title'] = "Networking Events";
+            $form['submitted']['networking_events_celia_king_dinner']['#suffix'] = $celia_king_dinner_copy;
+
+
+            $field_networking_ckdg_price = $form['#node']->field_networking_ckdg_price['und'][0]['value'];
+            if (empty($field_networking_ckdg_price)) {
+                $field_networking_ckdg_price = 0;
+            }
+            $celia_king_dinner_guest_price = "<span class='select_price'><i>$$field_networking_ckdg_price.00</i></span>";
+            $field_networking_ckdg_descripcio = $form['#node']->field_networking_ckdg_descripcio['und'][0]['value'];
+            $celia_king_dinner_guest_copy = "<div class='celia_king_dinner_guest_wrappers'><div class='celia_king_dinner_guest_copy select_copy'>" . $celia_king_dinner_guest_price . $field_networking_ckdg_descripcio . "</div></div>";
+            $form['submitted']['networking_events_celia_king_dinner_guest']['#title'] = ""; //$form['#node']->field_networking_ckdg_label['und'][0]['value'];
+            $form['submitted']['networking_events_celia_king_dinner_guest']['#suffix'] = $celia_king_dinner_guest_copy;
+            if ($user_is_admin) {
+                $form['submitted']['networking_events_celia_king_dinner_guest']['#prefix'] = "<div class='box'>";
+                $form['submitted']['confirmed_celia_king_dinner_guest']['#prefix'] = "<div class='highlight'>";
+                //$form['submitted']['confirmed_remove_celia_king_dinner_guest']['#suffix'] =  "</div></div>";
+                $form['submitted']['confirmed_celia_king_dinner_guest_email']['#title'] = "";
+                $form['submitted']['confirmed_celia_king_dinner_guest_email']['#suffix'] = "</div></div>";
+
+                $form['submitted']['networking_events_dinner_groups']['#prefix'] = "<div class='box'>";
+                $form['submitted']['confirmed_dinner_groups']['#prefix'] = "<div class='highlight'>";
+                //$form['submitted']['confirmed_remove_dinner_groups']['#suffix'] =  "</div></div>";
+                $form['submitted']['confirmed_dinner_groups_email']['#title'] = "";
+                $form['submitted']['confirmed_dinner_groups_email']['#suffix'] = "</div></div>";
+
+                $form['submitted']['networking_events_golf_outing']['#prefix'] = "<div class='box'>";
+                $form['submitted']['confirmed_golf_outing']['#prefix'] = "<div class='highlight'>";
+                //$form['submitted']['confirmed_remove_golf_outing']['#suffix'] =  "</div></div>".$hr;
+                $form['submitted']['confirmed_golf_outing_email']['#title'] = "";
+                $form['submitted']['confirmed_golf_outing_email']['#suffix'] = "</div></div>" . $hr;
+            }
+
+
+            //-> Dinner Groups Options.
+
+            $field_networking_dg_price = $form['#node']->field_networking_dg_price['und'][0]['value'];
+            if (empty($field_networking_dg_price)) {
+                $field_networking_dg_price = 0;
+            }
+
+            //hide($form['submitted']['networking_events_dinner_groups']['#options']['dinner_groups']);
+            $str_labels = "";
+            if (isset($form['#node']->field_label_d_g_option_1['und'][0]['value'])) {
+                $html_label = $form['#node']->field_label_d_g_option_1['und'][0]['value'];
+                $str_label = '<div relid="edit-submitted-networking-events-dinner-groups-1">' . $html_label . '</div>';
+                $str_labels = $str_labels . $str_label;
+            }
+            if (isset($form['#node']->field_label_d_g_option_2['und'][0]['value'])) {
+                $html_label = $form['#node']->field_label_d_g_option_2['und'][0]['value'];
+                $str_label = '<div relid="edit-submitted-networking-events-dinner-groups-2">' . $html_label . '</div>';
+                $str_labels = $str_labels . $str_label;
+            }
+
+            if (isset($form['#node']->field_label_d_g_option_3['und'][0]['value'])) {
+                $html_label = $form['#node']->field_label_d_g_option_3['und'][0]['value'];
+                $str_label = '<div relid="edit-submitted-networking-events-dinner-groups-3">' . $html_label . '</div>';
+                $str_labels = $str_labels . $str_label;
+            }
+            $str_labels = "<div class='networking-events-dinner-groups-labels'>" . $str_labels . "</div>";
+
+            $field_dinner_groups_option_1 = "";
+            $str_prices = "";
+
+            if (isset($form['#node']->field_dinner_groups_option_1['und'][0]['value'])) {
+                $field_dinner_groups_option_1 = $form['#node']->field_dinner_groups_option_1['und'][0]['value'];
+                $label = $form['submitted']['networking_events_dinner_groups']['#options']['dinner_groups_option_1'];
+                $price_format = number_format((float) $field_dinner_groups_option_1, 2, '.', '');
+                $label_price = '<div relid="edit-submitted-networking-events-dinner-groups-1"><span class="select_price"> $' . $price_format . '</span></div>';
+                $form['submitted']['networking_events_dinner_groups']['#options']['dinner_groups_option_1'] = $label;
+                $str_prices = $str_prices . $label_price;
+            }
+
+            $field_dinner_groups_option_2 = "";
+            if (isset($form['#node']->field_dinner_groups_option_2['und'][0]['value'])) {
+                $field_dinner_groups_option_2 = $form['#node']->field_dinner_groups_option_2['und'][0]['value'];
+                $label = $form['submitted']['networking_events_dinner_groups']['#options']['dinner_groups_option_2'];
+                $price_format = number_format((float) $field_dinner_groups_option_2, 2, '.', '');
+                $label_price = '<div relid="edit-submitted-networking-events-dinner-groups-2"><span class="select_price"> $' . $price_format . '</span></div>';
+                $form['submitted']['networking_events_dinner_groups']['#options']['dinner_groups_option_2'] = $label;
+                $str_prices = $str_prices . $label_price;
+            }
+
+            $field_dinner_groups_option_3 = "";
+            if (isset($form['#node']->field_dinner_groups_option_3['und'][0]['value'])) {
+                $field_dinner_groups_option_3 = $form['#node']->field_dinner_groups_option_3['und'][0]['value'];
+                $label = $form['submitted']['networking_events_dinner_groups']['#options']['dinner_groups_option_3'];
+                $price_format = number_format((float) $field_dinner_groups_option_3, 2, '.', '');
+                $label_price = '<div relid="edit-submitted-networking-events-dinner-groups-3"><span class="select_price"> $' . $price_format . '</span></div>';
+                $form['submitted']['networking_events_dinner_groups']['#options']['dinner_groups_option_3'] = $label;
+                $str_prices = $str_prices . $label_price;
+            }
+
+            $str_prices = "<div class='networking-events-dinner-groups-prices'>" . $str_prices . "</div>";
+
+            $dinner_groups_price = "<span class='select_price'><i>$$field_networking_dg_price.00</i></span>";
+            $field_networking_dg_descripcion = $form['#node']->field_networking_dg_descripcion['und'][0]['value'];
+            $dinner_groups_copy = "<div class=''><div class='dinner_groups_copy select_copy'>" . $field_networking_dg_descripcion . "</div></div>";
+            ;
+            $form['submitted']['networking_events_dinner_groups']['#title'] = '<label class="option-label-dinner-groups" for="edit-submitted-networking-events-dinner-groups-1">Dinner Groups </label>' . $dinner_groups_copy;
+            $form['submitted']['networking_events_dinner_groups']['#suffix'] = $str_labels . $str_prices; //$dinner_groups_copy;
+
+            $field_networking_go_price = $form['#node']->field_networking_go_price['und'][0]['value'];
+            if (empty($field_networking_go_price)) {
+                $field_networking_go_price = 0;
+            }
+            $golf_outing_price = "<span class='select_price'><i>$$field_networking_go_price.00</i></span>";
+            $field_networking_go_descripcion = $form['#node']->field_networking_go_descripcion['und'][0]['value'];
+            $golf_outing_copy = "<div class='golf_outing_wrappers'><div class='golf_outing_copy select_copy'>" . $golf_outing_price . $field_networking_go_descripcion . "</div></div>";
+            $form['submitted']['networking_events_golf_outing']['#title'] = ""; //$form['#node']->field_networking_go_label['und'][0]['value'];
+            $form['submitted']['networking_events_golf_outing']['#suffix'] = $golf_outing_copy . $hr;
+
+            //$form['submitted']['networking_events']['#suffix'] = $celia_king_dinner_copy.$celia_king_dinner_guest_copy.$dinner_groups_copy.$golf_outing_copy.$hr;  
+            //  +=====================================+
+            //  | Field Mentoring Program             |
+            //  +=====================================+
+            if (isset($form['submitted']['mentoring_program'])) {
+                $member_attendee_paired_with_mentor_copy = "<div class='member_attendee_paired_with_mentor_wrappers'><div class='member_attendee_paired_with_mentor_copy select_copy'>We invite all new members and conference attendees to be matched with an AASA veteran for at least one meeting during the conference.  Information on matches will be sent in early October.</div></div>";
+                $member_attendee_serving_as_mentor_copy = "<div class='member_attendee_serving_as_mentor_wrappers'><div class='member_attendee_serving_as_mentor_copy select_copy'>We invite all veteran members and conference attendees to pair with a new member or attendee for at least one meeting during the conference.  Information on matches will be sent in early October.</div></div>";
+                $form['submitted']['mentoring_program']['#suffix'] = $member_attendee_paired_with_mentor_copy . $member_attendee_serving_as_mentor_copy . $hr;
+            }
+            //  +=====================================+
+            //  | Field Dietary Restrictions          |
+            //  +=====================================+
+            $form['submitted']['dietary_restrictions']['#title'] = '<p><span class="dark_blue">Dietary Restrictions </span></p>';
+            $dietary_restrictions_copy = "<div class='dietary_restrictions_wrappers'><div class='dietary_restrictions_copy select_copy'><i>Please note that every effort will be made to accomodate your dietary restrictions at the Celia King dinner. Conference meals offer a variety of options to appeal to all attendees.</div></div>";
+            $form['submitted']['dietary_restrictions']['#suffix'] = $dietary_restrictions_copy;
+            //$form['submitted']['dietary_restrictions']['#prefix'] = "";
+            //  +=====================================+
+            //  | Field Guest Dietary Restrictions    |
+            //  +=====================================+
+            //-> (radio buttons, multiple selections permitted)
+            $form['submitted']['guest_dietary_restrictions']['#title'] = '<p><span class="dark_blue">Guest Dietary Restrictions </span></p>';
+            $guest_dietary_restrictions_copy = "<div class='guest_dietary_restrictions_wrappers'><div class='guest_dietary_restrictions_copy select_copy'><i>Please note that every effort will be made to accommodate the dietary restrictions of your guest at the Celia King dinner.</i></div></div>";
+            $form['submitted']['guest_dietary_restrictions']['#suffix'] = $guest_dietary_restrictions_copy;
+
+            //  +=====================================+
+            //  | Free Membership Application         |
+            //  +=====================================+
+            if ($membership_form == FALSE) {
+                //  +==========================================+
+                //  | Lock Free Membership Application         |
+                //  +==========================================+
+                hide($form['submitted']['region']);
+                hide($form['submitted']['current_position']);
+                hide($form['submitted']['years_in_healthcare']);
+                hide($form['submitted']['highest_edu_degree']);
+                hide($form['submitted']['certifications']);
+                hide($form['submitted']['mgma_member']);
+                hide($form['submitted']['university']);
+                hide($form['submitted']['medical_school']);
+                hide($form['submitted']['medical_school_website']);
+                hide($form['submitted']['department']);
+                hide($form['submitted']['department_website']);
+                hide($form['submitted']['division']);
+                hide($form['submitted']['specialties']);
+                hide($form['submitted']['transplant_specialties']);
+                hide($form['submitted']['address_line_1']);
+                hide($form['submitted']['address_line_2']);
+                hide($form['submitted']['city']);
+                hide($form['submitted']['state_province']);
+                hide($form['submitted']['zip']);
+                hide($form['submitted']['work_phone']);
+                hide($form['submitted']['ext']);
+                hide($form['submitted']['fax']);
+                hide($form['submitted']['alt_phone']);
+                hide($form['submitted']['i_want_to_add_a_free_membership']);
+                hide($form['submitted']['apa_member']);
+            } else {
+
+                $form['submitted']['i_want_to_add_a_free_membership']['#title'] = "";
+                $form['submitted']['region']['#prefix'] = "<div class='box free-membership-application-request'>" . '<div class="messages_status">Free Membership Application Request.</div><div class="row"><div class="col-md-6"><label class="label-title">Personal Information</label>';
+                $form['submitted']['apa_member']['#suffix'] = '</div><div class="col-md-6"><label class="label-title">Department & Institution Information</label>';
+                $form['submitted']['transplant_specialties']['#suffix'] = "</div></div>";
+
+                $form['submitted']['address_line_1']['#prefix'] = '<div class="row"><div class="col-md-6 contact-information"><label class="label-title">Contact Information</label>';
+                $form['submitted']['alt_phone']['#suffix'] = '</div></div></div>';
+
+                $required_icon = ' <span class="form-required" title="This field is required.">*</span>';
+                $label_university = $form['submitted']['university']['#title'] . $required_icon;
+                $form['submitted']['university']['#title'] = $label_university;
+
+                $label_medical_school = $form['submitted']['medical_school']['#title'] . $required_icon;
+                $form['submitted']['medical_school']['#title'] = $label_medical_school;
+
+                $label_department = $form['submitted']['department']['#title'] . $required_icon;
+                $form['submitted']['department']['#title'] = $label_department;
+
+                $label_state_province = $form['submitted']['state_province']['#title'] . $required_icon;
+                $form['submitted']['state_province']['#title'] = $label_state_province;
+            }
+        }
+    }
+
+    if ($form_id == "uc_coupon_add_form") {
+        hide($form['bulk']);
+        hide($form['product_types']);
+        hide($form['products']);
+        hide($form['terms']);
+        hide($form['skus']);
+    }
+
+    if ($form_id == 'uc_cart_checkout_form') {
+        $order_ = uc_order_load(intval($_SESSION['cart_order']));
+
+        if (isset($order_->products)) {
+            $product = array();
+            foreach ($order_->products as $key => $current_product) {
+                $product = $current_product;
+                break;
+            }
+            if (isset($product->data["atributes"]["sid"]) && isset($product->data["atributes"]["nid"])) {
+                $sid = $product->data["atributes"]["sid"];
+                $nid = $product->data["atributes"]["nid"];
+                $submission_ = webform_get_submission($nid, $sid);
+                if (isset($submission_->data[7][0])) {
+                    $primary_email = $submission_->data[7][0];
+                    $form['panes']['customer']['primary_email']['#value'] = $primary_email;
+                    $form['panes']['customer']['primary_email']['#default_value'] = $primary_email;
+                    $order_->primary_email = $primary_email;
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Implements hook_webform_submission_update().
+ */
+function aaap_conference_webform_submission_update($node, $submission) {
+    if ($node->type == "conference") {
+        $update_submission = true;
+        if (isset($submission->discard)) {
+            $update_submission = false;
+        }
+        if ($update_submission) {
+
+            // Todo: Validar si eres admin.
+
+            $user_is_logged_in = user_is_logged_in();
+            $user_is_active_member = user_is_active_member(true);
+            $non_members = TRUE;
+            if ($user_is_logged_in && $user_is_active_member) {
+                $non_members = FALSE;
+            }
+            $user_is_admin = user_is_admin();
+
+            //  | Background Information
+            $webform = $node->webform["components"];
+            $uid = $submission->uid;
+            $nid = $submission->nid;
+            $sid = $submission->sid;
+            $first_name = $submission->data[63][0];
+            $last_name = $submission->data[64][0];
+            $credentials = $submission->data[2][0];
+            $title = $submission->data[3][0];
+            $organization = $submission->data[4][0];
+            $street_address = $submission->data[5][0];
+            $city_state_zip = $submission->data[6][0];
+            $email_address = $submission->data[7][0];
+            $phone_number = $submission->data[8][0];
+            $preferred_name_on_badge = $submission->data[9][0];
+
+            //  | I am a veteran attendee and am willing to serve as an AASA buddy to new attendee
+            $veteran_attendee = (isset($submission->data[10][0])) ? $submission->data[10][0] : "";
+            //  | I am a first time attendee and wish to be paired with an AASA buddy
+            $first_time_attendee = (isset($submission->data[11][0])) ? $submission->data[11][0] : "";
+            //  | Hot Topics
+            $hot_topics = (isset($submission->data[12][0])) ? $submission->data[12][0] : "";
+            //  | General Sessions
+            $general_sessions = $submission->data[13][0];
+            //  | Precourse
+            $precourse = $submission->data[14][0];
+            //  | Networking Events
+            $celia_king_dinner = $submission->data[23][0];
+            $celia_king_dinner_guest = $submission->data[24][0];
+            $dinner_groups = $submission->data[25][0];
+            $golf_outing = $submission->data[26][0];
+            //  | Mentoring Program
+            $mentoring_program = (isset($submission->data[16][0])) ? $submission->data[16][0] : "";
+            //  | Dietary Restrictions
+            $dietary_restrictions = $submission->data[17][0];
+            //  | Guest Name
+            $guest_name = $submission->data[18][0];
+            //  | Guest Dietary Restrictions
+            $guest_dietary_restrictions = $submission->data[19][0];
+            //  | Payment Method
+            $payment_method = $submission->data[20][0];
+            //  | Confirmed
+            $confirmed = $submission->data[21][0];
+
+            //  +=====================================+
+            //  |  Add-ons Confirmed                  |
+            //  +=====================================+
+            //  | Confirmed - New Administrator Workshop
+            $confirmed_new_administrator_workshop = $submission->data[29][0]; // (not-apply - confirmed - not-confirmed -remove)
+            //  | Confirmed - Celia King Dinner Guest
+            $confirmed_celia_king_dinner_guest = $submission->data[30][0]; // (not-apply - confirmed - not-confirmed -remove)
+            //  | Confirmed - Dinner Groups
+            $confirmed_dinner_groups = $submission->data[31][0]; // (not-apply - confirmed - not-confirmed -remove)    
+            //  | Confirmed - Golf Outing
+            $confirmed_golf_outing = $submission->data[32][0]; // (not-apply - confirmed - not-confirmed -remove) 
+
+            global $base_root, $base_url;
+            $text_for_user = " Confirmation of National Conference Changes";
+            $text_for_admin = " Meeting: Updated Conference Registration";
+            $webform = $node->webform["components"];
+            $uid = $submission->uid;
+            $nid = $submission->nid;
+            $sid = $submission->sid;
+            $params["site_name"] = SITE_NAME;
+            $params["system_mail"] = SYSTEM_MAIL;
+            $params["admin_mail"] = ADMIN_MAIL_TEST;
+            $params["admin_node_url"] = $base_url . '/conference/' . $nid . '/registration/' . $sid . '/edit';
+            $params["node_url"] = $base_root . '/' . drupal_get_path_alias('node/' . $submission->nid);
+            $params["node_title"] = $node->title;
+            $params["first_name"] = $submission->data[63][0];
+            $params["last_name"] = $submission->data[64][0];
+            $params["credentials"] = $submission->data[2][0];
+            $params["title"] = $submission->data[3][0];
+            $params["organization"] = $submission->data[4][0];
+            $params["street_address"] = $submission->data[5][0];
+            $params["city_state_zip"] = $submission->data[6][0];
+            $params["email_address"] = $submission->data[7][0];
+            $params["phone_number"] = $submission->data[8][0];
+            $params["preferred_name_on_badge"] = $submission->data[9][0];
+            $params["i_am_a_veteran_attendee_and_am_willing_to_serve_as_an_aasa_buddy_to_new_attendee"] = (isset($submission->data[10][0])) ? $submission->data[10][0] : "";
+            $params["i_am_a_first_time_attendee_and_wish_to_be_paired_with_an_aasa_buddy"] = (isset($submission->data[11][0])) ? $submission->data[11][0] : "";
+            $params["hot_topics"] = (isset($submission->data[12][0])) ? $submission->data[12][0] : "";
+            //$params["precourse"] = $submission->data[12][0];
+            $params["networking_events_celia_king_dinner"] = $submission->data[23][0];
+            $params["mentoring_program"] = (isset($submission->data[16][0])) ? $submission->data[16][0] : "";
+            $params["dietary_restrictions"] = $submission->data[17];
+            $params["guest_name"] = $submission->data[18][0];
+            $params["guest_dietary_restrictions"] = $submission->data[19];
+            $addons = array();
+
+            if (!$user_is_admin) {
+                //-> Members no-admin Users.
+                $update_submission = false;
+                $transaction = array();
+                $to_delete = array();
+                //  +=====================================+
+                //  | Looking for Add-ons Changes         |
+                //  +=====================================+
+                //  +=====================+
+                //  | Precourse           |
+                //  +=====================+
+                $field_key = "new_administrator_workshop";
+                $submission_field_value = $precourse;
+                $node_add_key = "new_administrator_workshop";
+                $node_add_ons_value = floatval($node->field_precourse_naw_price['und'][0]['value']); // precourse_value
+                $submission_key_confirmation_field = 29;
+                $submission_key_confirmation_remove_field = 33;
+                $submission_key_add_ons_field = 14;
+                $webform_key_component = 14;
+                $precourse_response = looking_addons_changes($nid, $sid, $uid, $field_key, $submission_field_value, $webform, $node_add_key, $node_add_ons_value, $submission_key_confirmation_field, $submission_key_confirmation_remove_field, $submission_key_add_ons_field, $payment_method, $webform_key_component, $submission);
+                if ($precourse_response["update_submission"]) {
+                    $update_submission = true;
+                }
+                if (count($precourse_response["transaction"]) > 0) {
+                    $transaction[] = $precourse_response["transaction"][0];
+                }
+                if (count($precourse_response["to_delete"]) > 0) {
+                    $to_delete[] = $precourse_response["to_delete"];
+                }
+
+                //  +==============================+
+                //  | Celia King Dinner Guest      |
+                //  +==============================+
+                $field_key = "celia_king_dinner_guest";
+                $submission_field_value = $celia_king_dinner_guest;
+                $node_add_key = "celia_king_dinner_guest";
+                $node_add_ons_value = floatval($node->field_networking_ckdg_price['und'][0]['value']); // celia_king_dinner_value 
+                $submission_key_confirmation_field = 30;
+                $submission_key_confirmation_remove_field = 34;
+                $submission_key_add_ons_field = 24;
+                $webform_key_component = 24;
+                $celia_king_dinner_guest_response = looking_addons_changes($nid, $sid, $uid, $field_key, $submission_field_value, $webform, $node_add_key, $node_add_ons_value, $submission_key_confirmation_field, $submission_key_confirmation_remove_field, $submission_key_add_ons_field, $payment_method, $webform_key_component, $submission);
+                if ($celia_king_dinner_guest_response["update_submission"]) {
+                    $update_submission = true;
+                }
+                if (count($celia_king_dinner_guest_response["transaction"]) > 0) {
+                    $transaction[] = $celia_king_dinner_guest_response["transaction"][0];
+                }
+                if (count($celia_king_dinner_guest_response["to_delete"]) > 0) {
+                    $to_delete[] = $celia_king_dinner_guest_response["to_delete"];
+                }
+
+                //  +===================+
+                //  | Dinner Groups     |
+                //  +===================+
+                $field_key = "dinner_groups";
+                $submission_field_value = $dinner_groups;
+                $node_add_key = "dinner_groups";
+                //-> celia_king_dinner_value 
+                $node_add_ons_value = 0;
+                $key = "";
+                if (!empty($submission_field_value)) {
+                    if ($submission_field_value == "dinner_groups_option_1") {
+                        $node_add_key = "dinner_groups_option_1";
+                        $node_add_ons_value = floatval($node->field_dinner_groups_option_1['und'][0]['value']);
+                    } elseif ($submission_field_value == "dinner_groups_option_2") {
+                        $node_add_key = "dinner_groups_option_2";
+                        $node_add_ons_value = floatval($node->field_dinner_groups_option_2['und'][0]['value']);
+                    } elseif ($submission_field_value == "dinner_groups_option_3") {
+                        $node_add_key = "dinner_groups_option_3";
+                        $node_add_ons_value = floatval($node->field_dinner_groups_option_3['und'][0]['value']);
+                    }
+                }
+                // $node_add_ons_value = floatval($node->field_networking_dg_price['und'][0]['value']); 
+
+                $submission_key_confirmation_field = 31;
+                $submission_key_confirmation_remove_field = 35;
+                $submission_key_add_ons_field = 25;
+                $webform_key_component = 25;
+                $dinner_groups_response = looking_addons_changes($nid, $sid, $uid, $field_key, $submission_field_value, $webform, $node_add_key, $node_add_ons_value, $submission_key_confirmation_field, $submission_key_confirmation_remove_field, $submission_key_add_ons_field, $payment_method, $webform_key_component, $submission);
+                if ($dinner_groups_response["update_submission"]) {
+                    $update_submission = true;
+                }
+                if (count($dinner_groups_response["transaction"]) > 0) {
+                    $transaction[] = $dinner_groups_response["transaction"][0];
+                }
+                if (count($dinner_groups_response["to_delete"]) > 0) {
+                    $to_delete[] = $dinner_groups_response["to_delete"];
+                }
+                //  +===================+
+                //  | Golf Outing       |
+                //  +===================+
+                $field_key = "golf_outing";
+                $submission_field_value = $golf_outing;
+                $node_add_key = "golf_outing";
+                $node_add_ons_value = floatval($node->field_networking_go_price['und'][0]['value']); // celia_king_dinner_value 
+                $submission_key_confirmation_field = 32;
+                $submission_key_confirmation_remove_field = 36;
+                $submission_key_add_ons_field = 26;
+                $webform_key_component = 26;
+                $golf_outing_response = looking_addons_changes($nid, $sid, $uid, $field_key, $submission_field_value, $webform, $node_add_key, $node_add_ons_value, $submission_key_confirmation_field, $submission_key_confirmation_remove_field, $submission_key_add_ons_field, $payment_method, $webform_key_component, $submission);
+                if ($golf_outing_response["update_submission"]) {
+                    $update_submission = true;
+                }
+                if (count($golf_outing_response["transaction"]) > 0) {
+                    $transaction[] = $golf_outing_response["transaction"][0];
+                }
+                if (count($golf_outing_response["to_delete"]) > 0) {
+                    $to_delete[] = $golf_outing_response["to_delete"];
+                }
+
+                if ($update_submission) {
+                    $submission->discard = true;
+                    webform_submission_update($node, $submission);
+                }
+
+                //  +=====================+
+                //  | General sessions    |
+                //  +=====================+
+                $general_sessions = array();
+                $type = "national_conference_add_ons";
+                $conference_nid = $nid;
+                $submission_sid = $sid;
+                $field_key = "general_sessions";
+                $query = new EntityFieldQuery();
+                $query->entityCondition('entity_type', 'node')
+                        ->entityCondition('bundle', $type)
+                        ->fieldCondition('field_key', 'value', $field_key, '=')
+                        ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+                        ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+                        ->propertyOrderBy('created', 'DESC')
+                        ->range(0, 1);
+                $result = $query->execute();
+                if (isset($result['node'])) {
+                    $nids = array_keys($result['node']);
+                    $tmp_nid = $nids[0];
+                    $node_general_sessions = node_load($tmp_nid);
+                    $addons[] = $node_general_sessions;
+                    $general_sessions = $node_general_sessions;
+                    $show = TRUE;
+                    if ($general_sessions->field_transaction_type['und'][0]['value'] == "remove" && $general_sessions->field_confirmed['und'][0]['value'] == "confirmed") {
+                        $show = FALSE;
+                    }
+                    if ($show) {
+                        $params["general_sessions"] = $general_sessions;
+                    }
+                }
+                //  +=====================+
+                //  | Precourse           |
+                //  +=====================+
+                $precourse = array();
+                $type = "national_conference_add_ons";
+                $conference_nid = $nid;
+                $submission_sid = $sid;
+                $field_key = "new_administrator_workshop";
+                $query = new EntityFieldQuery();
+                $query->entityCondition('entity_type', 'node')
+                        ->entityCondition('bundle', $type)
+                        ->fieldCondition('field_key', 'value', $field_key, '=')
+                        ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+                        ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+                        ->propertyOrderBy('created', 'DESC')
+                        ->range(0, 1);
+                $result = $query->execute();
+                if (isset($result['node'])) {
+                    $nids = array_keys($result['node']);
+                    $tmp_nid = $nids[0];
+                    $node_add_ons = node_load($tmp_nid);
+                    $addons[] = $node_add_ons;
+                    $precourse = $node_add_ons;
+                    $show = TRUE;
+                    if ($precourse->field_transaction_type['und'][0]['value'] == "remove" && $precourse->field_confirmed['und'][0]['value'] == "confirmed") {
+                        $show = FALSE;
+                    }
+                    if ($show) {
+                        $params["precourse"] = $precourse;
+                    }
+                }
+                //  +==============================+
+                //  | Celia King Dinner Guest      |
+                //  +==============================+
+                $celia_king_dinner_guest = array();
+                $type = "national_conference_add_ons";
+                $conference_nid = $nid;
+                $submission_sid = $sid;
+                $field_key = "celia_king_dinner_guest";
+                $query = new EntityFieldQuery();
+                $query->entityCondition('entity_type', 'node')
+                        ->entityCondition('bundle', $type)
+                        ->fieldCondition('field_key', 'value', $field_key, '=')
+                        ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+                        ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+                        ->propertyOrderBy('created', 'DESC')
+                        ->range(0, 1);
+                $result = $query->execute();
+                if (isset($result['node'])) {
+                    $nids = array_keys($result['node']);
+                    $tmp_nid = $nids[0];
+                    $node_add_ons = node_load($tmp_nid);
+                    $addons[] = $node_add_ons;
+                    $celia_king_dinner_guest = $node_add_ons;
+                    $show = TRUE;
+                    if ($celia_king_dinner_guest->field_transaction_type['und'][0]['value'] == "remove" && $celia_king_dinner_guest->field_confirmed['und'][0]['value'] == "confirmed") {
+                        $show = FALSE;
+                    }
+                    if ($show) {
+                        $params["celia_king_dinner_guest"] = $celia_king_dinner_guest;
+                    }
+                }
+                //  +===================+
+                //  | Dinner Groups     |
+                //  +===================+
+                $dinner_groups = array();
+                $type = "national_conference_add_ons";
+                $conference_nid = $nid;
+                $submission_sid = $sid;
+                $field_key = "dinner_groups";
+                $query = new EntityFieldQuery();
+                $query->entityCondition('entity_type', 'node')
+                        ->entityCondition('bundle', $type)
+                        ->fieldCondition('field_key', 'value', $field_key, '=')
+                        ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+                        ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+                        ->propertyOrderBy('created', 'DESC')
+                        ->range(0, 1);
+                $result = $query->execute();
+                if (isset($result['node'])) {
+                    $nids = array_keys($result['node']);
+                    $tmp_nid = $nids[0];
+                    $node_add_ons = node_load($tmp_nid);
+                    $addons[] = $node_add_ons;
+                    $dinner_groups = $node_add_ons;
+                    $show = TRUE;
+                    if ($dinner_groups->field_transaction_type['und'][0]['value'] == "remove" && $dinner_groups->field_confirmed['und'][0]['value'] == "confirmed") {
+                        $show = FALSE;
+                    }
+                    if ($show) {
+                        $params["dinner_groups"] = $dinner_groups;
+                    }
+                }
+                //  +===================+
+                //  | Golf Outing       |
+                //  +===================+
+                $golf_outing = array();
+                $type = "national_conference_add_ons";
+                $conference_nid = $nid;
+                $submission_sid = $sid;
+                $field_key = "golf_outing";
+                $query = new EntityFieldQuery();
+                $query->entityCondition('entity_type', 'node')
+                        ->entityCondition('bundle', $type)
+                        ->fieldCondition('field_key', 'value', $field_key, '=')
+                        ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+                        ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+                        ->propertyOrderBy('created', 'DESC')
+                        ->range(0, 1);
+                $result = $query->execute();
+                if (isset($result['node'])) {
+                    $nids = array_keys($result['node']);
+                    $tmp_nid = $nids[0];
+                    $node_add_ons = node_load($tmp_nid);
+                    $addons[] = $node_add_ons;
+                    $golf_outing = $node_add_ons;
+                    $show = TRUE;
+                    if ($golf_outing->field_transaction_type['und'][0]['value'] == "remove" && $golf_outing->field_confirmed['und'][0]['value'] == "confirmed") {
+                        $show = FALSE;
+                    }
+                    if ($show) {
+                        $params["golf_outing"] = $golf_outing;
+                    }
+                }
+
+                // productos a remover.
+                $params["to_delete"] = $to_delete;
+
+                //  +==============================+
+                //  | Execute transactions!.       |
+                //  +==============================+
+
+                $send_update_email = FALSE;
+                // Go to pay for news add-ons
+                if (count($transaction) > 0) {
+                    if ($payment_method == 'credit_card') {
+                        $transaction_nid = array();
+                        foreach ($transaction as $current_node) {
+                            node_save($current_node);
+                            $transaction_nid[] = $current_node->nid;
+                        }
+
+                        //-> Empties a cart of its contents.
+                        uc_cart_empty(uc_cart_get_id());
+                        $data = array('atributes' => array('sid' => $submission->sid, "nid" => $nid, 'sid', 'operation' => "update", 'to_delete' => $params["to_delete"]));
+                        foreach ($transaction_nid as $current_nid) {
+                            //-> Adds an item to a user's cart.
+                            uc_cart_add_item($current_nid, $qty = 1, $data, $cid = NULL, $msg = TRUE, $check_redirect = TRUE, $rebuild = TRUE);
+                        }
+                        drupal_get_messages('status', $clear_queue = TRUE);
+                        drupal_goto('cart/checkout');
+                    } elseif ($payment_method == 'mail_check') {
+                        $send_update_email = TRUE;
+                        $transaction_nid = array();
+                        foreach ($transaction as $current_node) {
+                            node_save($current_node);
+                            $transaction_nid[] = $current_node->nid;
+                        }
+                        $params["payment_method"] = 'mail_check';
+                        $params["to_add"] = $transaction;
+                    }
+                } else {
+                    $send_update_email = TRUE;
+                }
+
+                //  +==============================+
+                //  | Send Update Emails.          |
+                //  +==============================+
+
+                if ($send_update_email) {
+
+                    //  +=====================================+
+                    //  | Mail To Member                      |
+                    //  +=====================================+ 
+                    $message = theme('aaap_conference_event_update_notification_to_user', array('params' => $params));
+                    $subject = $params["site_name"] . $text_for_user;
+                    $email = new PHPMailer();
+                    $email->From = $params["system_mail"];
+                    $email->FromName = $params["site_name"];
+                    $email->Subject = $subject;
+                    $email->Body = $message;
+                    $email->IsHTML(true);
+                    $email->AddAddress($email_address, '');
+                    $email->Send();
+                    //  +=====================================+
+                    //  | Mail To Superadmin-Admin            |
+                    //  +=====================================+ 
+                    $subject = $params["site_name"] . $text_for_admin;
+                    $message = theme('aaap_conference_event_update_notification_to_admin', array('params' => $params));
+                    $email = new PHPMailer();
+                    $email->From = $params["system_mail"];
+                    $email->FromName = $params["site_name"];
+                    $email->Subject = $subject;
+                    $email->Body = $message;
+                    $email->IsHTML(true);
+                    $email_to = explode(',', $params["admin_mail"]);
+                    foreach ($email_to as $value) {
+                        $email->AddAddress($value, '');
+                    }
+                    $email->Send();
+                    //  +=====================================+
+                    //  | Redirect To THanks Page             |
+                    //  +=====================================+ 
+                    drupal_goto('thank-you-conference-registering');
+                }
+            } else {
+
+                //-> NOTE. Add no can add-ons.
+                //-> Admin Users.
+                //-> Confirm registration.
+                $update_submission = false;
+                if ($general_sessions == "members_only" || $general_sessions == "non_members") {
+                    if (!empty($confirmed)) {
+                        //  +=====================+
+                        //  | General sessions    |
+                        //  +=====================+
+                        $general_sessions = array();
+                        $type = "national_conference_add_ons";
+                        $conference_nid = $nid;
+                        $submission_sid = $sid;
+                        $field_key = "general_sessions";
+                        $query = new EntityFieldQuery();
+                        $query->entityCondition('entity_type', 'node')
+                                ->entityCondition('bundle', $type)
+                                ->fieldCondition('field_key', 'value', $field_key, '=')
+                                ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+                                ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+                                ->propertyOrderBy('created', 'DESC')
+                                ->range(0, 1);
+                        $result = $query->execute();
+                        if (isset($result['node'])) {
+                            $nids = array_keys($result['node']);
+                            $tmp_nid = $nids[0];
+                            $node_general_sessions = node_load($tmp_nid);
+                            $node_general_sessions->field_confirmed['und'][0]['value'] = $confirmed;
+                            node_save($node_general_sessions);
+                            //-> Confirmacion (Para este caso solo se puede confirmar de added).
+                            if ($node_general_sessions->field_payment_method['und'][0]['value'] == "mail_check") {
+
+                                $key_id = $submission_sid;
+                                $item_id = $conference_nid;
+                                set_status_invoice($key_id, $item_id, 'completed');
+
+                                $confirmed_email = $submission->data[65][0];
+                                if ($confirmed_email == "confirmed_email") {
+                                    $params["general_sessions_confirmation_add_email"] = $node_general_sessions;
+                                    $submission->data[65][0] = "";
+                                    $send_confirmation_email = TRUE;
+                                    $update_submission = TRUE;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                //-> Confirm Add | Remove Services.
+                //  +=====================+
+                //  | Precourse           |
+                //  +=====================+
+                $operation = "";
+                $confirmed_new_administrator_workshop = $submission->data[29][0];
+                if ($confirmed_new_administrator_workshop == "not-apply") {
+                    if (empty($precourse)) {
+                        $operation = "not-apply";
+                    } else {
+                        $operation = "pending";
+                    }
+                } elseif ($confirmed_new_administrator_workshop == "confirmed") {
+                    if (empty($precourse)) {
+                        $operation = "remove";
+                    } else {
+                        $operation = "add";
+                    }
+                } elseif ($confirmed_new_administrator_workshop == "not-confirmed") {
+                    if (empty($precourse)) {
+                        $operation = "pending";
+                    } else {
+                        $operation = "pending";
+                    }
+                } elseif ($confirmed_new_administrator_workshop == "remove") {
+                    //-> Verificamos si esta pendiente o confirmado
+                    $confirmed_remove_new_administrator_workshop = $submission->data[33][0];
+                    if ($confirmed_remove_new_administrator_workshop == "confirmed") {
+                        //-> Ha sido eliminado el servicio y el admin aprueba
+                        $operation = "remove";
+                    } elseif ($confirmed_remove_new_administrator_workshop == "not-confirmed") {
+                        $operation = "pending_remove";
+                    }
+                }
+                $type = "national_conference_add_ons";
+                $conference_nid = $nid;
+                $submission_sid = $sid;
+                $field_key = "new_administrator_workshop";
+                $query = new EntityFieldQuery();
+                $query->entityCondition('entity_type', 'node')
+                        ->entityCondition('bundle', $type)
+                        ->fieldCondition('field_key', 'value', $field_key, '=')
+                        ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+                        ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+                        ->propertyOrderBy('created', 'DESC')
+                        ->range(0, 1);
+                $result = $query->execute();
+                if (isset($result['node'])) {
+                    $nids = array_keys($result['node']);
+                    $tmp_nid = $nids[0];
+                    $node_add_ons = node_load($tmp_nid);
+                    $node_precourse = $node_add_ons;
+                    $confirmed_precourse_email = $submission->data[66][0];
+                    $confirmation_added = FALSE;
+                    $confirmation_removed = FALSE;
+                    if ($operation == "not-apply" || $operation == "remove") {
+                        $node_precourse->field_transaction_type['und'][0]['value'] = "remove";
+                        $node_precourse->field_confirmed['und'][0]['value'] = "confirmed";
+                        if ($confirmed_precourse_email == "confirmed_new_administrator_workshop_email") {
+                            //-> Confirmar de removido.
+                            $confirmation_removed = TRUE;
+                        }
+                    } elseif ($operation == "add") {
+                        $node_precourse->field_transaction_type['und'][0]['value'] = "add";
+                        $node_precourse->field_confirmed['und'][0]['value'] = "confirmed";
+                        if ($confirmed_precourse_email == "confirmed_new_administrator_workshop_email") {
+                            if ($node_precourse->field_payment_method['und'][0]['value'] == "mail_check") {
+                                //-> Confirmar de añadido.
+                                $confirmation_added = TRUE;
+                            }
+                        }
+                    } elseif ($operation == "pending") {
+                        $node_precourse->field_transaction_type['und'][0]['value'] = "add";
+                        $node_precourse->field_confirmed['und'][0]['value'] = "not-confirmed";
+                    } elseif ($operation == "pending_remove") {
+                        $node_precourse->field_transaction_type['und'][0]['value'] = "remove";
+                        $node_precourse->field_confirmed['und'][0]['value'] = "not-confirmed";
+                    }
+                    node_save($node_precourse);
+                    //-> Confirmacion (Para este caso: Confirmar de added || Confirmar de removed).
+                    if ($confirmation_removed) {
+                        $params["general_precourse_confirmation_remove_email"] = $node_precourse;
+                        $submission->data[66][0] = "";
+                        $send_confirmation_email = TRUE;
+                        $update_submission = TRUE;
+                    }
+
+                    if ($confirmation_added) {
+                        $params["general_precourse_confirmation_add_email"] = $node_precourse;
+                        $submission->data[66][0] = "";
+                        $send_confirmation_email = TRUE;
+                        $update_submission = TRUE;
+                    }
+                }
+                //  +==============================+
+                //  | Celia King Dinner Guest      |
+                //  +==============================+
+                $operation = "";
+                $confirmed_celia_king_dinner_guest = $submission->data[30][0];
+                if ($confirmed_celia_king_dinner_guest == "not-apply") {
+                    if (empty($celia_king_dinner_guest)) {
+                        $operation = "not-apply";
+                    } else {
+                        $operation = "pending";
+                    }
+                } elseif ($confirmed_celia_king_dinner_guest == "confirmed") {
+                    if (empty($celia_king_dinner_guest)) {
+                        $operation = "remove";
+                    } else {
+                        $operation = "add";
+                    }
+                } elseif ($confirmed_celia_king_dinner_guest == "not-confirmed") {
+                    if (empty($celia_king_dinner_guest)) {
+                        $operation = "pending";
+                    } else {
+                        $operation = "pending";
+                    }
+                } elseif ($confirmed_celia_king_dinner_guest == "remove") {
+                    //-> Verificamos si esta pendiente o confirmado
+                    $confirmed_remove_celia_king_dinner_guest = $submission->data[34][0];
+                    if ($confirmed_remove_celia_king_dinner_guest == "confirmed") {
+                        //-> Ha sido eliminado el servicio y el admin aprueba
+                        $operation = "remove";
+                    } elseif ($confirmed_remove_celia_king_dinner_guest == "not-confirmed") {
+                        $operation = "pending_remove";
+                    }
+                }
+                $type = "national_conference_add_ons";
+                $conference_nid = $nid;
+                $submission_sid = $sid;
+                $field_key = "celia_king_dinner_guest";
+                $query = new EntityFieldQuery();
+                $query->entityCondition('entity_type', 'node')
+                        ->entityCondition('bundle', $type)
+                        ->fieldCondition('field_key', 'value', $field_key, '=')
+                        ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+                        ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+                        ->propertyOrderBy('created', 'DESC')
+                        ->range(0, 1);
+                $result = $query->execute();
+                if (isset($result['node'])) {
+                    $nids = array_keys($result['node']);
+                    $tmp_nid = $nids[0];
+                    $node_add_ons = node_load($tmp_nid);
+                    $node_celia_king_dinner_guest = $node_add_ons;
+                    $confirmed_celia_king_dinner_guest_email = $submission->data[67][0];
+                    $confirmation_added = FALSE;
+                    $confirmation_removed = FALSE;
+                    if ($operation == "not-apply" || $operation == "remove") {
+                        $node_celia_king_dinner_guest->field_transaction_type['und'][0]['value'] = "remove";
+                        $node_celia_king_dinner_guest->field_confirmed['und'][0]['value'] = "confirmed";
+                        if ($confirmed_celia_king_dinner_guest_email == "confirmed_celia_king_dinner_guest_email") {
+                            //-> Confirmar de removido.
+                            $confirmation_removed = TRUE;
+                        }
+                    } elseif ($operation == "add") {
+                        $node_celia_king_dinner_guest->field_transaction_type['und'][0]['value'] = "add";
+                        $node_celia_king_dinner_guest->field_confirmed['und'][0]['value'] = "confirmed";
+                        if ($confirmed_celia_king_dinner_guest_email == "confirmed_celia_king_dinner_guest_email") {
+                            if ($node_celia_king_dinner_guest->field_payment_method['und'][0]['value'] == "mail_check") {
+                                //-> Confirmar de añadido.
+                                $confirmation_added = TRUE;
+                            }
+                        }
+                    } elseif ($operation == "pending") {
+                        $node_celia_king_dinner_guest->field_transaction_type['und'][0]['value'] = "add";
+                        $node_celia_king_dinner_guest->field_confirmed['und'][0]['value'] = "not-confirmed";
+                    } elseif ($operation == "pending_remove") {
+                        $node_celia_king_dinner_guest->field_transaction_type['und'][0]['value'] = "remove";
+                        $node_celia_king_dinner_guest->field_confirmed['und'][0]['value'] = "not-confirmed";
+                    }
+                    node_save($node_celia_king_dinner_guest);
+                    //-> Confirmacion (Para este caso: Confirmar de added || Confirmar de removed).
+                    if ($confirmation_removed) {
+                        $params["general_celia_king_dinner_guest_confirmation_remove_email"] = $node_celia_king_dinner_guest;
+                        $submission->data[67][0] = "";
+                        $send_confirmation_email = TRUE;
+                        $update_submission = TRUE;
+                    }
+                    if ($confirmation_added) {
+                        $params["general_celia_king_dinner_guest_confirmation_add_email"] = $node_celia_king_dinner_guest;
+                        $submission->data[67][0] = "";
+                        $send_confirmation_email = TRUE;
+                        $update_submission = TRUE;
+                    }
+                }
+                //  +===================+
+                //  | Dinner Groups     |
+                //  +===================+
+                $operation = "";
+                $confirmed_dinner_groups = $submission->data[31][0];
+                if ($confirmed_dinner_groups == "not-apply") {
+                    if (empty($dinner_groups)) {
+                        $operation = "not-apply";
+                    } else {
+                        $operation = "pending";
+                    }
+                } elseif ($confirmed_dinner_groups == "confirmed") {
+                    if (empty($dinner_groups)) {
+                        $operation = "remove";
+                    } else {
+                        $operation = "add";
+                    }
+                } elseif ($confirmed_dinner_groups == "not-confirmed") {
+                    if (empty($dinner_groups)) {
+                        $operation = "pending";
+                    } else {
+                        $operation = "pending";
+                    }
+                } elseif ($confirmed_dinner_groups == "remove") {
+                    //-> Verificamos si esta pendiente o confirmado
+                    $confirmed_remove_dinner_groups = $submission->data[35][0];
+                    if ($confirmed_remove_dinner_groups == "confirmed") {
+                        //-> Ha sido eliminado el servicio y el admin aprueba
+                        $operation = "remove";
+                    } elseif ($confirmed_remove_dinner_groups == "not-confirmed") {
+                        $operation = "pending_remove";
+                    }
+                }
+                $type = "national_conference_add_ons";
+                $conference_nid = $nid;
+                $submission_sid = $sid;
+                $field_key = "dinner_groups";
+                $query = new EntityFieldQuery();
+                $query->entityCondition('entity_type', 'node')
+                        ->entityCondition('bundle', $type)
+                        ->fieldCondition('field_key', 'value', $field_key, '=')
+                        ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+                        ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+                        ->propertyOrderBy('created', 'DESC')
+                        ->range(0, 1);
+                $result = $query->execute();
+                if (isset($result['node'])) {
+                    $nids = array_keys($result['node']);
+                    $tmp_nid = $nids[0];
+                    $node_add_ons = node_load($tmp_nid);
+                    $node_dinner_groups = $node_add_ons;
+                    $confirmed_dinner_groups_email = $submission->data[68][0];
+                    $confirmation_added = FALSE;
+                    $confirmation_removed = FALSE;
+                    if ($operation == "not-apply" || $operation == "remove") {
+                        $node_dinner_groups->field_transaction_type['und'][0]['value'] = "remove";
+                        $node_dinner_groups->field_confirmed['und'][0]['value'] = "confirmed";
+                        if (isset($submission->data[25][0])) {
+                            if (!empty($submission->data[25][0])) {
+                                $submission->data[25][0] = "";
+                                $update_submission = TRUE;
+                            }
+                        }
+                        if ($confirmed_dinner_groups_email == "confirmed_dinner_groups_email") {
+                            //-> Confirmar de removido.
+                            $confirmation_removed = TRUE;
+                        }
+                    } elseif ($operation == "add") {
+                        $node_dinner_groups->field_transaction_type['und'][0]['value'] = "add";
+                        $node_dinner_groups->field_confirmed['und'][0]['value'] = "confirmed";
+                        if ($confirmed_dinner_groups_email == "confirmed_dinner_groups_email") {
+                            if ($node_dinner_groups->field_payment_method['und'][0]['value'] == "mail_check") {
+                                //-> Confirmar de añadido.
+                                $confirmation_added = TRUE;
+                            }
+                        }
+                    } elseif ($operation == "pending") {
+                        $node_dinner_groups->field_transaction_type['und'][0]['value'] = "add";
+                        $node_dinner_groups->field_confirmed['und'][0]['value'] = "not-confirmed";
+                    } elseif ($operation == "pending_remove") {
+                        $node_dinner_groups->field_transaction_type['und'][0]['value'] = "remove";
+                        $node_dinner_groups->field_confirmed['und'][0]['value'] = "not-confirmed";
+                    }
+                    node_save($node_dinner_groups);
+                    //-> Confirmacion (Para este caso: Confirmar de added || Confirmar de removed).
+                    if ($confirmation_removed) {
+                        $params["general_dinner_groups_confirmation_remove_email"] = $node_dinner_groups;
+                        $submission->data[68][0] = "";
+                        $send_confirmation_email = TRUE;
+                        $update_submission = TRUE;
+                    }
+                    if ($confirmation_added) {
+                        $params["general_dinner_groups_confirmation_add_email"] = $node_dinner_groups;
+                        $submission->data[68][0] = "";
+                        $send_confirmation_email = TRUE;
+                        $update_submission = TRUE;
+                    }
+                }
+                //  +===================+
+                //  | Golf Outing       |
+                //  +===================+
+                $operation = "";
+                $confirmed_golf_outing = $submission->data[32][0];
+                if ($confirmed_golf_outing == "not-apply") {
+                    if (empty($golf_outing)) {
+                        $operation = "not-apply";
+                    } else {
+                        $operation = "pending";
+                    }
+                } elseif ($confirmed_golf_outing == "confirmed") {
+                    if (empty($golf_outing)) {
+                        $operation = "remove";
+                    } else {
+                        $operation = "add";
+                    }
+                } elseif ($confirmed_golf_outing == "not-confirmed") {
+                    if (empty($golf_outing)) {
+                        $operation = "pending";
+                    } else {
+                        $operation = "pending";
+                    }
+                } elseif ($confirmed_golf_outing == "remove") {
+                    //-> Verificamos si esta pendiente o confirmado
+                    $confirmed_remove_golf_outing = $submission->data[36][0];
+                    if ($confirmed_remove_golf_outing == "confirmed") {
+                        //-> Ha sido eliminado el servicio y el admin aprueba
+                        $operation = "remove";
+                    } elseif ($confirmed_remove_golf_outing == "not-confirmed") {
+                        $operation = "pending_remove";
+                    }
+                }
+                $type = "national_conference_add_ons";
+                $conference_nid = $nid;
+                $submission_sid = $sid;
+                $field_key = "golf_outing";
+                $query = new EntityFieldQuery();
+                $query->entityCondition('entity_type', 'node')
+                        ->entityCondition('bundle', $type)
+                        ->fieldCondition('field_key', 'value', $field_key, '=')
+                        ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+                        ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+                        ->propertyOrderBy('created', 'DESC')
+                        ->range(0, 1);
+                $result = $query->execute();
+                if (isset($result['node'])) {
+                    $nids = array_keys($result['node']);
+                    $tmp_nid = $nids[0];
+                    $node_add_ons = node_load($tmp_nid);
+                    $node_golf_outing = $node_add_ons;
+                    $confirmed_golf_outing_email = $submission->data[69][0];
+                    $confirmation_added = FALSE;
+                    $confirmation_removed = FALSE;
+                    if ($operation == "not-apply" || $operation == "remove") {
+                        $node_golf_outing->field_transaction_type['und'][0]['value'] = "remove";
+                        $node_golf_outing->field_confirmed['und'][0]['value'] = "confirmed";
+                        if ($confirmed_golf_outing_email == "confirmed_golf_outing_email") {
+                            //-> Confirmar de removido.
+                            $confirmation_removed = TRUE;
+                        }
+                    } elseif ($operation == "add") {
+                        $node_golf_outing->field_transaction_type['und'][0]['value'] = "add";
+                        $node_golf_outing->field_confirmed['und'][0]['value'] = "confirmed";
+                        if ($confirmed_golf_outing_email == "confirmed_golf_outing_email") {
+                            if ($node_golf_outing->field_payment_method['und'][0]['value'] == "mail_check") {
+                                //-> Confirmar de añadido.
+                                $confirmation_added = TRUE;
+                            }
+                        }
+                    } elseif ($operation == "pending") {
+                        $node_golf_outing->field_transaction_type['und'][0]['value'] = "add";
+                        $node_golf_outing->field_confirmed['und'][0]['value'] = "not-confirmed";
+                    } elseif ($operation == "pending_remove") {
+                        $node_golf_outing->field_transaction_type['und'][0]['value'] = "remove";
+                        $node_golf_outing->field_confirmed['und'][0]['value'] = "not-confirmed";
+                    }
+                    node_save($node_golf_outing);
+                    //-> Confirmacion (Para este caso: Confirmar de added || Confirmar de removed).
+                    if ($confirmation_removed) {
+                        $params["general_golf_outing_confirmation_remove_email"] = $node_golf_outing;
+                        $submission->data[69][0] = "";
+                        $send_confirmation_email = TRUE;
+                        $update_submission = TRUE;
+                    }
+                    if ($confirmation_added) {
+                        $params["general_golf_outing_confirmation_add_email"] = $node_golf_outing;
+                        $submission->data[69][0] = "";
+                        $send_confirmation_email = TRUE;
+                        $update_submission = TRUE;
+                    }
+                }
+
+                if ($update_submission) {
+                    $submission->discard = true;
+                    webform_submission_update($node, $submission);
+                }
+
+                if ($send_confirmation_email) {
+                    //  +=====================================+
+                    //  | Mail To Member                      |
+                    //  +=====================================+ 
+                    $text_for_user = " Confirmation of Change to Registration";
+                    $message = theme('aaap_conference_event_update_confirmation_notification_to_user', array('params' => $params));
+                    $subject = $params["site_name"] . $text_for_user;
+                    $email = new PHPMailer();
+                    $email->From = $params["system_mail"];
+                    $email->FromName = $params["site_name"];
+                    $email->Subject = $subject;
+                    $email->Body = $message;
+                    $email->IsHTML(true);
+                    $email->AddAddress($email_address, '');
+                    $email->Send();
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Implements hook_webform_submission_insert().
+ */
+function aaap_conference_webform_submission_insert($node, $submission) {
+    if ($node->type == "conference") {
+        //-> Empties a cart of its contents.
+        uc_cart_empty(uc_cart_get_id());
+        //-> TODO: Clean Products in the current cart
+        //die(var_dump($node));
+        //dsm($submission);
+        //die(var_dump($submission));
+        global $base_root, $base_url;
+        $user_is_logged_in = user_is_logged_in();
+        $user_is_active_member = user_is_active_member(true);
+        $non_members = TRUE;
+        if ($user_is_logged_in && $user_is_active_member) {
+            $non_members = FALSE;
+        }
+
+        $update_submission = FALSE;
+        //  | Background Information
+        $webform = $node->webform["components"];
+        $uid = $submission->uid;
+        $nid = $submission->nid;
+        $sid = $submission->sid;
+        $first_name = $submission->data[63][0];
+        $last_name = $submission->data[64][0];
+        $credentials = $submission->data[2][0];
+        $title = $submission->data[3][0];
+        $organization = $submission->data[4][0];
+        $street_address = $submission->data[5][0];
+        $city_state_zip = $submission->data[6][0];
+        $email_address = $submission->data[7][0];
+        $phone_number = $submission->data[8][0];
+        $preferred_name_on_badge = $submission->data[9][0];
+
+        //  | I am a veteran attendee and am willing to serve as an AASA buddy to new attendee
+        $veteran_attendee = $submission->data[10][0];
+        //  | I am a first time attendee and wish to be paired with an AASA buddy
+        $first_time_attendee = $submission->data[11][0];
+        //  | Hot Topics
+        $hot_topics = $submission->data[12][0];
+        //  | General Sessions
+        $general_sessions = $submission->data[13][0];
+        //  | Precourse
+        $precourse = $submission->data[14][0];
+        //  | Networking Events
+        $celia_king_dinner = $submission->data[23][0];
+        $celia_king_dinner_guest = $submission->data[24][0];
+        $dinner_groups = $submission->data[25][0];
+        $golf_outing = $submission->data[26][0];
+        //  | Mentoring Program
+        $mentoring_program = $submission->data[16][0];
+        //  | Dietary Restrictions
+        $dietary_restrictions = $submission->data[17][0];
+        //  | Guest Name
+        $guest_name = $submission->data[18][0];
+        //  | Guest Dietary Restrictions
+        $guest_dietary_restrictions = $submission->data[19][0];
+        //  | Payment Method
+        $payment_method = $submission->data[20][0];
+        //  | Confirmed
+        $confirmed = $submission->data[21][0];
+
+        //  +=====================================+
+        //  | Free Membership Application         |
+        //  +=====================================+
+        $i_want_to_add_a_free_membership = $submission->data[37][0];
+        $region = $submission->data[38][0];
+        $current_position = $submission->data[39][0];
+        $years_in_healthcare = $submission->data[40][0];
+        $highest_edu_degree = $submission->data[41][0];
+        $certifications = $submission->data[42][0];
+        $mgma_member = $submission->data[43][0];
+        $apa_member = $submission->data[44][0];
+        $university = $submission->data[45][0];
+        $medical_school = $submission->data[46][0];
+        $medical_school_website = $submission->data[47][0];
+        $department = $submission->data[48][0];
+        $department_website = $submission->data[49][0];
+        $division = $submission->data[50][0];
+        $specialties = $submission->data[51][0];
+        $transplant_specialties = $submission->data[52][0];
+        $address_line_1 = $submission->data[53][0];
+        $address_line_2 = $submission->data[54][0];
+        $city = $submission->data[55][0];
+        $state_province = $submission->data[56][0];
+        $zip = $submission->data[57][0];
+        $work_phone = $submission->data[58][0];
+        $ext = $submission->data[59][0];
+        $fax = $submission->data[60][0];
+        $alt_phone = $submission->data[61][0];
+
+        $registration = true;
+        $addons = false;
+        $transaction = array();
+        $params["to_add"] = array();
+
+        $params["site_name"] = SITE_NAME;
+        $params["system_mail"] = SYSTEM_MAIL;
+        $params["admin_mail"] = ADMIN_MAIL_TEST;
+        $params["admin_node_url"] = $base_url . '/conference/' . $nid . '/registration/' . $sid . '/edit';
+        $params["node_url"] = $base_root . '/' . drupal_get_path_alias('node/' . $submission->nid);
+        $params["node_title"] = $node->title;
+        $params["first_name"] = $submission->data[63][0];
+        $params["last_name"] = $submission->data[64][0];
+        $params["credentials"] = $submission->data[2][0];
+        $params["title"] = $submission->data[3][0];
+        $params["organization"] = $submission->data[4][0];
+        $params["street_address"] = $submission->data[5][0];
+        $params["city_state_zip"] = $submission->data[6][0];
+        $params["email_address"] = $submission->data[7][0];
+        $params["phone_number"] = $submission->data[8][0];
+        $params["preferred_name_on_badge"] = $submission->data[9][0];
+        $params["i_am_a_veteran_attendee_and_am_willing_to_serve_as_an_aasa_buddy_to_new_attendee"] = $submission->data[10][0];
+        $params["i_am_a_first_time_attendee_and_wish_to_be_paired_with_an_aasa_buddy"] = $submission->data[11][0];
+        $params["hot_topics"] = $submission->data[12][0];
+        $params["networking_events_celia_king_dinner"] = $submission->data[23][0];
+        $params["mentoring_program"] = $submission->data[16][0];
+        $params["dietary_restrictions"] = $submission->data[17];
+        $params["guest_name"] = $submission->data[18][0];
+        $params["guest_dietary_restrictions"] = $submission->data[19];
+
+        $info = array(
+            "dietary_restrictions" => $params["dietary_restrictions"],
+            "guest_dietary_restrictions" => $params["guest_dietary_restrictions"]
+        );
+        //die(var_dump($info));
+        //dpm($info);
+        //  +=============================================+
+        //  | Looking Free Membership Application         |
+        //  +=============================================+  
+        if ($i_want_to_add_a_free_membership == "i_want_to_add_a_free_membership") {
+            //  +============================================+
+            //  |  Free Membership Application Request.      |
+            //  +============================================+  
+            //This will generate a random password, you could set your own here
+            $password = user_password(8);
+            //set up the user fields
+            $fields = array(
+                'name' => $email_address,
+                'mail' => $email_address,
+                'pass' => $password,
+                'status' => 1,
+                'init' => 'email address',
+                'roles' => array(
+                    DRUPAL_AUTHENTICATED_RID => 'authenticated user',
+                    6 => 'Pending Approval',
+                ),
+            );
+
+            $fields['field_first_name']['und'][0]['value'] = $first_name;
+            $fields['field_last_name']['und'][0]['value'] = $last_name;
+            $fields['field_position_title']['und'][0]['value'] = $title;
+            $fields['field_type_of_member']['und'][0]['value'] = "regular";
+            //$fields['field_renewal_date']['und'][0]['value'] = "";// To double Check.
+            $fields['field_position_title']['und'][0]['value'] = $title;
+            $fields['field_region']['und'][0]['value'] = $region;
+            $fields['field_became_aaap_member']['und'][0]['value'] = date('Y');
+            $fields['field_current_position']['und'][0]['value'] = $current_position;
+            $fields['field_years_in_healthcare']['und'][0]['value'] = $years_in_healthcare;
+            $fields['field_highest_edu_degree']['und'][0]['value'] = $highest_edu_degree;
+            $fields['field_certifications']['und'][0]['value'] = $certifications;
+            $fields['field_mgma_member']['und'][0]['value'] = $mgma_member;
+            $fields['field_apa_member']['und'][0]['value'] = $apa_member;
+            $fields['field_institution']['und'][0]['value'] = $university;
+            $fields['field_medical_school']['und'][0]['value'] = $medical_school;
+            $fields['field_medical_school_website']['und'][0]['value'] = $medical_school_website;
+            $fields['field_department']['und'][0]['value'] = $department;
+            $fields['field_department_website']['und'][0]['value'] = $department_website;
+            $fields['field_division']['und'][0]['value'] = $division;
+            $fields['field_specialties']['und'][0]['value'] = $specialties;
+            $fields['field_transplant_specialties']['und'][0]['value'] = $transplant_specialties;
+            $fields['field_address_line_1']['und'][0]['value'] = $address_line_1;
+            $fields['field_address_line_2']['und'][0]['value'] = $address_line_2;
+            $fields['field_city']['und'][0]['value'] = $city;
+            $fields['field_state']['und'][0]['value'] = $state_province;
+            $fields['field_zip']['und'][0]['value'] = $zip;
+            $fields['field_office_telephone']['und'][0]['value'] = $work_phone;
+            $fields['field_ext']['und'][0]['value'] = $ext;
+            $fields['field_fax']['und'][0]['value'] = $fax;
+            $fields['field_mobile_telephone']['und'][0]['value'] = $alt_phone;
+            $fields['field_created_by']['und'][0]['value'] = 'national_conference_form';
+            $fields['field_choose_payment_method']['und'][0]['value'] = "free_membership_application_request";
+
+
+            $params = array_merge($params, $fields);
+
+            //the first parameter is left blank so a new user is created
+            $account = user_save('', $fields);
+            if (isset($account->uid)) {
+                $uid = $account->uid;
+                $submission->uid = $account->uid;
+                $submission->discard = true;
+                webform_submission_update($node, $submission);
+            }
+            //  +=====================================+
+            //  | Mail To Superadmin-Admin            |
+            //  +=====================================+ 
+            $text_free_membership_application = " Free Membership Application Request.";
+            $params["user_url"] = $base_root . '/user/' . $account->uid . '/edit';
+
+            $subject = $params["site_name"] . $text_free_membership_application;
+            $message = theme('aaap_conference_event_text_free_membership_application_request_notification_to_admin', array('params' => $params));
+            $email = new PHPMailer();
+            $email->From = $params["system_mail"];
+            $email->FromName = $params["site_name"];
+            $email->Subject = $subject;
+            $email->Body = $message;
+            $email->IsHTML(true);
+            $email_to = explode(',', $params["admin_mail"]);
+            foreach ($email_to as $value) {
+                $email->AddAddress($value, '');
+            }
+
+            if (!$email->Send()) {
+                $msq_watchdog = $subject . "email has NOT been sent.";
+            } else {
+                $msq_watchdog = $subject . " - Email has been sent.";
+            }
+            watchdog('actions', $msq_watchdog, $variables = array(), $severity = WATCHDOG_NOTICE, $link = NULL);
+            //  +====================================+
+            //  | Send Notification Emails.          |
+            //  +====================================+
+            //  +=====================================+
+            //  | Mail To Member                      |
+            //  +=====================================+ 
+            $email->clearAllRecipients();
+            $message = theme('aaap_conference_event_text_free_membership_application_request_notification_to_user', array('params' => $params));
+            $subject = $params["site_name"] . $text_free_membership_application;
+            // $email = new PHPMailer();
+            $email->From = $params["system_mail"];
+            $email->FromName = $params["site_name"];
+            $email->Subject = $subject;
+            $email->Body = $message;
+            $email->IsHTML(true);
+            $email->AddAddress($params["email_address"], '');
+            if (!$email->Send()) {
+                $msq_watchdog = $subject . "email has NOT been sent.<br/><br/>" . $message;
+            } else {
+                $msq_watchdog = $subject . " - Email has been sent.<br/><br/>" . $message;
+            }
+            watchdog('actions', $msq_watchdog, $variables = array(), $severity = WATCHDOG_NOTICE, $link = NULL);
+        }
+
+        //  +=====================================+
+        //  | Field Get fee                       |
+        //  +=====================================+
+        $event_fee = 0;
+        $early_bird_date_over = $node->field_early_bird_date_over["und"][0]["value"];
+        //  | Check if early_bird_date is expired
+        //$form
+        $now = new DateTime();
+        $expiryDate = new DateTime($early_bird_date_over);
+        $isExpired = $now > $expiryDate;
+        $key = "";
+        if ($non_members) {
+            if ($isExpired) {
+                $event_fee = $node->field_non_member_registration_fe["und"][0]["value"];
+            } else {
+                $event_fee = $node->field_non_member_early_bird_fee["und"][0]["value"];
+            }
+            $key = "non_members";
+        } else {
+
+            if ($isExpired) {
+                $event_fee = $node->field_member_registration_fee["und"][0]["value"];
+            } else {
+                $event_fee = $node->field_member_reg_early_bird_fee["und"][0]["value"];
+            }
+            $key = "members_only";
+        }
+
+        $transaction_nid = array();
+        $string = $webform[13]["extra"]["items"];
+        $general_sessions_label = get_label_by_key($string, $key);
+        $event_fee = floatval($event_fee);
+        $node_general_sessions = new stdClass();
+        $node_general_sessions->type = 'national_conference_add_ons';
+        $node_general_sessions->status = 1;
+        $node_general_sessions->uid = $uid;
+        $node_general_sessions->title = $node->title . " - " . $general_sessions_label;
+        $node_general_sessions->field_price['und'][0]['value'] = $event_fee;
+        $node_general_sessions->field_nid['und'][0]['nid'] = $nid;
+        $node_general_sessions->field_sid['und'][0]['value'] = $sid;
+        $node_general_sessions->field_transaction_type['und'][0]['value'] = "registration";
+        $node_general_sessions->field_confirmed['und'][0]['value'] = "not-confirmed";
+        $node_general_sessions->field_key['und'][0]['value'] = "general_sessions";
+        $node_general_sessions->field_payment_method['und'][0]['value'] = $payment_method;
+        $node_general_sessions->price = $event_fee;
+        $node_general_sessions->sell_price = $event_fee;
+        $transaction[] = $node_general_sessions;
+        node_save($node_general_sessions);
+        $transaction_nid[] = $node_general_sessions->nid;
+        $params["general_sessions"] = $node_general_sessions;
+        $params["to_add"][] = $params["general_sessions"];
+        if ($payment_method == 'mail_check') {
+            $submission->data[21][0] = "not-confirmed"; // general_sessions
+            $update_submission = TRUE;
+        }
+        //  +=====================================+
+        //  | Add-ons                             |
+        //  +=====================================+
+        //  | Precourse
+        if ($precourse == "new_administrator_workshop") {
+            $precourse_value = floatval($node->field_precourse_naw_price['und'][0]['value']);
+            $addons = true;
+            $key = "new_administrator_workshop";
+            $string = $webform[14]["extra"]["items"];
+            $precourse_label = get_label_by_key($string, $key);
+
+            $node_precourse = new stdClass();
+            $node_precourse->type = 'national_conference_add_ons';
+            $node_precourse->status = 1;
+            $node_precourse->uid = $uid;
+            $node_precourse->title = $precourse_label;
+            $node_precourse->field_price['und'][0]['value'] = $precourse_value;
+            $node_precourse->field_nid['und'][0]['nid'] = $nid;
+            $node_precourse->field_sid['und'][0]['value'] = $sid;
+            $node_precourse->field_transaction_type['und'][0]['value'] = "add";
+            $node_precourse->field_confirmed['und'][0]['value'] = "not-confirmed";
+            $node_precourse->field_key['und'][0]['value'] = "new_administrator_workshop";
+            $node_precourse->field_payment_method['und'][0]['value'] = $payment_method;
+            $node_precourse->price = $precourse_value;
+            $node_precourse->sell_price = $precourse_value;
+            $transaction[] = $node_precourse;
+            node_save($node_precourse);
+            $transaction_nid[] = $node_precourse->nid;
+            $params["precourse"] = $node_precourse;
+            $params["to_add"][] = $params["precourse"];
+            if ($payment_method == 'mail_check') {
+                $submission->data[29][0] = "not-confirmed"; // new_administrator_workshop
+                $update_submission = TRUE;
+            }
+        }
+
+        //  | Celia King Dinner Guest
+        if ($celia_king_dinner_guest == "celia_king_dinner_guest") {
+            $celia_king_dinner_value = floatval($node->field_networking_ckdg_price['und'][0]['value']);
+            $key = "celia_king_dinner_guest";
+            $string = $webform[24]["extra"]["items"];
+            $celia_king_dinner_guest_label = get_label_by_key($string, $key);
+
+            $node_celia_king_dinner_guest = new stdClass();
+            $node_celia_king_dinner_guest->type = 'national_conference_add_ons';
+            $node_celia_king_dinner_guest->status = 1;
+            $node_celia_king_dinner_guest->uid = $uid;
+            $node_celia_king_dinner_guest->title = $celia_king_dinner_guest_label;
+            $node_celia_king_dinner_guest->field_price['und'][0]['value'] = $celia_king_dinner_value;
+            $node_celia_king_dinner_guest->field_nid['und'][0]['nid'] = $nid;
+            $node_celia_king_dinner_guest->field_sid['und'][0]['value'] = $sid;
+            $node_celia_king_dinner_guest->field_transaction_type['und'][0]['value'] = "add";
+            $node_celia_king_dinner_guest->field_confirmed['und'][0]['value'] = "not-confirmed";
+            $node_celia_king_dinner_guest->field_key['und'][0]['value'] = "celia_king_dinner_guest";
+            $node_celia_king_dinner_guest->field_payment_method['und'][0]['value'] = $payment_method;
+            $node_celia_king_dinner_guest->price = $celia_king_dinner_value;
+            $node_celia_king_dinner_guest->sell_price = $celia_king_dinner_value;
+            $transaction[] = $node_celia_king_dinner_guest;
+            node_save($node_celia_king_dinner_guest);
+            $transaction_nid[] = $node_celia_king_dinner_guest->nid;
+            $params["celia_king_dinner_guest"] = $node_celia_king_dinner_guest;
+            $params["to_add"][] = $params["celia_king_dinner_guest"];
+            if ($payment_method == 'mail_check') {
+                $submission->data[30][0] = "not-confirmed"; // celia_king_dinner_guest
+                $update_submission = TRUE;
+            }
+        }
+
+        //  | Dinner Groups
+        $dinner_groups_value = "";
+        $key = "";
+        if (!empty($dinner_groups)) {
+            if ($dinner_groups == "dinner_groups_option_1") {
+                $key = "dinner_groups_option_1";
+                $dinner_groups_value = floatval($node->field_dinner_groups_option_1['und'][0]['value']);
+            } elseif ($dinner_groups == "dinner_groups_option_2") {
+                $key = "dinner_groups_option_2";
+                $dinner_groups_value = floatval($node->field_dinner_groups_option_2['und'][0]['value']);
+            } elseif ($dinner_groups == "dinner_groups_option_3") {
+                $key = "dinner_groups_option_3";
+                $dinner_groups_value = floatval($node->field_dinner_groups_option_3['und'][0]['value']);
+            }
+        }
+        if (!empty($dinner_groups_value)) {
+
+            //$dinner_groups_value = floatval($node->field_networking_dg_price['und'][0]['value']);
+            //$key = "dinner_groups";
+            $string = $webform[25]["extra"]["items"];
+            $dinner_groups_label = "Dinner Groups: " . get_label_by_key($string, $key);
+
+            $node_dinner_groups = new stdClass();
+            $node_dinner_groups->type = 'national_conference_add_ons';
+            $node_dinner_groups->status = 1;
+            $node_dinner_groups->uid = $uid;
+            $node_dinner_groups->title = $dinner_groups_label;
+            $node_dinner_groups->field_price['und'][0]['value'] = $dinner_groups_value;
+            $node_dinner_groups->field_nid['und'][0]['nid'] = $nid;
+            $node_dinner_groups->field_sid['und'][0]['value'] = $sid;
+            $node_dinner_groups->field_transaction_type['und'][0]['value'] = "add";
+            $node_dinner_groups->field_confirmed['und'][0]['value'] = "not-confirmed";
+            $node_dinner_groups->field_key['und'][0]['value'] = "dinner_groups";
+            $node_dinner_groups->field_payment_method['und'][0]['value'] = $payment_method;
+            $node_dinner_groups->price = $dinner_groups_value;
+            $node_dinner_groups->sell_price = $dinner_groups_value;
+            $transaction[] = $node_dinner_groups;
+            node_save($node_dinner_groups);
+            $transaction_nid[] = $node_dinner_groups->nid;
+            $params["dinner_groups"] = $node_dinner_groups;
+            $params["to_add"][] = $params["dinner_groups"];
+            if ($payment_method == 'mail_check') {
+                $submission->data[31][0] = "not-confirmed"; // dinner_groups
+                $update_submission = TRUE;
+            }
+        }
+
+        //  |  Golf Outing
+        if ($golf_outing == "golf_outing") {
+            $golf_outing_value = floatval($node->field_networking_go_price['und'][0]['value']);
+            $key = "golf_outing";
+            $string = $webform[26]["extra"]["items"];
+            $golf_outing_label = get_label_by_key($string, $key);
+
+            $node_golf_outing = new stdClass();
+            $node_golf_outing->type = 'national_conference_add_ons';
+            $node_golf_outing->status = 1;
+            $node_golf_outing->uid = $uid;
+            $node_golf_outing->title = $golf_outing_label;
+            $node_golf_outing->field_price['und'][0]['value'] = $golf_outing_value;
+            $node_golf_outing->field_nid['und'][0]['nid'] = $nid;
+            $node_golf_outing->field_sid['und'][0]['value'] = $sid;
+            $node_golf_outing->field_transaction_type['und'][0]['value'] = "add";
+            $node_golf_outing->field_confirmed['und'][0]['value'] = "not-confirmed";
+            $node_golf_outing->field_key['und'][0]['value'] = "golf_outing";
+            $node_golf_outing->field_payment_method['und'][0]['value'] = $payment_method;
+            $node_golf_outing->price = $golf_outing_value;
+            $node_golf_outing->sell_price = $golf_outing_value;
+            $transaction[] = $node_golf_outing;
+            node_save($node_golf_outing);
+            $transaction_nid[] = $node_golf_outing->nid;
+            $params["golf_outing"] = $node_golf_outing;
+            $params["to_add"][] = $params["golf_outing"];
+            if ($payment_method == 'mail_check') {
+                $submission->data[32][0] = "not-confirmed"; // golf_outing
+                $update_submission = TRUE;
+            }
+        }
+
+        $fee = $event_fee;
+        $vent_guest = $event_fee;
+        $total = 0.0;
+        foreach ($transaction as $ite => $current_node) {
+            $total = $total + floatval($current_node->sell_price);
+        }
+
+        //  +=====================================+
+        //  | insert_invoice                      |
+        //  +=====================================+
+        $additional_price = 0;
+        $additional_amount = 0;
+        $order_id = insert_invoice(array(
+            'uid' => $uid,
+            'order_total' => $total,
+            'item_id' => $submission->nid,
+            'key_id' => $submission->sid,
+            'order_status' => 'pending',
+            'payment_method' => $payment_method,
+            'primary_email' => $email_address,
+            'additional_price' => 0,
+            'additional_amount' => 0,
+            'billing_first_name' => $params["first_name"],
+            'billing_last_name' => $params["last_name"],
+            'billing_company' => $organization,
+            'billing_street1' => $street_address,
+            'billing_street2' => "",
+            'billing_city' => $city_state_zip,
+            'billing_zone' => "",
+            'billing_postal_code' => "",
+            'order_type' => 'national_conference_registration',
+            'order_summary' => ""
+        ));
+
+        set_invoice_from_products($params["to_add"], $order_id, "national_conference_add_ons");
+
+      
+        if ($payment_method == 'credit_card') {
+            //-> Looking for discount code
+            $order = new stdClass();
+            $order->products = uc_cart_get_contents();
+            $nid_to_remove = array();
+            $discount_code = FALSE;
+            if (count($order->products) > 0) {
+                foreach ($order->products as $delta => $product) {
+                    if ($product->data["module"] == "uc_product") {
+                        $discount_code = TRUE;
+                        if ($product->type == "discount_code") {
+                            $nid_to_remove[] = $product->nid;
+                        }
+                    }
+                }
+            }
+            //-> End Looking for discount code
+            //-> Empties a cart of its contents.
+            if (!$discount_code) {
+                uc_cart_empty(uc_cart_get_id());
+            }
+
+            $data = array('atributes' => array('sid' => $submission->sid, "nid" => $nid, 'operation' => "insert"));
+            foreach ($transaction_nid as $current_nid) {
+                //-> Adds an item to a user's cart.
+                uc_cart_add_item($current_nid, $qty = 1, $data, $cid = NULL, $msg = TRUE, $check_redirect = TRUE, $rebuild = TRUE);
+            }
+
+            if (count($nid_to_remove) > 0) {
+                node_delete_multiple($nid_to_remove);
+            }
+
+            drupal_get_messages('status', $clear_queue = TRUE);
+            drupal_goto('cart/checkout');
+        } elseif ($payment_method == 'mail_check') {
+
+            $order_summary = new stdClass();
+            $order_summary->products = $params["to_add"];
+            //  +=========================================+
+            //  | Update webform submission To confirmed  |
+            //  +=========================================+
+            $completed_submission = "TRUE";
+            $submission->data[70][0] = $completed_submission;
+            $submission->discard = true;
+            webform_submission_update($node, $submission);
+
+            $items = get_line_items_pay_by_mail_check($params["to_add"]);
+
+            foreach ($items as $delta => $line_item) {
+                if (isset($line_item["type"])) {
+                    if ($line_item["type"] == "subtotal") {
+                        //-> Subtotal
+                        $params["to_add_subtotal"] = $line_item;
+                        $order_summary->subtotal = $params["to_add_subtotal"];
+                    }
+                    if ($line_item["type"] == "coupon") {
+                        //-> Coupon
+                        $params["to_add_coupon"][] = $line_item;
+                        $order_summary->coupon = $params["to_add_coupon"];
+                    }
+                }
+            }
+
+
+            //  +=====================================+
+            //  | Update Invoice(Total)               |
+            //  +=====================================+
+            $total = 0.0;
+            foreach ($params["to_add"] as $key => $product_to_add) {
+                $total = $total + floatval($product_to_add->sell_price);
+            }
+            if (isset($params["to_add_subtotal"])) {
+                $total = floatval($params["to_add_subtotal"]["amount"]);
+            }
+
+            $calculate = FALSE;
+
+            if (isset($params["to_add_subtotal"]["amount"]) && isset($params["to_add_coupon"])) {
+                $total = floatval($params["to_add_subtotal"]["amount"]);
+                $calculate = TRUE;
+            }
+
+            if (isset($params["to_add_coupon"])) {
+                foreach ($params["to_add_coupon"] as $to_add_coupon) {
+                    if ($calculate) {
+                        $total = $total + floatval($to_add_coupon["amount"]);
+                    }
+                }
+            }
+
+            $key_id = $submission->sid;
+            $item_id = $submission->nid;
+            db_update('aaap_check_invoices')->fields(array('order_total' => $total, 'modified' => strtotime('now'), 'order_summary' => json_encode($order_summary)))->condition('key_id', $key_id, '=')->condition('item_id', $item_id, '=')->execute();
+            $result = db_query('SELECT order_id '
+                    . 'FROM {aaap_check_invoices} '
+                    . 'WHERE key_id = :keyid '
+                    . 'AND item_id = :itemid '
+                    . 'ORDER BY order_id DESC '
+                    . 'LIMIT 1', array(':keyid' => $key_id, ':itemid' => $item_id));
+            $all_result = $result->fetchAll();
+            if (isset($all_result[0])) {
+                $order = $all_result[0];
+                if (isset($order->order_id)) {
+                    $params["order_id"] = $order->order_id;
+                    $params["order_download_link_type"] = "Invoice";
+                    $params["order_download_link"] = $base_url . '/invoice/' . $params["order_id"] . '/print';
+                }
+            }
+
+            //  +====================================+
+            //  | Send Notification Emails.          |
+            //  +====================================+
+            $params["payment_method"] = 'mail_check';
+            $text_for_user = " Event Registration and Payment Instructions";
+            $text_for_admin = " Meeting: New Conference Registration";
+            //  +=====================================+
+            //  | Mail To Member                      |
+            //  +=====================================+ 
+            $message = theme('aaap_conference_event_registration_notification_to_user', array('params' => $params));
+            $subject = $params["site_name"] . $text_for_user;
+            $email = new PHPMailer();
+            $email->From = $params["system_mail"];
+            $email->FromName = $params["site_name"];
+            $email->Subject = $subject;
+            $email->Body = $message;
+            $email->IsHTML(true);
+            $email->AddAddress($params["email_address"], '');
+            $email_str_to = (string) $params["email_address"];
+            if (!$email->Send()) {
+                $msq_watchdog = $subject . " <br/> Mail To: " . $email_str_to . " <br/>Email was NOT sent.<br/><br/> Mailer error: " . $email->ErrorInfo . "<br/><br/>" . $message;
+            } else {
+                $msq_watchdog = $subject . " <br/> Mail To: " . $email_str_to . " <br/>Email has been sent.<br/><br/>" . $message;
+            }
+            watchdog('actions', $msq_watchdog, $variables = array(), $severity = WATCHDOG_NOTICE, $link = NULL);
+            //  +=====================================+
+            //  | Mail To Superadmin-Admin            |
+            //  +=====================================+ 
+            $subject = $params["site_name"] . $text_for_admin;
+            $message = theme('aaap_conference_event_registration_notification_to_admin', array('params' => $params));
+            $email = new PHPMailer();
+            $email->From = $params["system_mail"];
+            $email->FromName = $params["site_name"];
+            $email->Subject = $subject;
+            $email->Body = $message;
+            $email->IsHTML(true);
+            $email_to = explode(',', $params["admin_mail"]);
+            foreach ($email_to as $value) {
+                $email->AddAddress($value, '');
+            }
+            $email_str_to = (string) $params["admin_mail"];
+            if (!$email->Send()) {
+                $msq_watchdog = $subject . " <br/> Mail To: " . $email_str_to . " <br/>Email was NOT sent.<br/><br/> Mailer error: " . $email->ErrorInfo . "<br/><br/>" . $message;
+            } else {
+                $msq_watchdog = $subject . " <br/> Mail To: " . $email_str_to . " <br/>Email has been sent.<br/><br/>" . $message;
+            }
+            watchdog('actions', $msq_watchdog, $variables = array(), $severity = WATCHDOG_NOTICE, $link = NULL);
+
+            //Removes one (or all) coupon codes from the session.
+            uc_coupon_session_clear($code = NULL);
+            //Empties a cart of its contents.
+            uc_cart_empty(uc_cart_get_id(FALSE));
+
+            //  +=====================================+
+            //  | Redirect To THanks Page             |
+            //  +=====================================+ 
+            drupal_goto('thank-you-conference-registering');
+        }
+
+        $submission->data[71][0] = $total; // golf_outing
+        $update_submission = TRUE;
+
+        if ($update_submission) {
+            $submission->discard = true;
+            webform_submission_update($node, $submission);
+        }
+
+    }
+}
+
+/**
+ * Implements hook_uc_checkout_complete().
+ */
+function aaap_conference_uc_checkout_complete($order, $account) {
+    global $base_root, $base_url;
+    $user_is_logged_in = user_is_logged_in();
+    $user_is_active_member = user_is_active_member(true);
+    $non_members = TRUE;
+    if ($user_is_logged_in && $user_is_active_member) {
+        $non_members = FALSE;
+    }
+    $atributes = aaap_conference_get_product_from_order($order);
+    $node = $atributes["node"];
+    $sid = $atributes['sid'];
+    $operation = $atributes['operation'];
+    $to_delete = $atributes['to_delete'];
+
+    //-> Change User Rol For anonymous user Registration on event
+    if (count($account->roles) == 1) {
+        if (isset($account->roles[2])) {
+            //-> 2 => "authenticated user" 
+            user_save($account, array('roles' => array(DRUPAL_AUTHENTICATED_RID => 'authenticated user', 10 => 'checkout anonymous user')));
+        }
+    }
+
+    if ($node->type == "conference") {
+
+        module_load_include('inc', 'webform', 'includes/webform.submissions');
+        $products = $order->products;
+        $submission = webform_get_submission($node->nid, $sid);
+        $params["added"] = array();
+        $params["payee"] = $order->billing_first_name . " " . $order->billing_last_name;
+        //-> Actualizamos el estado de todos los productos comprados en esta transacción.
+        foreach ($products as $order_product_id => $product) {
+            if ($product->data["module"] == "uc_product") {
+                //  +============================================================================+
+                //  | Update 'General Session' and 'National Conference - Add-ons' To confirmed  |
+                //  +============================================================================+
+                $add_ons_id = $product->nid;
+                $node_add_ons = node_load($add_ons_id);
+                $node_add_ons->changed = $product->order->modified;
+                $node_add_ons->field_confirmed['und'][0]['value'] = "confirmed";
+                $node_add_ons->field_order_product_id['und'][0]['value'] = $product->order_product_id;
+                $node_add_ons->field_order_id['und'][0]['value'] = $product->order_id;
+                node_save($node_add_ons);
+                $params["added"][] = $node_add_ons;
+                //  +=========================================+
+                //  | Update webform submission To confirmed  |
+                //  +=========================================+
+                $key = $node_add_ons->field_key['und'][0]['value'];
+                switch ($key) {
+                    case "general_sessions":
+                        $submission->data[21][0] = "confirmed";
+                        break;
+                    case 'new_administrator_workshop':
+                        $submission->data[29][0] = "confirmed";
+                        break;
+                    case "celia_king_dinner_guest":
+                        $submission->data[30][0] = "confirmed";
+                        break;
+                    case "dinner_groups":
+                        $submission->data[31][0] = "confirmed";
+                        break;
+                    case "golf_outing":
+                        $submission->data[32][0] = "confirmed";
+                        break;
+                }
+            } elseif ($product->data["module"] == "uc_coupon") {
+                //  +======================+
+                //  | Apply Discount Code  |
+                //  +======================+
+                if ($operation == "insert") {
+                    //-> User Register for the event.
+                    $params["added"][] = $product;
+                }
+            }
+        }
+        //  +=========================================+
+        //  | Update webform submission To confirmed  |
+        //  +=========================================+
+        $completed_submission = "TRUE";
+        $submission->data[70][0] = $completed_submission;
+        $submission->discard = true;
+        webform_submission_update($node, $submission);
+        //- Get the submission update.
+        $submission = webform_get_submission($node->nid, $sid);
+
+        $webform = $node->webform["components"];
+        $uid = $submission->uid;
+        $nid = $submission->nid;
+        $sid = $submission->sid;
+        $params["site_name"] = SITE_NAME;
+        $params["system_mail"] = SYSTEM_MAIL;
+        $params["admin_mail"] = ADMIN_MAIL_TEST;
+        $params["admin_node_url"] = $base_url . '/conference/' . $nid . '/registration/' . $sid . '/edit';
+        $params["node_url"] = $base_root . '/' . drupal_get_path_alias('node/' . $submission->nid);
+        $params["node_title"] = $node->title;
+        $params["first_name"] = $submission->data[63][0];
+        $params["last_name"] = $submission->data[64][0];
+        $params["credentials"] = $submission->data[2][0];
+        $params["title"] = $submission->data[3][0];
+        $params["organization"] = $submission->data[4][0];
+        $params["street_address"] = $submission->data[5][0];
+        $params["city_state_zip"] = $submission->data[6][0];
+        $params["email_address"] = $submission->data[7][0];
+        $params["phone_number"] = $submission->data[8][0];
+        $params["preferred_name_on_badge"] = $submission->data[9][0];
+        $params["i_am_a_veteran_attendee_and_am_willing_to_serve_as_an_aasa_buddy_to_new_attendee"] = $submission->data[10][0];
+        $params["i_am_a_first_time_attendee_and_wish_to_be_paired_with_an_aasa_buddy"] = $submission->data[11][0];
+        $params["hot_topics"] = $submission->data[12][0];
+        //$params["precourse"] = $submission->data[12][0];
+        $params["networking_events_celia_king_dinner"] = $submission->data[23][0];
+        $params["mentoring_program"] = $submission->data[16][0];
+        $params["dietary_restrictions"] = $submission->data[17];
+        $params["guest_name"] = $submission->data[18][0];
+        $params["guest_dietary_restrictions"] = $submission->data[19];
+        $addons = array();
+        //  +=====================+
+        //  | General sessions    |
+        //  +=====================+
+        $general_sessions = array();
+        $type = "national_conference_add_ons";
+        $conference_nid = $nid;
+        $submission_sid = $sid;
+        $field_key = "general_sessions";
+        $query = new EntityFieldQuery();
+        $query->entityCondition('entity_type', 'node')
+                ->entityCondition('bundle', $type)
+                ->fieldCondition('field_key', 'value', $field_key, '=')
+                ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+                ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+                ->propertyOrderBy('created', 'DESC')
+                ->range(0, 1);
+        $result = $query->execute();
+        if (isset($result['node'])) {
+            $nids = array_keys($result['node']);
+            $tmp_nid = $nids[0];
+            $node_general_sessions = node_load($tmp_nid);
+            $addons[] = $node_add_ons;
+            $general_sessions = $node_general_sessions;
+            $show = TRUE;
+            if ($general_sessions->field_transaction_type['und'][0]['value'] == "remove" && $general_sessions->field_confirmed['und'][0]['value'] == "confirmed") {
+                $show = FALSE;
+            }
+            if ($show) {
+                $params["general_sessions"] = $general_sessions;
+            }
+        }
+        //  +=====================+
+        //  | Precourse           |
+        //  +=====================+
+        $precourse = array();
+        $type = "national_conference_add_ons";
+        $conference_nid = $nid;
+        $submission_sid = $sid;
+        $field_key = "new_administrator_workshop";
+        $query = new EntityFieldQuery();
+        $query->entityCondition('entity_type', 'node')
+                ->entityCondition('bundle', $type)
+                ->fieldCondition('field_key', 'value', $field_key, '=')
+                ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+                ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+                ->propertyOrderBy('created', 'DESC')
+                ->range(0, 1);
+        $result = $query->execute();
+        if (isset($result['node'])) {
+            $nids = array_keys($result['node']);
+            $tmp_nid = $nids[0];
+            $node_add_ons = node_load($tmp_nid);
+            $addons[] = $node_add_ons;
+            $precourse = $node_add_ons;
+            $show = TRUE;
+            if ($precourse->field_transaction_type['und'][0]['value'] == "remove" && $precourse->field_confirmed['und'][0]['value'] == "confirmed") {
+                $show = FALSE;
+            }
+            if ($show) {
+                $params["precourse"] = $precourse;
+            }
+        }
+        //  +==============================+
+        //  | Celia King Dinner Guest      |
+        //  +==============================+
+        $celia_king_dinner_guest = array();
+        $type = "national_conference_add_ons";
+        $conference_nid = $nid;
+        $submission_sid = $sid;
+        $field_key = "celia_king_dinner_guest";
+        $query = new EntityFieldQuery();
+        $query->entityCondition('entity_type', 'node')
+                ->entityCondition('bundle', $type)
+                ->fieldCondition('field_key', 'value', $field_key, '=')
+                ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+                ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+                ->propertyOrderBy('created', 'DESC')
+                ->range(0, 1);
+        $result = $query->execute();
+        if (isset($result['node'])) {
+            $nids = array_keys($result['node']);
+            $tmp_nid = $nids[0];
+            $node_add_ons = node_load($tmp_nid);
+            $addons[] = $node_add_ons;
+            $celia_king_dinner_guest = $node_add_ons;
+            $show = TRUE;
+            if ($celia_king_dinner_guest->field_transaction_type['und'][0]['value'] == "remove" && $celia_king_dinner_guest->field_confirmed['und'][0]['value'] == "confirmed") {
+                $show = FALSE;
+            }
+            if ($show) {
+                $params["celia_king_dinner_guest"] = $celia_king_dinner_guest;
+            }
+        }
+        //  +===================+
+        //  | Dinner Groups     |
+        //  +===================+
+        $dinner_groups = array();
+        $type = "national_conference_add_ons";
+        $conference_nid = $nid;
+        $submission_sid = $sid;
+        $field_key = "dinner_groups";
+        $query = new EntityFieldQuery();
+        $query->entityCondition('entity_type', 'node')
+                ->entityCondition('bundle', $type)
+                ->fieldCondition('field_key', 'value', $field_key, '=')
+                ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+                ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+                ->propertyOrderBy('created', 'DESC')
+                ->range(0, 1);
+        $result = $query->execute();
+        if (isset($result['node'])) {
+            $nids = array_keys($result['node']);
+            $tmp_nid = $nids[0];
+            $node_add_ons = node_load($tmp_nid);
+            $addons[] = $node_add_ons;
+            $dinner_groups = $node_add_ons;
+            $show = TRUE;
+            if ($dinner_groups->field_transaction_type['und'][0]['value'] == "remove" && $dinner_groups->field_confirmed['und'][0]['value'] == "confirmed") {
+                $show = FALSE;
+            }
+            if ($show) {
+                $params["dinner_groups"] = $dinner_groups;
+            }
+        }
+        //  +===================+
+        //  | Golf Outing       |
+        //  +===================+
+        $golf_outing = array();
+        $type = "national_conference_add_ons";
+        $conference_nid = $nid;
+        $submission_sid = $sid;
+        $field_key = "golf_outing";
+        $query = new EntityFieldQuery();
+        $query->entityCondition('entity_type', 'node')
+                ->entityCondition('bundle', $type)
+                ->fieldCondition('field_key', 'value', $field_key, '=')
+                ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+                ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+                ->propertyOrderBy('created', 'DESC')
+                ->range(0, 1);
+        $result = $query->execute();
+        if (isset($result['node'])) {
+            $nids = array_keys($result['node']);
+            $tmp_nid = $nids[0];
+            $node_add_ons = node_load($tmp_nid);
+            $addons[] = $node_add_ons;
+            $golf_outing = $node_add_ons;
+            $show = TRUE;
+            if ($golf_outing->field_transaction_type['und'][0]['value'] == "remove" && $golf_outing->field_confirmed['und'][0]['value'] == "confirmed") {
+                $show = FALSE;
+            }
+            if ($show) {
+                $params["golf_outing"] = $golf_outing;
+            }
+        }
+
+        if (empty($order->primary_email)) {
+            $order->primary_email = $params["email_address"];
+        }
+
+        if ($operation == "insert") {
+            $order_summary = new stdClass();
+            $order_summary->products = $params["added"];
+            $items = uc_order_load_line_items($order);
+            foreach ($items as $delta => $line_item) {
+                if (isset($line_item["type"])) {
+                    if ($line_item["type"] == "subtotal") {
+                        //-> Subtotal
+                        $params["added_subtotal"] = $line_item;
+                        $order_summary->subtotal = $params["added_subtotal"];
+                    }
+                    if ($line_item["type"] == "coupon") {
+                        //-> Coupon
+                        $params["added_coupon"][] = $line_item;
+                        $order_summary->coupon = $params["added_coupon"];
+                    }
+                }
+            }
+
+            //  +=====================================+
+            //  | Update Invoice(Total)               |
+            //  +=====================================+
+            $total = 0.0;
+            foreach ($params["added"] as $key => $product_added) {
+                $total = $total + floatval($product_added->sell_price);
+            }
+            if (isset($params["added_subtotal"])) {
+                $total = floatval($params["added_subtotal"]["amount"]);
+            }
+
+            $calculate = FALSE;
+
+            if (isset($params["added_subtotal"]["amount"]) && isset($params["added_coupon"])) {
+                $total = floatval($params["added_subtotal"]["amount"]);
+                $calculate = TRUE;
+            }
+
+            if (isset($params["added_coupon"])) {
+                foreach ($params["added_coupon"] as $added_coupon) {
+                    if ($calculate) {
+                        $total = $total + floatval($added_coupon["amount"]);
+                    }
+                }
+            }
+
+            $key_id = $sid;
+            $item_id = $node->nid;
+            set_status_invoice($key_id, $item_id, 'completed');
+            db_update('aaap_check_invoices')->fields(array('order_total' => $total, 'modified' => strtotime('now'), 'order_summary' => json_encode($order_summary)))->condition('key_id', $key_id, '=')->condition('item_id', $item_id, '=')->execute();
+            $result = db_query('SELECT order_id '
+                    . 'FROM {aaap_check_invoices} '
+                    . 'WHERE key_id = :keyid '
+                    . 'AND item_id = :itemid '
+                    . 'ORDER BY order_id DESC '
+                    . 'LIMIT 1', array(':keyid' => $key_id, ':itemid' => $item_id));
+            $all_result = $result->fetchAll();
+            if (isset($all_result[0])) {
+                $order_tmp = $all_result[0];
+                if (isset($order_tmp->order_id)) {
+                    $params["order_id"] = $order_tmp->order_id;
+                    $params["order_download_link_type"] = "Receipt";
+                    $params["order_download_link"] = $base_url . '/invoice/' . $params["order_id"] . '/print';
+                }
+            }
+
+            //  +====================================+
+            //  | Send Notification Emails.          |
+            //  +====================================+
+            $text_for_user = " National Conference Confirmation";
+            $text_for_admin = " Meeting: New Conference Registrations";
+            //  +=====================================+
+            //  | Mail To Member                      |
+            //  +=====================================+ 
+            $message = theme('aaap_conference_event_registration_notification_to_user', array('params' => $params));
+            $subject = $params["site_name"] . $text_for_user;
+            $email = new PHPMailer();
+            $email->From = $params["system_mail"];
+            $email->FromName = $params["site_name"];
+            $email->Subject = $subject;
+            $email->Body = $message;
+            $email->IsHTML(true);
+            $email->AddAddress($order->primary_email, '');
+            $email->Send();
+            //  +=====================================+
+            //  | Mail To Superadmin-Admin            |
+            //  +=====================================+ 
+            $subject = $params["site_name"] . $text_for_admin;
+            $message = theme('aaap_conference_event_registration_notification_to_admin', array('params' => $params));
+            $email = new PHPMailer();
+            $email->From = $params["system_mail"];
+            $email->FromName = $params["site_name"];
+            $email->Subject = $subject;
+            $email->Body = $message;
+            $email->IsHTML(true);
+            $email_to = explode(',', $params["admin_mail"]);
+            foreach ($email_to as $value) {
+                $email->AddAddress($value, '');
+            }
+            $email->Send();
+        } else {
+            //-> User update their registration.
+            $text_for_user = " Confirmation of National Conference Changes";
+            $text_for_admin = " Meeting: Updated Conference Registration";
+            //-> Looking for Add-Ons To Remove. And Looking for Add-Ons To Add.
+            $params["to_delete"] = array();
+            if (count($to_delete) > 0) {
+                $params["to_delete"] = $to_delete;
+            }
+            $params["to_add"] = array();
+            $update_submission = false;
+            //  +=====================+
+            //  | Precourse           |
+            //  +=====================+
+            if (count($params["precourse"]) > 0) {
+                $update_submission = true;
+                if ($params["precourse"]->field_transaction_type['und'][0]['value'] == "remove" && $params["precourse"]->field_confirmed['und'][0]['value'] == "not-confirmed") {
+                    $params["to_delete"][] = $params["precourse"];
+                    $submission->data[29][0] = "remove"; //-> Confirmed - New Administrator Workshop
+                    $submission->data[33][0] = "not-confirmed"; //-> Confirmed Remove - New Administrator Workshop
+                } elseif ($params["precourse"]->field_transaction_type['und'][0]['value'] == "remove" && $params["precourse"]->field_confirmed['und'][0]['value'] == "confirmed") {
+                    $submission->data[29][0] = "not-apply"; //-> Confirmed - New Administrator Workshop
+                    $submission->data[33][0] = "confirmed"; //-> Confirmed Remove - New Administrator Workshop
+                } elseif ($params["precourse"]->field_transaction_type['und'][0]['value'] == "add" && $params["precourse"]->field_confirmed['und'][0]['value'] == "not-confirmed") {
+                    $params["to_add"][] = $params["precourse"];
+                    $submission->data[29][0] = "not-confirmed"; //-> Confirmed - New Administrator Workshop
+                    $submission->data[33][0] = ""; //-> Confirmed Remove - New Administrator Workshop
+                } elseif ($params["precourse"]->field_transaction_type['und'][0]['value'] == "add" && $params["precourse"]->field_confirmed['und'][0]['value'] == "confirmed") {
+                    $submission->data[29][0] = "confirmed"; //-> Confirmed - New Administrator Workshop
+                    $submission->data[33][0] = ""; //-> Confirmed Remove - New Administrator Workshop
+                }
+            }
+
+            //  +==============================+
+            //  | Celia King Dinner Guest      |
+            //  +==============================+
+            if (count($params["celia_king_dinner_guest"]) > 0) {
+                $update_submission = true;
+                if ($params["celia_king_dinner_guest"]->field_transaction_type['und'][0]['value'] == "remove" && $params["celia_king_dinner_guest"]->field_confirmed['und'][0]['value'] == "not-confirmed") {
+                    $params["to_delete"][] = $params["celia_king_dinner_guest"];
+                    $submission->data[30][0] = "remove"; //-> Confirmed - Celia King Dinner Guest
+                    $submission->data[34][0] = "not-confirmed";  //-> Confirmed Remove - Celia King Dinner Guest
+                } elseif ($params["celia_king_dinner_guest"]->field_transaction_type['und'][0]['value'] == "remove" && $params["celia_king_dinner_guest"]->field_confirmed['und'][0]['value'] == "confirmed") {
+                    $submission->data[30][0] = "not-apply"; //-> Confirmed - Celia King Dinner Guest
+                    $submission->data[34][0] = "confirmed";  //-> Confirmed Remove - Celia King Dinner Guest
+                } elseif ($params["celia_king_dinner_guest"]->field_transaction_type['und'][0]['value'] == "add" && $params["celia_king_dinner_guest"]->field_confirmed['und'][0]['value'] == "not-confirmed") {
+                    $params["to_add"][] = $params["celia_king_dinner_guest"];
+                    $submission->data[30][0] = "not-confirmed"; //-> Confirmed - Celia King Dinner Guest
+                    $submission->data[34][0] = "";  //-> Confirmed Remove - Celia King Dinner Guest 
+                } elseif ($params["celia_king_dinner_guest"]->field_transaction_type['und'][0]['value'] == "add" && $params["celia_king_dinner_guest"]->field_confirmed['und'][0]['value'] == "confirmed") {
+                    $submission->data[30][0] = "confirmed"; //-> Confirmed - Celia King Dinner Guest
+                    $submission->data[34][0] = "";  //-> Confirmed Remove - Celia King Dinner Guest 
+                }
+            }
+
+            //  +===================+
+            //  | Dinner Groups     |
+            //  +===================+
+            if (count($params["dinner_groups"]) > 0) {
+                $update_submission = true;
+                if ($params["dinner_groups"]->field_transaction_type['und'][0]['value'] == "remove" && $params["dinner_groups"]->field_confirmed['und'][0]['value'] == "not-confirmed") {
+                    $params["to_delete"][] = $params["dinner_groups"];
+                    $submission->data[31][0] = "remove"; //-> Confirmed - Dinner Groups
+                    $submission->data[35][0] = "not-confirmed"; //-> Confirmed Remove - Dinner Groups
+                } elseif ($params["dinner_groups"]->field_transaction_type['und'][0]['value'] == "remove" && $params["dinner_groups"]->field_confirmed['und'][0]['value'] == "confirmed") {
+                    $submission->data[31][0] = "not-apply"; //-> Confirmed - Dinner Groups
+                    $submission->data[35][0] = "confirmed"; //-> Confirmed Remove - Dinner Groups
+                } elseif ($params["dinner_groups"]->field_transaction_type['und'][0]['value'] == "add" && $params["dinner_groups"]->field_confirmed['und'][0]['value'] == "not-confirmed") {
+                    $params["to_add"][] = $params["dinner_groups"];
+                    $submission->data[31][0] = "not-confirmed"; //-> Confirmed - Dinner Groups
+                    $submission->data[35][0] = ""; //-> Confirmed Remove - Dinner Groups
+                } elseif ($params["dinner_groups"]->field_transaction_type['und'][0]['value'] == "add" && $params["dinner_groups"]->field_confirmed['und'][0]['value'] == "confirmed") {
+                    $submission->data[31][0] = "confirmed"; //-> Confirmed - Dinner Groups
+                    $submission->data[35][0] = ""; //-> Confirmed Remove - Dinner Groups
+                }
+            }
+
+            //  +===================+
+            //  | Golf Outing       |
+            //  +===================+
+            if (count($params["golf_outing"]) > 0) {
+                $update_submission = true;
+                if ($params["golf_outing"]->field_transaction_type['und'][0]['value'] == "remove" && $params["golf_outing"]->field_confirmed['und'][0]['value'] == "not-confirmed") {
+                    $params["to_delete"][] = $params["golf_outing"];
+                    $submission->data[32][0] = "remove"; //-> Confirmed - Golf Outing
+                    $submission->data[36][0] = "not-confirmed"; //-> Confirmed Remove - Golf Outing
+                } elseif ($params["golf_outing"]->field_transaction_type['und'][0]['value'] == "remove" && $params["golf_outing"]->field_confirmed['und'][0]['value'] == "confirmed") {
+                    $submission->data[32][0] = "not-apply"; //-> Confirmed - Golf Outing
+                    $submission->data[36][0] = "confirmed"; //-> Confirmed Remove - Golf Outing
+                } elseif ($params["golf_outing"]->field_transaction_type['und'][0]['value'] == "add" && $params["golf_outing"]->field_confirmed['und'][0]['value'] == "not-confirmed") {
+                    $params["to_add"][] = $params["golf_outing"];
+                    $submission->data[32][0] = "not-confirmed"; //-> Confirmed - Golf Outing
+                    $submission->data[36][0] = ""; //-> Confirmed Remove - Golf Outing
+                } elseif ($params["golf_outing"]->field_transaction_type['und'][0]['value'] == "add" && $params["golf_outing"]->field_confirmed['und'][0]['value'] == "confirmed") {
+                    $submission->data[32][0] = "confirmed"; //-> Confirmed - Golf Outing
+                    $submission->data[36][0] = ""; //-> Confirmed Remove - Golf Outing
+                }
+            }
+
+            if ($update_submission) {
+                $submission->discard = true;
+                webform_submission_update($node, $submission);
+            }
+
+
+            //  +==============================+
+            //  | Send Update Emails.          |
+            //  +==============================+
+            //  +=====================================+
+            //  | Mail To Member                      |
+            //  +=====================================+ 
+            $message = theme('aaap_conference_event_update_notification_to_user', array('params' => $params));
+            $subject = $params["site_name"] . $text_for_user;
+            $email = new PHPMailer();
+            $email->From = $params["system_mail"];
+            $email->FromName = $params["site_name"];
+            $email->Subject = $subject;
+            $email->Body = $message;
+            $email->IsHTML(true);
+            $email->AddAddress($order->primary_email, '');
+            $email->Send();
+            //  +=====================================+
+            //  | Mail To Superadmin-Admin            |
+            //  +=====================================+ 
+            $subject = $params["site_name"] . $text_for_admin;
+            $message = theme('aaap_conference_event_update_notification_to_admin', array('params' => $params));
+            $email = new PHPMailer();
+            $email->From = $params["system_mail"];
+            $email->FromName = $params["site_name"];
+            $email->Subject = $subject;
+            $email->Body = $message;
+            $email->IsHTML(true);
+            $email_to = explode(',', $params["admin_mail"]);
+            foreach ($email_to as $value) {
+                $email->AddAddress($value, '');
+            }
+            $email->Send();
+        }
+
+
+        //Removes one (or all) coupon codes from the session.
+        uc_coupon_session_clear($code = NULL);
+        //Empties a cart of its contents.
+        uc_cart_empty(uc_cart_get_id(FALSE));
+        //  +=====================================+
+        //  | Redirect To THanks Page             |
+        //  +=====================================+ 
+        drupal_goto('thank-you-conference-registering');
+    }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function aaap_conference_theme($existing, $type, $theme, $path) {
+    return array(
+        'aaap_conference_event_text_free_membership_application_request_notification_to_admin' => array(
+            'template' => 'templates/aaap-conference-event-text-free-membership-application-request-notification-to-admin',
+            'variables' => array('params' => NULL),
+        ),
+        'aaap_conference_event_text_free_membership_application_request_notification_to_user' => array(
+            'template' => 'templates/aaap-conference-event-text-free-membership-application-request-notification-to-user',
+            'variables' => array('params' => NULL),
+        ),
+        'aaap_conference_event_notification_payment_received' => array(
+            'template' => 'templates/aaap-conference-event-notification-payment-received',
+            'variables' => array('params' => NULL),
+        ),
+        'aaap_conference_event_update_confirmation_notification_to_user' => array(
+            'template' => 'templates/aaap-conference-event-update-confirmation-notification-to-user',
+            'variables' => array('params' => NULL),
+        ),
+        'aaap_conference_event_update_notification_to_user' => array(
+            'template' => 'templates/aaap-conference-event-update-notification-to-user',
+            'variables' => array('params' => NULL),
+        ),
+        'aaap_conference_event_update_notification_to_admin' => array(
+            'template' => 'templates/aaap-conference-event-update-notification-to-admin',
+            'variables' => array('params' => NULL),
+        ),
+        'aaap_conference_event_registration_notification_to_user' => array(
+            'template' => 'templates/aaap-conference-event-registration-notification-to-user',
+            'variables' => array('params' => NULL),
+        ),
+        'aaap_conference_event_registration_notification_to_admin' => array(
+            'template' => 'templates/aaap-conference-event-registration-notification-to-admin',
+            'variables' => array('params' => NULL),
+        ),
+        'view_edit_national_conference_registration' => array(
+            'template' => 'templates/view-edit-national-conference-registration',
+            'variables' => array('params' => NULL),
+        ),
+    );
+}
+
+function aaap_conference_get_product_from_order($order) {
+    $products = $order->products;
+    $nid = "";
+    $sid = "";
+    $operation = "";
+    $to_delete = array();
+    $product_purchased = array();
+    foreach ($products as $key => $product) {
+        if (isset($product->data['atributes']['nid'])) {
+            $nid = $product->data['atributes']['nid'];
+        }
+        if (isset($product->data['atributes']['operation'])) {
+            $operation = $product->data['atributes']['operation'];
+        }
+        if (isset($product->data['atributes']['sid'])) {
+            $sid = $product->data['atributes']['sid'];
+        }
+        if (isset($product->data['atributes']['to_delete'])) {
+            $to_delete = $product->data['atributes']['to_delete'];
+        }
+        if (!empty($nid) && !empty($sid)) {
+            break;
+        }
+    }
+    $product_purchased = node_load($nid);
+    return array("node" => $product_purchased, "sid" => $sid, "operation" => $operation, "to_delete" => $to_delete);
+}
+
+function _conference_registration($nid) {
+    if (request_uri() == '/conference/' . $nid . '/registration') {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+/**
+ * Menu callback; Present a Webform submission page for display or editing.
+ */
+function _conference_webform_submission_page($nid, $sid, $format) {
+    //  +=========================================================+
+    //  |  Load a webform node if the given nid is a webform.     |
+    //  +=========================================================+ 
+    if (!is_numeric($nid)) {
+        return FALSE;
+    }
+    $node = node_load($nid);
+    if (!isset($node->type) || !variable_get('webform_node_' . $node->type, FALSE)) {
+        return FALSE;
+    }
+
+    //  +=============================================================+
+    //  |  Load a webform submission if the given sid is a valid.     |
+    //  +=============================================================+ 
+    module_load_include('inc', 'webform', 'includes/webform.submissions');
+    $submission = webform_get_submission($nid, $sid);
+
+    if (!empty($submission)) {
+        if ($format == 'form') {
+            $output = drupal_get_form('webform_client_form_' . $node->nid, $node, $submission);
+            return $output;
+            //die(var_dump($output));
+        } else {
+            return FALSE;
+        }
+    } else {
+        return FALSE;
+    }
+}
+
+/*
+ * Funtion to filter report table acording to filters
+ */
+
+function _conference_do_filter_report($filter, &$submissions) {
+
+    switch ($filter) {
+        case 'members':
+            foreach ($submissions as $sid => $submission) {
+                if ($submission->uid == 0 or user_load($submission->uid) == NULL) {
+                    unset($submissions[$sid]);
+                }
+            }
+            break;
+        case 'non-members':
+            foreach ($submissions as $sid => $submission) {
+                if ($submission->uid != 0 and user_load($submission->uid) != NULL) {
+                    unset($submissions[$sid]);
+                }
+            }
+            break;
+        case 'non-members-pending':
+            break;
+        case 'members-pending':
+            break;
+    }
+}
+
+/**
+ * Menu callback; Present a list National Conference Registration.
+ */
+function _conference_reports($nid) {
+
+    global $user;
+    $node = node_load($nid);
+    $submissions = webform_get_submissions($nid);
+    //  +====================+
+    //  | Filters            |
+    //  +====================+
+    if (isset($_GET['filter'])) {
+        _conference_do_filter_report($_GET['filter'], $submissions);
+    }
+    $header = array(
+        array('data' => 'Name'),
+        array('data' => 'Organization'),
+        array('data' => 'Street Address'),
+        array('data' => 'City, State, Zip'),
+        array('data' => 'Email'),
+        array('data' => 'Operations'),
+    );
+
+    $rows = array();
+    $destination = drupal_get_destination();
+    foreach ($submissions as $sid => $submission) {
+        //dpm($submission);
+        $name = $submission->data[63][0] . " " . $submission->data[64][0];
+        $organization = $submission->data[4][0];
+        $street_address = $submission->data[5][0];
+        $city_state_zip = $submission->data[6][0];
+        $email = $submission->data[7][0];
+        $view = l(t('View '), "view/$node->nid/conference/$submission->sid");
+        $edit = l(t('Edit '), "conference/$node->nid/registration/$submission->sid/edit", array('query' => $destination));
+        $operations = $view . " - " . $edit;
+        $row = array($name, $organization, $street_address, $city_state_zip, $email, $operations);
+        $rows[] = $row;
+    }
+
+    $element = array();
+    $element['#theme'] = 'webform_results_submissions';
+    $element['#node'] = $node;
+    $element['#submissions'] = $submissions;
+    $element['#attached']['library'][] = array('webform', 'admin');
+    $element['table']['#theme'] = 'table';
+    $element['table']['#header'] = $header;
+    $element['table']['#rows'] = $rows;
+
+    drupal_set_title(t("Edit National Conference"));
+    //  +====================+
+    //  | Set Filter         |
+    //  +====================+
+    $all = isset($_GET['filter']) ? "<a href='/admin/conference/" . $nid . "/report'>All participants</a>" : "All participants";
+    $members = $filter != 'members' ? "<a href='?filter=members'>Members Registered</a>" : "Members Registered";
+    $non_members = $filter != 'non-members' ? "<a href='?filter=non-members'>Non-Members Registered</a>" : "Non-Members Registered";
+    $members_pending = $filter != 'members-pending' ? "<a href='?filter=members-pending'>Members with payment pending</a>" : "Members with payment pending";
+    $non_members_pending = $filter != 'non-members-pending' ? "<a href='?filter=non-members-pending'>Non-Members with payment pending</a>" : "Non-Members with payment pending";
+    $filters = "Showing: $all | $members | $non_members | $members_pending | $non_members_pending";
+    if (isset($_GET['filter']) || true) {
+        $csv_filter = "filter=" . $_GET['filter'];
+    } else {
+        $csv_filter = "";
+    }
+    $csv = " -- <a href='/admin/conference/$nid/csv?$csv_filter'>DOWNLOAD AS CSV</a>";
+    $output = "<h2 class='panel-title'>$node->title.</h2>";
+    $output .= "<div id='view-invoices'>" . $filters . $csv;
+    $output .= drupal_render($element);
+    $output .= "</div>";
+    return array(
+        'top_table' => array(
+            '#type' => 'markup',
+            '#markup' => $output,
+        ),
+    );
+}
+
+/**
+ * Menu callback; based on webform_results_download_form_submit in webform.report.inc ... webform 7.x-3.20
+ */
+function _conference_export_submissions_to_csv($nid) {
+
+    $node = node_load($nid);
+    $submissions = webform_get_submissions($node->nid);
+    if (isset($_GET['filter'])) {
+        _conference_do_filter_report($_GET['filter'], $submissions);
+    }
+    $options = array(
+        'delimiter' => ',',
+        'components' => array('time', 'webform_time', '63', '64', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '21', '14', '29', '23', '24', '63', '30', '25', '31', '26', '32', '16', '17', '18', '19', '20', "70", "71"),
+        'select_keys' => 0,
+        'select_format' => 'separate',
+        'range_type' => 'range',
+        'download' => TRUE,
+    );
+
+    // Retrieve the list of required SIDs.
+    $options['sids'] = _conference_extract_sids($submissions);
+
+    $export_info = webform_results_export($node, 'delimited', $options);
+    webform_results_download($node, $export_info);
+}
+
+/*
+ * Function to extract sids from submissions
+ */
+
+function _conference_extract_sids($submissions) {
+    $sids = array();
+    foreach ($submissions as $sub) {
+        $sids[] = $sub->sid;
+    }
+    return $sids;
+}
+
+/**
+ * Menu callback; Present a list National Conference Registration.
+ */
+function _conference_manage_conferences() {
+    global $user;
+    $node_type = "conference"; // can find this on the node type's "edit" screen in the Drupal admin section.
+    $nids = db_select('node', 'n')
+            ->fields('n', array('nid'))
+            ->condition('type', $node_type, '=')
+            ->execute()
+            ->fetchCol();
+    $nodes = node_load_multiple($nids);
+    $header = array(
+        array('data' => 'Titles'),
+        array('data' => 'Date'),
+        array('data' => 'Actions'),
+    );
+
+    $rows = array();
+    foreach ($nodes as $key => $node) {
+        $date_event = "";
+        if (isset($node->field_date['und'][0]['value'])) {
+            $date_event = date('l, M jS', strtotime($node->field_date['und'][0]['value']));
+            if ($node->field_date['und'][0]['value'] != $node->field_date['und'][0]['value2']) {
+                $date_event .= " to " . date('l, M jS', strtotime($node->field_date['und'][0]['value2'])) . ".";
+            }
+        }
+
+        $edit_link = '<a href="/node/' . $node->nid . '/edit" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-pencil"></span> <span class="txt-btn">Edit</span></a>';
+        $delete_link = '<a href="/node/' . $node->nid . '/delete" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-pencil"></span> <span class="txt-btn">Delete</span></a>';
+        $repot_link = '<a href="/admin/conference/' . $node->nid . '/report" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-pencil"></span> <span class="txt-btn">Report</span></a>';
+        $actions = $edit_link . " - " . $delete_link . " - " . $repot_link;
+        $title = l($node->title, 'node/' . $node->nid, array('options' => array('absolute' => TRUE)));
+        $row = array($title, $date_event, $actions);
+        $rows[] = $row;
+    }
+
+    $element = array();
+    $element['#theme'] = 'webform_results_submissions';
+    $element['#node'] = $node;
+    //$element['#submissions'] = $submissions;
+    $element['#attached']['library'][] = array('webform', 'admin');
+    $element['table']['#theme'] = 'table';
+    $element['table']['#header'] = $header;
+    $element['table']['#rows'] = $rows;
+
+    drupal_set_title(t("Manage National Conference"));
+    $output = "<h2 class='panel-title'>National Conferences</h2>";
+    $output .= "<div id='view-invoices'>";
+    $output .= drupal_render($element);
+    $output .= "</div>";
+    return array(
+        'top_table' => array(
+            '#type' => 'markup',
+            '#markup' => $output,
+        ),
+    );
+}
+
+/**
+ * Menu callback; Present a list to View/Edit National Conference Registration.
+ */
+function _conference_view_edit_individual_registration($nid, $sid) {
+
+    drupal_set_title(t("View/Edit National Conference Registration"));
+
+    $path_module = drupal_get_path("module", "aaap_conference");
+    drupal_add_css($path_module . '/css/style.css');
+
+    module_load_include('inc', 'webform', 'includes/webform.submissions');
+    $submission = webform_get_submission($nid, $sid, $reset = FALSE);
+
+    $output = "<h2 class='panel-title'>View/Edit National Conference Registration</h2>";
+    $output .= "<div id='view-invoices'>";
+
+    $sid = $submission->sid;
+    $nid = $submission->nid;
+    $uid = $submission->uid;
+    $node = node_load($nid);
+    $title = $node->title;
+    $addons = array();
+    //  +=====================+
+    //  | General sessions    |
+    //  +=====================+
+    $general_sessions = array();
+    $type = "national_conference_add_ons";
+    $conference_nid = $nid;
+    $submission_sid = $sid;
+    $field_key = "general_sessions";
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node')
+            ->entityCondition('bundle', $type)
+            ->fieldCondition('field_key', 'value', $field_key, '=')
+            ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+            ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+            ->propertyOrderBy('created', 'DESC')
+            ->range(0, 1);
+    $result = $query->execute();
+    if (isset($result['node'])) {
+        $nids = array_keys($result['node']);
+        $tmp_nid = $nids[0];
+        $node_general_sessions = node_load($tmp_nid);
+        $general_sessions = $node_general_sessions;
+    }
+    //  +=====================+
+    //  | Precourse           |
+    //  +=====================+
+    $type = "national_conference_add_ons";
+    $conference_nid = $nid;
+    $submission_sid = $sid;
+    $field_key = "new_administrator_workshop";
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node')
+            ->entityCondition('bundle', $type)
+            ->fieldCondition('field_key', 'value', $field_key, '=')
+            ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+            ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+            ->propertyOrderBy('created', 'DESC')
+            ->range(0, 1);
+    $result = $query->execute();
+    if (isset($result['node'])) {
+        $nids = array_keys($result['node']);
+        $tmp_nid = $nids[0];
+        $node_add_ons = node_load($tmp_nid);
+        if ($node_add_ons->field_transaction_type['und'][0]['value'] == "remove") {
+            if ($node_add_ons->field_confirmed['und'][0]['value'] != "confirmed") {
+                $addons[] = $node_add_ons;
+            }
+        } else {
+            $addons[] = $node_add_ons;
+        }
+    }
+
+    //  +==============================+
+    //  | Celia King Dinner Guest      |
+    //  +==============================+
+    $type = "national_conference_add_ons";
+    $conference_nid = $nid;
+    $submission_sid = $sid;
+    $field_key = "celia_king_dinner_guest";
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node')
+            ->entityCondition('bundle', $type)
+            ->fieldCondition('field_key', 'value', $field_key, '=')
+            ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+            ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+            ->propertyOrderBy('created', 'DESC')
+            ->range(0, 1);
+    $result = $query->execute();
+    if (isset($result['node'])) {
+        $nids = array_keys($result['node']);
+        $tmp_nid = $nids[0];
+        $node_add_ons = node_load($tmp_nid);
+        if ($node_add_ons->field_transaction_type['und'][0]['value'] == "remove") {
+            if ($node_add_ons->field_confirmed['und'][0]['value'] != "confirmed") {
+                $addons[] = $node_add_ons;
+            }
+        } else {
+            $addons[] = $node_add_ons;
+        }
+    }
+    //  +===================+
+    //  | Dinner Groups     |
+    //  +===================+
+    $type = "national_conference_add_ons";
+    $conference_nid = $nid;
+    $submission_sid = $sid;
+    $field_key = "dinner_groups";
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node')
+            ->entityCondition('bundle', $type)
+            ->fieldCondition('field_key', 'value', $field_key, '=')
+            ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+            ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+            ->propertyOrderBy('created', 'DESC')
+            ->range(0, 1);
+    $result = $query->execute();
+    if (isset($result['node'])) {
+        $nids = array_keys($result['node']);
+        $tmp_nid = $nids[0];
+        $node_add_ons = node_load($tmp_nid);
+        if ($node_add_ons->field_transaction_type['und'][0]['value'] == "remove") {
+            if ($node_add_ons->field_confirmed['und'][0]['value'] != "confirmed") {
+                $addons[] = $node_add_ons;
+            }
+        } else {
+            $addons[] = $node_add_ons;
+        }
+    }
+    //  +===================+
+    //  | Golf Outing       |
+    //  +===================+
+    $type = "national_conference_add_ons";
+    $conference_nid = $nid;
+    $submission_sid = $sid;
+    $field_key = "golf_outing";
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node')
+            ->entityCondition('bundle', $type)
+            ->fieldCondition('field_key', 'value', $field_key, '=')
+            ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+            ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+            ->propertyOrderBy('created', 'DESC')
+            ->range(0, 1);
+    $result = $query->execute();
+    if (isset($result['node'])) {
+        $nids = array_keys($result['node']);
+        $tmp_nid = $nids[0];
+        $node_add_ons = node_load($tmp_nid);
+        if ($node_add_ons->field_transaction_type['und'][0]['value'] == "remove") {
+            if ($node_add_ons->field_confirmed['und'][0]['value'] != "confirmed") {
+                $addons[] = $node_add_ons;
+            }
+        } else {
+            $addons[] = $node_add_ons;
+        }
+    }
+
+    if (isset($node->field_imagen_event['und'][0]['uri'])) {
+        $image_event = theme('image_style', array('style_name' => 'thumbnail_148x114', 'path' => $node->field_imagen_event['und'][0]['uri'], 'getsize' => FALSE));
+    } else {
+        $image_event = "";
+    }
+
+    $date_event = "";
+    if (isset($node->field_date['und'][0]['value'])) {
+        $date_event = date('l, M jS', strtotime($node->field_date['und'][0]['value']));
+        if ($node->field_date['und'][0]['value'] != $node->field_date['und'][0]['value2']) {
+            $date_event .= " - " . date('l, M jS', strtotime($node->field_date['und'][0]['value2']));
+        }
+    }
+
+    $date_location = "";
+    if (isset($node->field_event_location['und'][0]['value'])) {
+        $date_location = $node->field_event_location['und'][0]['value'] . " - " . $node->field_city['und'][0]['value'] . ", " . $node->field_state_province['und'][0]['value'];
+        ;
+    }
+
+    $description = "";
+    if (isset($node->field_short_description['und'][0]['value'])) {
+        $description = $node->field_short_description['und'][0]['value'];
+    }
+
+    $edit_link = "/conference/" . $nid . "/registration/" . $sid . "/edit";
+    $submitted = date("j F Y", $submission->submitted);
+    $params = array("sid" => $sid, "nid" => $nid, "uid" => $uid, "image_event" => $image_event, "title" => $title, "date_event" => $date_event, "date_location" => $date_location, "description" => $description, "edit_link" => $edit_link, "general_sessions" => $general_sessions, "addons" => $addons);
+    $output .= theme('view_edit_national_conference_registration', array('params' => $params));
+
+    $output .= "</div>";
+    return array(
+        'top_table' => array(
+            '#type' => 'markup',
+            '#markup' => $output,
+        ),
+    );
+
+    //return $output;
+}
+
+/**
+ * Menu callback; Present a list to View/Edit National Conference Registration.
+ */
+function _conference_view_edit_registration() {
+    global $user;
+    $path_module = drupal_get_path("module", "aaap_conference");
+    drupal_add_css($path_module . '/css/style.css');
+
+    $node_type = "conference"; // can find this on the node type's "edit" screen in the Drupal admin section.
+
+    $nids = db_select('node', 'n')
+            ->fields('n', array('nid'))
+            ->condition('type', $node_type, '=')
+            ->execute()
+            ->fetchCol();
+
+    module_load_include('inc', 'webform', 'includes/webform.submissions');
+    $submissions = array();
+    foreach ($nids as $key => $nid) {
+        $submissions[] = webform_get_submissions($filters = array('nid' => $nid, 'uid' => $user->uid), $header = NULL, $pager_count = 0);
+    }
+
+    // die(var_dump($submissions));
+    // $mysubmission_count = webform_get_submission_count($node->nid, $user->uid);
+    $output = "<h2 class='panel-title'>View/Edit National Conference Registration</h2>";
+    $output .= "<div id='view-invoices'>";
+
+    foreach ($submissions as $node_submissions) {
+        if (count($node_submissions) > 1) {
+            
+        } else {
+
+            foreach ($node_submissions as $submission) {
+                $completedSubmission = $submission->data[70][0];
+                if ($completedSubmission == "TRUE") {
+                    $sid = $submission->sid;
+                    $nid = $submission->nid;
+                    $uid = $submission->uid;
+                    $node = node_load($nid);
+                    $title = $node->title;
+                    $addons = array();
+                    //  +=====================+
+                    //  | General sessions    |
+                    //  +=====================+
+                    $general_sessions = array();
+                    $type = "national_conference_add_ons";
+                    $conference_nid = $nid;
+                    $submission_sid = $sid;
+                    $field_key = "general_sessions";
+                    $query = new EntityFieldQuery();
+                    $query->entityCondition('entity_type', 'node')
+                            ->entityCondition('bundle', $type)
+                            ->fieldCondition('field_key', 'value', $field_key, '=')
+                            ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+                            ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+                            ->propertyOrderBy('created', 'DESC')
+                            ->range(0, 1);
+                    $result = $query->execute();
+                    if (isset($result['node'])) {
+                        $nids = array_keys($result['node']);
+                        $tmp_nid = $nids[0];
+                        $node_general_sessions = node_load($tmp_nid);
+                        $general_sessions = $node_general_sessions;
+                    }
+                    //  +=====================+
+                    //  | Precourse           |
+                    //  +=====================+
+                    $type = "national_conference_add_ons";
+                    $conference_nid = $nid;
+                    $submission_sid = $sid;
+                    $field_key = "new_administrator_workshop";
+                    $query = new EntityFieldQuery();
+                    $query->entityCondition('entity_type', 'node')
+                            ->entityCondition('bundle', $type)
+                            ->fieldCondition('field_key', 'value', $field_key, '=')
+                            ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+                            ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+                            ->propertyOrderBy('created', 'DESC')
+                            ->range(0, 1);
+                    $result = $query->execute();
+                    if (isset($result['node'])) {
+                        $nids = array_keys($result['node']);
+                        $tmp_nid = $nids[0];
+                        $node_add_ons = node_load($tmp_nid);
+                        if ($node_add_ons->field_transaction_type['und'][0]['value'] == "remove") {
+                            if ($node_add_ons->field_confirmed['und'][0]['value'] != "confirmed") {
+                                $addons[] = $node_add_ons;
+                            }
+                        } else {
+                            $addons[] = $node_add_ons;
+                        }
+                    }
+
+                    //  +==============================+
+                    //  | Celia King Dinner Guest      |
+                    //  +==============================+
+                    $type = "national_conference_add_ons";
+                    $conference_nid = $nid;
+                    $submission_sid = $sid;
+                    $field_key = "celia_king_dinner_guest";
+                    $query = new EntityFieldQuery();
+                    $query->entityCondition('entity_type', 'node')
+                            ->entityCondition('bundle', $type)
+                            ->fieldCondition('field_key', 'value', $field_key, '=')
+                            ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+                            ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+                            ->propertyOrderBy('created', 'DESC')
+                            ->range(0, 1);
+                    $result = $query->execute();
+                    if (isset($result['node'])) {
+                        $nids = array_keys($result['node']);
+                        $tmp_nid = $nids[0];
+                        $node_add_ons = node_load($tmp_nid);
+                        if ($node_add_ons->field_transaction_type['und'][0]['value'] == "remove") {
+                            if ($node_add_ons->field_confirmed['und'][0]['value'] != "confirmed") {
+                                $addons[] = $node_add_ons;
+                            }
+                        } else {
+                            $addons[] = $node_add_ons;
+                        }
+                    }
+                    //  +===================+
+                    //  | Dinner Groups     |
+                    //  +===================+
+                    $type = "national_conference_add_ons";
+                    $conference_nid = $nid;
+                    $submission_sid = $sid;
+                    $field_key = "dinner_groups";
+                    $query = new EntityFieldQuery();
+                    $query->entityCondition('entity_type', 'node')
+                            ->entityCondition('bundle', $type)
+                            ->fieldCondition('field_key', 'value', $field_key, '=')
+                            ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+                            ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+                            ->propertyOrderBy('created', 'DESC')
+                            ->range(0, 1);
+                    $result = $query->execute();
+                    if (isset($result['node'])) {
+                        $nids = array_keys($result['node']);
+                        $tmp_nid = $nids[0];
+                        $node_add_ons = node_load($tmp_nid);
+                        if ($node_add_ons->field_transaction_type['und'][0]['value'] == "remove") {
+                            if ($node_add_ons->field_confirmed['und'][0]['value'] != "confirmed") {
+                                $addons[] = $node_add_ons;
+                            }
+                        } else {
+                            $addons[] = $node_add_ons;
+                        }
+                    }
+                    //  +===================+
+                    //  | Golf Outing       |
+                    //  +===================+
+                    $type = "national_conference_add_ons";
+                    $conference_nid = $nid;
+                    $submission_sid = $sid;
+                    $field_key = "golf_outing";
+                    $query = new EntityFieldQuery();
+                    $query->entityCondition('entity_type', 'node')
+                            ->entityCondition('bundle', $type)
+                            ->fieldCondition('field_key', 'value', $field_key, '=')
+                            ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+                            ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+                            ->propertyOrderBy('created', 'DESC')
+                            ->range(0, 1);
+                    $result = $query->execute();
+                    if (isset($result['node'])) {
+                        $nids = array_keys($result['node']);
+                        $tmp_nid = $nids[0];
+                        $node_add_ons = node_load($tmp_nid);
+                        if ($node_add_ons->field_transaction_type['und'][0]['value'] == "remove") {
+                            if ($node_add_ons->field_confirmed['und'][0]['value'] != "confirmed") {
+                                $addons[] = $node_add_ons;
+                            }
+                        } else {
+                            $addons[] = $node_add_ons;
+                        }
+                    }
+
+
+                    if (isset($node->field_imagen_event['und'][0]['uri'])) {
+                        $image_event = theme('image_style', array('style_name' => 'thumbnail_148x114', 'path' => $node->field_imagen_event['und'][0]['uri'], 'getsize' => FALSE));
+                    } else {
+                        $image_event = "";
+                    }
+
+                    $date_event = "";
+                    if (isset($node->field_date['und'][0]['value'])) {
+                        $date_event = date('l, M jS', strtotime($node->field_date['und'][0]['value']));
+                        if ($node->field_date['und'][0]['value'] != $node->field_date['und'][0]['value2']) {
+                            $date_event .= " - " . date('l, M jS', strtotime($node->field_date['und'][0]['value2']));
+                        }
+                    }
+
+                    $date_location = "";
+                    if (isset($node->field_event_location['und'][0]['value'])) {
+                        $date_location = $node->field_event_location['und'][0]['value'] . " - " . $node->field_city['und'][0]['value'] . ", " . $node->field_state_province['und'][0]['value'];
+                        ;
+                    }
+
+                    $description = "";
+                    if (isset($node->field_short_description['und'][0]['value'])) {
+                        $description = $node->field_short_description['und'][0]['value'];
+                    }
+
+                    $edit_link = "/conference/" . $nid . "/registration/" . $sid . "/edit";
+                    $submitted = date("j F Y", $submission->submitted);
+                    $params = array("sid" => $sid, "nid" => $nid, "uid" => $uid, "image_event" => $image_event, "title" => $title, "date_event" => $date_event, "date_location" => $date_location, "description" => $description, "edit_link" => $edit_link, "general_sessions" => $general_sessions, "addons" => $addons);
+                    $output .= theme('view_edit_national_conference_registration', array('params' => $params));
+                }
+            }
+        }
+    }
+    $output .= "</div>";
+    return array(
+        'top_table' => array(
+            '#type' => 'markup',
+            '#markup' => $output,
+        ),
+    );
+    //return $output;
+}
+
+function _render_conference_webform($nid) {
+    //-> Check if the user already have an submitted
+    global $user;
+    $filters = array('nid' => $nid, 'uid' => $user->uid);
+    $submissions = webform_get_submissions($filters, $header = NULL, $pager_count = 0);
+    if (count($submissions) > 0) {
+        reset($submissions);
+        $sid = key($submissions);
+        drupal_goto($path = "conference/$nid/registration/$sid/edit");
+    } else {
+        $node = node_load($nid);
+        return node_view($node);
+    }
+}
+
+/**
+ * Helper Function
+ */
+//$admin = true then admins should be considered as active members
+function user_is_active_member($admin = false) {
+    global $user;
+    if (array_key_exists(ACTIVE, $user->roles)) {
+        return true;
+    }
+    if ($admin && (array_key_exists(ADMINISTRATOR, $user->roles) || array_key_exists(SUPER, $user->roles))) {
+        return true;
+    }
+    return false;
+}
+
+function user_is_admin() {
+    global $user;
+    if (array_key_exists(ADMINISTRATOR, $user->roles) || array_key_exists(SUPER, $user->roles)) {
+        return true;
+    }
+    return false;
+}
+
+/*
+ * Function to get el label of an select item by key
+ */
+
+function get_label_by_key($string, $key) {
+    $label = "";
+    $partido = explode("\n", $string);
+    foreach ($partido as $key_intern => $item) {
+        $cutent_item = explode("|", $item);
+        foreach ($cutent_item as $ite => $lab) {
+            if ($lab == $key) {
+                $label = $cutent_item[$ite + 1];
+                break;
+            }
+        }
+    }
+    return $label;
+}
+
+/*
+ * Funtion to  Looking for Add-ons Changes on edit event registration for an specific add-ons
+ */
+
+function looking_addons_changes($nid, $sid, $uid, $field_key, $submission_field_value, $webform, $node_add_key, $node_add_ons_value, $submission_key_confirmation_field, $submission_key_confirmation_remove_field, $submission_key_add_ons_field, $payment_method, $webform_key_component, &$submission) {
+    //  +===================================+
+    //  | Looking for Add-ons Changes       |
+    //  +===================================+
+    $response = array("update_submission" => FALSE, "transaction" => array(), "to_delete" => array());
+    $type = "national_conference_add_ons";
+    $conference_nid = $nid;
+    $submission_sid = $sid;
+    $field_key = $field_key;
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node')
+            ->entityCondition('bundle', $type)
+            ->fieldCondition('field_key', 'value', $field_key, '=')
+            ->fieldCondition('field_nid', 'nid', $conference_nid, '=')
+            ->fieldCondition('field_sid', 'value', $submission_sid, '=')
+            ->propertyOrderBy('created', 'DESC')
+            ->range(0, 1);
+    $result = $query->execute();
+    if (isset($result['node'])) {
+        // El usuario tiene el servicio Validamos si cambio algo en este servicio
+        $nids = array_keys($result['node']);
+        $tmp_nid = $nids[0];
+        $node_add_ons = node_load($tmp_nid);
+        //-> Verificamos la peticion del formulario
+        if (empty($submission_field_value)) {
+            //-> Peticion para eliminar el servicio.
+            $can_remove_service = false;
+            if ($node_add_ons->field_transaction_type['und'][0]['value'] == "add") {
+                $can_remove_service = true;
+            }
+            if ($can_remove_service) {
+                //-> Eliminamos el servicio.
+                //  | Remove - New Administrator Workshop
+                $submission->data[$submission_key_confirmation_field][0] = "remove";
+                $submission->data[$submission_key_confirmation_remove_field][0] = "not-confirmed";
+                $response["update_submission"] = TRUE;
+                //  | Update add - ons.
+                $node_add_ons->field_confirmed['und'][0]['value'] = "not-confirmed";
+                $node_add_ons->field_transaction_type['und'][0]['value'] = "remove";
+                node_save($node_add_ons);
+                //-> Send email: Eliminando servicio actual.
+                $response["to_delete"] = $node_add_ons;
+            } else {
+                //-> No puede eliminar o esta ya eliminado el servicio
+                //-> Verificamos que el servicio no este ya removido.
+                if ($submission->data[$submission_key_confirmation_field][0] == "remove" && $submission->data[$submission_key_confirmation_remove_field][0] == "confirmed" && $node_add_ons->field_confirmed['und'][0]['value'] == "confirmed" && $node_add_ons->field_transaction_type['und'][0]['value'] == "remove") {
+                    //-> El servicio ya esta removido
+                } else {
+                    //-> El servicio no esta removido y no se puede remover
+                    $submission->data[$submission_key_add_ons_field][0] = $field_key;
+                    $response["update_submission"] = TRUE;
+                }
+            }
+        } else {
+            //-> El servicio no tiene cambio | El usuario quiere añadir el servicio
+            if ($node_add_ons->field_transaction_type['und'][0]['value'] == "remove" && $node_add_ons->field_confirmed['und'][0]['value'] == "confirmed") {
+                //  | Update add - ons.
+                $node_add_ons->field_confirmed['und'][0]['value'] = "not-confirmed";
+                $node_add_ons->field_transaction_type['und'][0]['value'] = "add";
+                $node_add_ons->field_payment_method['und'][0]['value'] = $payment_method;
+                node_save($node_add_ons);
+                //-> Send email: Añadiendo servicio actual.
+                $response["transaction"][] = $node_add_ons;
+                //  | Add - make sure that confirmation field are up-to-date
+                $submission->data[$submission_key_confirmation_field][0] = "not-confirmed";
+                $submission->data[$submission_key_confirmation_remove_field][0] = "not-confirmed";
+                $response["update_submission"] = TRUE;
+            } else {
+                //-> El usuario no puede añadir el servicio aún
+                //$submission->data[$submission_key_add_ons_field][0] = "";
+                //$response["update_submission"] = TRUE;
+            }
+        }
+    } else {
+        //-> Verificamos la peticion del formulario
+        if (empty($submission_field_value)) {
+            //-> No ahi ninguna peticion para este servicio
+        } else {
+            //-> Añadir el servicio.
+            $key = $node_add_key;
+            $string = $webform[$webform_key_component]["extra"]["items"];
+            $node_add_ons_label = get_label_by_key($string, $key);
+
+            $node_add_ons = new stdClass();
+            $node_add_ons->type = 'national_conference_add_ons';
+            $node_add_ons->status = 1;
+            $node_add_ons->uid = $uid;
+            $node_add_ons->title = $node_add_ons_label;
+            $node_add_ons->field_price['und'][0]['value'] = $node_add_ons_value;
+            $node_add_ons->field_nid['und'][0]['nid'] = $nid;
+            $node_add_ons->field_sid['und'][0]['value'] = $sid;
+            $node_add_ons->field_transaction_type['und'][0]['value'] = "add";
+            $node_add_ons->field_confirmed['und'][0]['value'] = "not-confirmed";
+            $node_add_ons->field_payment_method['und'][0]['value'] = $payment_method;
+            $node_add_ons->field_key['und'][0]['value'] = $field_key;
+            $node_add_ons->price = $node_add_ons_value;
+            $node_add_ons->sell_price = $node_add_ons_value;
+            //-> Send email: Añadiendo servicio actual.
+            $response["transaction"][] = $node_add_ons;
+            //  | Remove - New Administrator Workshop
+            $submission->data[$submission_key_confirmation_field][0] = "not-confirmed";
+            $response["update_submission"] = TRUE;
+        }
+    }
+    return $response;
+}
+
+/*
+ * Function to calcule subtotal with discount if apply
+ */
+
+function get_line_items_pay_by_mail_check($product_to_add = array()) {
+    //-> Looking for discount code
+    $products = uc_cart_get_contents();
+    $coupon_code = "";
+    $nid_to_remove = array();
+    $line_items = array();
+    $discount_code = FALSE;
+    if (count($products) > 0) {
+        foreach ($products as $delta => $product) {
+            if ($product->data["module"] == "uc_product") {
+                $discount_code = TRUE;
+                if ($product->type == "discount_code") {
+                    $nid_to_remove[] = $product->nid;
+                }
+            }
+        }
+    }
+
+    //-> Añadimos los productos a la orden
+    if (count($product_to_add) > 0) {
+        //-> Empties a cart of its contents.
+        if (!$discount_code) {
+            uc_cart_empty(uc_cart_get_id());
+        }
+        $data = array('atributes' => array('operation' => "insert"));
+        $uid = "";
+        foreach ($product_to_add as $delta => $product) {
+            $uid = $product->uid;
+            uc_cart_add_item($product->nid, $qty = 1, $data, $cid = NULL, $msg = FALSE, $check_redirect = FALSE, $rebuild = TRUE);
+        }
+
+        $order = uc_order_new($uid, 'in_checkout');
+        $order_id = $order->order_id;
+        $_SESSION['cart_order'] = $order_id;
+        $order->products = uc_cart_get_contents();
+        unset($_SESSION['uc_cart_order_rebuild']);
+        uc_order_save($order);
+        $order = uc_order_load($order_id);
+        $line_items = uc_order_load_line_items($order);
+    }
+
+    if (count($nid_to_remove) > 0) {
+        node_delete_multiple($nid_to_remove);
+    }
+
+    return $line_items;
+}

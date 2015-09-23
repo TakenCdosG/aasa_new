@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the AAAP Module Configurations feature.
+ */
+
+include_once 'aaap_module_configurations.features.inc';

@@ -1,0 +1,31 @@
+<?php
+
+
+function aasa_form_alter(&$form, &$form_state, $form_id){
+
+    global $user;
+
+    if($form_id == 'search_block_form'){
+        $form['#submit'] = $form['#submit'] = array('aasa_search_box_form_submit');
+    }
+
+    if($form_id == 'user_profile_form'){
+//    dsm($form);
+        $form['field_verify_email']['#access']= FALSE;
+
+    }
+
+    if($form_id == 'user_register_form'){
+//    dsm($form);
+        if(array_key_exists(ADMINISTRATOR, $user->roles) || array_key_exists(SUPER, $user->roles)){
+            $form['field_verify_email']['#access']= FALSE;
+        }
+
+    }
+}
+
+function aasa_search_box_form_submit(&$form, &$form_state){
+
+    drupal_goto("http://aasa1.org/search/node/".$form_state['values']['search_block_form']);
+
+}
