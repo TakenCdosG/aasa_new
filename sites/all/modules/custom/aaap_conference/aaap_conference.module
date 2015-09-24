@@ -1853,6 +1853,7 @@ function aaap_conference_webform_submission_insert($node, $submission) {
             $node_precourse->sell_price = $precourse_value;
             $transaction[] = $node_precourse;
             node_save($node_precourse);
+            $submission->data[73][0] = $precourse_value;
             $transaction_nid[] = $node_precourse->nid;
             $params["precourse"] = $node_precourse;
             $params["to_add"][] = $params["precourse"];
@@ -1885,6 +1886,7 @@ function aaap_conference_webform_submission_insert($node, $submission) {
             $node_celia_king_dinner_guest->sell_price = $celia_king_dinner_value;
             $transaction[] = $node_celia_king_dinner_guest;
             node_save($node_celia_king_dinner_guest);
+            $submission->data[75][0] = $celia_king_dinner_value;
             $transaction_nid[] = $node_celia_king_dinner_guest->nid;
             $params["celia_king_dinner_guest"] = $node_celia_king_dinner_guest;
             $params["to_add"][] = $params["celia_king_dinner_guest"];
@@ -1932,6 +1934,7 @@ function aaap_conference_webform_submission_insert($node, $submission) {
             $node_dinner_groups->sell_price = $dinner_groups_value;
             $transaction[] = $node_dinner_groups;
             node_save($node_dinner_groups);
+            $submission->data[76][0] = $dinner_groups_value;
             $transaction_nid[] = $node_dinner_groups->nid;
             $params["dinner_groups"] = $node_dinner_groups;
             $params["to_add"][] = $params["dinner_groups"];
@@ -1964,6 +1967,7 @@ function aaap_conference_webform_submission_insert($node, $submission) {
             $node_golf_outing->sell_price = $golf_outing_value;
             $transaction[] = $node_golf_outing;
             node_save($node_golf_outing);
+            $submission->data[72][0] = $golf_outing_value;
             $transaction_nid[] = $node_golf_outing->nid;
             $params["golf_outing"] = $node_golf_outing;
             $params["to_add"][] = $params["golf_outing"];
