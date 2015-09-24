@@ -161,6 +161,10 @@ function aaap_conference_form_alter(&$form, &$form_state, $form_id) {
 
             hide($form['submitted']['completed_submission']);
             hide($form['submitted']['total_paid']);
+            hide($form['submitted']['golf_outing']);
+            hide($form['submitted']['new_administrator_workshop']);
+            hide($form['submitted']['celia_king_dinner_guest']);
+            hide($form['submitted']['dinner_groups']);
 
             //  +==============================================+
             //  | Hide Free membership || Hide Discount Codes  |
