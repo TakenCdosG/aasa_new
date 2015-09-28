@@ -56,6 +56,13 @@ function aaap_conference_menu() {
         'type' => MENU_CALLBACK,
     );
 
+    $items['admin/update_conference_submissions'] = array(
+        'page callback' => '_update_conference_submissions',
+        'access callback' => TRUE,
+        'title callback' => t('Update Conference Submissions'),
+        'type' => MENU_CALLBACK,
+    );
+
     return $items;
 }
 
@@ -3476,9 +3483,56 @@ function _render_conference_webform($nid) {
     }
 }
 
+function _update_conference_submissions(){
+
+    $submissions = webform_get_submissions(array('nid'=>290));
+
+    //$submission = $submissions[552];
+
+    //dpm($submission->data[29][0]);
+
+    foreach($submissions as $key => $submission){
+    update_conference_submission($submission,72,14,50);
+
+    update_conference_submission($submission,73,24,150);
+
+
+    switch ($submission->data[25][0]) {
+        case 'dinner_groups_option_1':
+            $price = 75;
+            break;
+        case 'dinner_groups_option_2':
+            $price = 65;
+            break;
+        case 'dinner_groups_option_3':
+            $price = 35;
+            break;
+    }
+    update_conference_submission($submission,74,25,$price);
+
+
+    update_conference_submission($submission,75,26,65);
+
+
+    }
+    return $submissions;
+}
+
 /**
  * Helper Function
  */
+
+function update_conference_submission($submission,$field_total,$field_to_check,$price){
+    if(empty($submission->data[$field_to_check][0])){
+        $price = 0;
+    }
+    if(array_key_exists($field_total,$submission->data)){
+        db_update('webform_submitted_data')->fields(array('data' => $price))->condition('nid', 290, '=')->condition('sid', $submission->sid, '=')->condition('cid',$field_total,'=')->execute();
+    }else{
+        db_insert('webform_submitted_data')->fields(array('nid'=>290,'sid'=>$submission->sid,'cid'=>$field_total,'data' => $price))->execute();
+    }
+}
+
 //$admin = true then admins should be considered as active members
 function user_is_active_member($admin = false) {
     global $user;
