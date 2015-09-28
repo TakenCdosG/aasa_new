@@ -29,6 +29,7 @@ function aaap_conference_menu() {
         'access callback' => TRUE,
         'title callback' => t('View/Edit National Conference Registration'),
         'type' => MENU_CALLBACK,
+
     );
 
     $items['view/%/conference/%'] = array(
@@ -49,10 +50,12 @@ function aaap_conference_menu() {
     $items['admin/conference/%/report'] = array(
         'page callback' => '_conference_reports',
         'page arguments' => array(2),
-        'access callback' => TRUE,
+        'access callback' => 'custom_permission_access',
+        'access arguments' => array(array('Administrator', 'Super Administrator')),
         'title callback' => t('Manage Conferences Registration'),
         'type' => MENU_CALLBACK,
     );
+
 
     $items['admin/conference/%/csv'] = array(
         'page callback' => '_conference_export_submissions_to_csv',
@@ -72,6 +75,19 @@ function aaap_conference_menu() {
     return $items;
 }
 
+function custom_permission_access($roles){
+    if (user_is_logged_in()) {
+        global $user;
+        foreach ($roles as $role) {
+            if (in_array($role, $user->roles)) {
+                return TRUE;
+            }
+        }
+    }
+    else {
+        return FALSE;
+    }
+}
 /*
  * Function to custom validate of webform
  */
