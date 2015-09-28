@@ -3507,6 +3507,8 @@ function _update_conference_submissions(){
         case 'dinner_groups_option_3':
             $price = 35;
             break;
+        default:
+            $price = 0;
     }
     update_conference_submission($submission,74,25,$price);
 
