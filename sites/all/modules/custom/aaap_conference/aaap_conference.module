@@ -18,6 +18,12 @@ function aaap_conference_menu() {
         'title' => 'Event Registration Edit'
     );
 
+    $items['admin/conference/%/registration/%/cancel'] = array(
+        'page callback' => '_conference_cancel_individual_registration',
+        'page arguments' => array(2, 4),
+        'access callback' => TRUE
+    );
+
     $items['view/conference'] = array(
         'page callback' => '_conference_view_edit_registration',
         'access callback' => TRUE,
@@ -56,8 +62,8 @@ function aaap_conference_menu() {
         'type' => MENU_CALLBACK,
     );
 
-    $items['admin/update_conference_submissions'] = array(
-        'page callback' => '_update_conference_submissions',
+    $items['admin/conference/update_conference_submissions'] = array(
+        'page callback' => '_conference_update_submissions',
         'access callback' => TRUE,
         'title callback' => t('Update Conference Submissions'),
         'type' => MENU_CALLBACK,
@@ -155,6 +161,7 @@ function aaap_conference_form_alter(&$form, &$form_state, $form_id) {
 
     if (isset($form['#node']->type) && isset($form['submitted'])) {
         if ($form['#node']->type == "conference") {
+
             $webform_client_form_validate = $form['#validate'][0];
             $form['#validate'] = array();
             $form['#validate'][] = 'aaap_conference_webform_client_form_validate';
@@ -172,6 +179,8 @@ function aaap_conference_form_alter(&$form, &$form_state, $form_id) {
             hide($form['submitted']['new_administrator_workshop']);
             hide($form['submitted']['celia_king_dinner_guest']);
             hide($form['submitted']['dinner_groups']);
+            hide($form['submitted']['canceled']);
+
 
             //  +==============================================+
             //  | Hide Free membership || Hide Discount Codes  |
@@ -190,7 +199,7 @@ function aaap_conference_form_alter(&$form, &$form_state, $form_id) {
                 }
             }
 
-            //dpm($form);
+
             //-> Todo: Validar que sea tambien un usuario activo.
             $user_is_logged_in = user_is_logged_in();
             $user_is_active_member = user_is_active_member(true);
@@ -205,7 +214,6 @@ function aaap_conference_form_alter(&$form, &$form_state, $form_id) {
                 $members = TRUE;
             }
 
-            $messages_status = '';
             $membership_form = TRUE;
             if ($user_is_active_member || $user_is_admin) {
                 $membership_form = FALSE;
@@ -215,6 +223,15 @@ function aaap_conference_form_alter(&$form, &$form_state, $form_id) {
             //  +===========================================+
             //  | Lock form to lock the form if necessary   |
             //  +===========================================+
+
+            //Block the form if was canceled
+            if($form['#submission']->data[76][0]== 'TRUE' && !$user_is_admin){
+                $form = block_submission_form($form);
+                $messages_status = '<div class="messages_status">Notice: This register was canceled.You are not available to edit it.</div>';
+                $messages_status .= '<h4 class="section_title">Background Information</h4>';
+
+            }
+
             if (isset($form['#submission']->sid) && isset($form['#submission']->nid)) {
                 $sid = $form['#submission']->sid;
                 $nid = $form['#submission']->nid;
@@ -247,39 +264,14 @@ function aaap_conference_form_alter(&$form, &$form_state, $form_id) {
                         $tmp_nid = $nids[0];
                         $lock_form = TRUE;
                     }
-                    $lock_form = FALSE;
-                    if ($lock_form) {
-                        //-> Lock the form.
-                        $form['submitted']['first_name']['#attributes']['disabled'] = 'disabled';
-                        $form['submitted']['last_name']['#attributes']['disabled'] = 'disabled';
-                        $form['submitted']['credentials']['#attributes']['disabled'] = 'disabled';
-                        $form['submitted']['title']['#attributes']['disabled'] = 'disabled';
-                        $form['submitted']['organization']['#attributes']['disabled'] = 'disabled';
-                        $form['submitted']['street_address']['#attributes']['disabled'] = 'disabled';
-                        $form['submitted']['city_state_zip']['#attributes']['disabled'] = 'disabled';
-                        $form['submitted']['email_address']['#attributes']['disabled'] = 'disabled';
-                        $form['submitted']['phone_number']['#attributes']['disabled'] = 'disabled';
-                        $form['submitted']['preferred_name_on_badge']['#attributes']['disabled'] = 'disabled';
-                        $form['submitted']['i_am_a_veteran_attendee_and_am_willing_to_serve_as_an_aasa_buddy_to_new_attendee']['#attributes']['disabled'] = 'disabled';
-                        $form['submitted']['i_am_a_first_time_attendee_and_wish_to_be_paired_with_an_aasa_buddy']['#attributes']['disabled'] = 'disabled';
-                        $form['submitted']['hot_topics']['#attributes']['disabled'] = 'disabled';
-                        $form['submitted']['general_sessions']['#attributes']['disabled'] = 'disabled';
-                        $form['submitted']['precourse']['#attributes']['disabled'] = 'disabled';
-                        $form['submitted']['networking_events_celia_king_dinner']['#attributes']['disabled'] = 'disabled';
-                        $form['submitted']['networking_events_celia_king_dinner_guest']['#attributes']['disabled'] = 'disabled';
-                        $form['submitted']['networking_events_dinner_groups']['#attributes']['disabled'] = 'disabled';
-                        $form['submitted']['networking_events_golf_outing']['#attributes']['disabled'] = 'disabled';
-                        $form['submitted']['mentoring_program']['#attributes']['disabled'] = 'disabled';
-                        $form['submitted']['dietary_restrictions']['#attributes']['disabled'] = 'disabled';
-                        $form['submitted']['guest_name']['#attributes']['disabled'] = 'disabled';
-                        $form['submitted']['guest_dietary_restrictions']['#attributes']['disabled'] = 'disabled';
-                        $form['submitted']['payment_method']['#attributes']['disabled'] = 'disabled';
-                        $form['actions']['submit']['#attributes']['disabled'] = 'disabled';
-                        hide($form['actions']['submit']);
 
-                        $messages_status = '<div class="messages_status bg-warning">Notice: While you have current changes pending, you will not be able to edit your registration form.</div>';
+                    $lock_form = FALSE;
+                    if($lock_form){
+                        $form = block_submission_form($form);
+                        $messages_status .= '<div class="messages_status bg-warning">Notice: While you have current changes pending, you will not be able to edit your registration form.</div>';
                         $messages_status .= '<h4 class="section_title">Background Information</h4>';
                     }
+
                 }
             }
 
@@ -2907,7 +2899,8 @@ function _conference_reports($nid) {
         $email = $submission->data[7][0];
         $view = l(t('View '), "view/$node->nid/conference/$submission->sid");
         $edit = l(t('Edit '), "conference/$node->nid/registration/$submission->sid/edit", array('query' => $destination));
-        $operations = $view . " - " . $edit;
+        $cancel = l(t('Cancel '), "admin/conference/$node->nid/registration/$submission->sid/cancel");
+        $operations = $view . " - " . $edit. " - " .$cancel;
         $row = array($name, $organization, $street_address, $city_state_zip, $email, $operations);
         $rows[] = $row;
     }
@@ -3483,19 +3476,14 @@ function _render_conference_webform($nid) {
     }
 }
 
-function _update_conference_submissions(){
+function _conference_update_submissions(){
 
     $submissions = webform_get_submissions(array('nid'=>290));
 
-    //$submission = $submissions[552];
-
-    //dpm($submission->data[29][0]);
-
     foreach($submissions as $key => $submission){
+
     update_conference_submission($submission,72,14,50);
-
     update_conference_submission($submission,73,24,150);
-
 
     switch ($submission->data[25][0]) {
         case 'dinner_groups_option_1':
@@ -3511,18 +3499,60 @@ function _update_conference_submissions(){
             $price = 0;
     }
     update_conference_submission($submission,74,25,$price);
-
-
     update_conference_submission($submission,75,26,65);
 
-
     }
-    return $submissions;
+    return "UPDATED";
+}
+
+function _conference_cancel_individual_registration($nid,$sid){
+
+    $submission = webform_get_submission($nid, $sid);
+    //dpm($submission);
+    if(array_key_exists(76,$submission->data)){
+        db_update('webform_submitted_data')->fields(array('data' => 'TRUE'))->condition('nid', $nid, '=')->condition('sid', $submission->sid, '=')->condition('cid',76,'=')->execute();
+    }else{
+        db_insert('webform_submitted_data')->fields(array('nid'=>$nid,'sid'=>$submission->sid,'cid'=>76,'data' => 'TRUE'))->execute();
+    }
+    drupal_goto('admin/conference/290/report');
 }
 
 /**
  * Helper Function
  */
+
+function  block_submission_form($form){
+
+        $form['submitted']['first_name']['#attributes']['disabled'] = 'disabled';
+        $form['submitted']['last_name']['#attributes']['disabled'] = 'disabled';
+        $form['submitted']['credentials']['#attributes']['disabled'] = 'disabled';
+        $form['submitted']['title']['#attributes']['disabled'] = 'disabled';
+        $form['submitted']['organization']['#attributes']['disabled'] = 'disabled';
+        $form['submitted']['street_address']['#attributes']['disabled'] = 'disabled';
+        $form['submitted']['city_state_zip']['#attributes']['disabled'] = 'disabled';
+        $form['submitted']['email_address']['#attributes']['disabled'] = 'disabled';
+        $form['submitted']['phone_number']['#attributes']['disabled'] = 'disabled';
+        $form['submitted']['preferred_name_on_badge']['#attributes']['disabled'] = 'disabled';
+        $form['submitted']['i_am_a_veteran_attendee_and_am_willing_to_serve_as_an_aasa_buddy_to_new_attendee']['#attributes']['disabled'] = 'disabled';
+        $form['submitted']['i_am_a_first_time_attendee_and_wish_to_be_paired_with_an_aasa_buddy']['#attributes']['disabled'] = 'disabled';
+        $form['submitted']['hot_topics']['#attributes']['disabled'] = 'disabled';
+        $form['submitted']['general_sessions']['#attributes']['disabled'] = 'disabled';
+        $form['submitted']['precourse']['#attributes']['disabled'] = 'disabled';
+        $form['submitted']['networking_events_celia_king_dinner']['#attributes']['disabled'] = 'disabled';
+        $form['submitted']['networking_events_celia_king_dinner_guest']['#attributes']['disabled'] = 'disabled';
+        $form['submitted']['networking_events_dinner_groups']['#attributes']['disabled'] = 'disabled';
+        $form['submitted']['networking_events_golf_outing']['#attributes']['disabled'] = 'disabled';
+        $form['submitted']['mentoring_program']['#attributes']['disabled'] = 'disabled';
+        $form['submitted']['dietary_restrictions']['#attributes']['disabled'] = 'disabled';
+        $form['submitted']['guest_name']['#attributes']['disabled'] = 'disabled';
+        $form['submitted']['guest_dietary_restrictions']['#attributes']['disabled'] = 'disabled';
+        $form['submitted']['payment_method']['#attributes']['disabled'] = 'disabled';
+        $form['actions']['submit']['#attributes']['disabled'] = 'disabled';
+        hide($form['actions']['submit']);
+
+
+    return $form;
+}
 
 function update_conference_submission($submission,$field_total,$field_to_check,$price){
     if(empty($submission->data[$field_to_check][0])){
