@@ -4,6 +4,7 @@
  * Implements hook_menu().
  */
 function aaap_conference_menu() {
+
     $items['conference/%/registration'] = array(
         'page callback' => '_render_conference_webform',
         'page arguments' => array(1),
@@ -20,6 +21,8 @@ function aaap_conference_menu() {
 
     $items['admin/conference/%/registration/%/cancel'] = array(
         'page callback' => '_conference_cancel_individual_registration',
+        'access callback' => 'custom_permission_access',
+        'access arguments' => array(array('Administrator', 'Super Administrator')),
         'page arguments' => array(2, 4),
         'access callback' => TRUE
     );
@@ -42,8 +45,9 @@ function aaap_conference_menu() {
 
     $items['admin/manage-conferences'] = array(
         'page callback' => '_conference_manage_conferences',
-        'access callback' => TRUE,
         'title callback' => t('Manage Conferences Registration'),
+        'access callback' => 'custom_permission_access',
+        'access arguments' => array(array('Administrator', 'Super Administrator')),
         'type' => MENU_CALLBACK,
     );
 
@@ -56,18 +60,19 @@ function aaap_conference_menu() {
         'type' => MENU_CALLBACK,
     );
 
-
     $items['admin/conference/%/csv'] = array(
         'page callback' => '_conference_export_submissions_to_csv',
         'page arguments' => array(2),
-        'access callback' => TRUE,
+        'access callback' => 'custom_permission_access',
+        'access arguments' => array(array('Administrator', 'Super Administrator')),
         'title callback' => t('Manage Conferences Registration'),
         'type' => MENU_CALLBACK,
     );
 
     $items['admin/conference/update_conference_submissions'] = array(
         'page callback' => '_conference_update_submissions',
-        'access callback' => TRUE,
+        'access callback' => 'custom_permission_access',
+        'access arguments' => array(array('Administrator', 'Super Administrator')),
         'title callback' => t('Update Conference Submissions'),
         'type' => MENU_CALLBACK,
     );
@@ -88,6 +93,7 @@ function custom_permission_access($roles){
         return FALSE;
     }
 }
+
 /*
  * Function to custom validate of webform
  */
