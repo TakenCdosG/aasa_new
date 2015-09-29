@@ -253,7 +253,7 @@ function aaap_conference_form_alter(&$form, &$form_state, $form_id) {
             //  +===========================================+
 
             //Block the form if was canceled
-            if($form['#submission']->data[76][0]== 'TRUE' && !$user_is_admin){
+            if($form['#submission']->data[76][0]== 'CANCELED' && !$user_is_admin){
                 $form = block_submission_form($form);
                 $messages_status = '<div class="messages_status">Notice: This register was canceled.You are not available to edit it.</div>';
                 $messages_status .= '<h4 class="section_title">Background Information</h4>';
@@ -2927,8 +2927,8 @@ function _conference_reports($nid) {
         $email = $submission->data[7][0];
         $view = l(t('View '), "view/$node->nid/conference/$submission->sid");
         $edit = l(t('Edit '), "conference/$node->nid/registration/$submission->sid/edit", array('query' => $destination));
-        print isset($submission->data[76]);
-        if($submission->data[76][0]=='CANCELED' or !isset($submission->data[76])){
+
+        if($submission->data[76][0]=='ACTIVE' or !isset($submission->data[76])){
             $action = l(t('Cancel '), "admin/conference/$node->nid/registration/$submission->sid/cancel");
         }else{
             $action = l(t('Active '), "admin/conference/$node->nid/registration/$submission->sid/active");
