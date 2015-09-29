@@ -207,7 +207,7 @@ function aaap_conference_form_alter(&$form, &$form_state, $form_id) {
             hide($form['submitted']['new_administrator_workshop']);
             hide($form['submitted']['celia_king_dinner_guest']);
             hide($form['submitted']['dinner_groups']);
-            //hide($form['submitted']['canceled']);
+            hide($form['submitted']['canceled']);
 
 
             //  +==============================================+
