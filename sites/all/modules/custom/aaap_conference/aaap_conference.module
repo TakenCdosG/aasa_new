@@ -23,8 +23,14 @@ function aaap_conference_menu() {
         'page callback' => '_conference_cancel_individual_registration',
         'access callback' => 'custom_permission_access',
         'access arguments' => array(array('Administrator', 'Super Administrator')),
-        'page arguments' => array(2, 4),
-        'access callback' => TRUE
+        'page arguments' => array(2, 4)
+    );
+
+    $items['admin/conference/%/registration/%/active'] = array(
+        'page callback' => '_conference_active_individual_registration',
+        'access callback' => 'custom_permission_access',
+        'access arguments' => array(array('Administrator', 'Super Administrator')),
+        'page arguments' => array(2, 4)
     );
 
     $items['view/conference'] = array(
@@ -201,7 +207,7 @@ function aaap_conference_form_alter(&$form, &$form_state, $form_id) {
             hide($form['submitted']['new_administrator_workshop']);
             hide($form['submitted']['celia_king_dinner_guest']);
             hide($form['submitted']['dinner_groups']);
-            hide($form['submitted']['canceled']);
+            //hide($form['submitted']['canceled']);
 
 
             //  +==============================================+
@@ -2921,8 +2927,15 @@ function _conference_reports($nid) {
         $email = $submission->data[7][0];
         $view = l(t('View '), "view/$node->nid/conference/$submission->sid");
         $edit = l(t('Edit '), "conference/$node->nid/registration/$submission->sid/edit", array('query' => $destination));
-        $cancel = l(t('Cancel '), "admin/conference/$node->nid/registration/$submission->sid/cancel");
-        $operations = $view . " - " . $edit. " - " .$cancel;
+        print isset($submission->data[76]);
+        if($submission->data[76][0]=='CANCELED' or !isset($submission->data[76])){
+            $action = l(t('Cancel '), "admin/conference/$node->nid/registration/$submission->sid/cancel");
+        }else{
+            $action = l(t('Active '), "admin/conference/$node->nid/registration/$submission->sid/active");
+        }
+
+
+        $operations = $view . " - " . $edit. " - " .$action;
         $row = array($name, $organization, $street_address, $city_state_zip, $email, $operations);
         $rows[] = $row;
     }
@@ -2976,7 +2989,7 @@ function _conference_export_submissions_to_csv($nid) {
     }
     $options = array(
         'delimiter' => ',',
-        'components' => array('time', 'webform_time', '63', '64', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '21', '14', '29', '23', '24', '63', '30', '25', '31', '26', '32', '16', '17', '18', '19', '20', "70", "71", "72", "73", "74", "75"),
+        'components' => array('time', 'webform_time', '63', '64', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '21', '14', '29', '23', '24', '63', '30', '25', '31', '26', '32', '16', '17', '18', '19', '20', '70', '71', '72', '73', '74', '75','76'),
         'select_keys' => 0,
         'select_format' => 'separate',
         'range_type' => 'range',
@@ -3532,10 +3545,24 @@ function _conference_cancel_individual_registration($nid,$sid){
     $submission = webform_get_submission($nid, $sid);
     //dpm($submission);
     if(array_key_exists(76,$submission->data)){
-        db_update('webform_submitted_data')->fields(array('data' => 'TRUE'))->condition('nid', $nid, '=')->condition('sid', $submission->sid, '=')->condition('cid',76,'=')->execute();
+        db_update('webform_submitted_data')->fields(array('data' => 'CANCELED'))->condition('nid', $nid, '=')->condition('sid', $submission->sid, '=')->condition('cid',76,'=')->execute();
     }else{
-        db_insert('webform_submitted_data')->fields(array('nid'=>$nid,'sid'=>$submission->sid,'cid'=>76,'data' => 'TRUE'))->execute();
+        db_insert('webform_submitted_data')->fields(array('nid'=>$nid,'sid'=>$submission->sid,'cid'=>76,'data' => 'CANCELED'))->execute();
     }
+    drupal_set_message("The register was canceled");
+    drupal_goto('admin/conference/290/report');
+}
+
+function _conference_active_individual_registration($nid,$sid){
+
+    $submission = webform_get_submission($nid, $sid);
+    //dpm($submission);
+    if(array_key_exists(76,$submission->data)){
+        db_update('webform_submitted_data')->fields(array('data' => 'ACTIVE'))->condition('nid', $nid, '=')->condition('sid', $submission->sid, '=')->condition('cid',76,'=')->execute();
+    }else{
+        db_insert('webform_submitted_data')->fields(array('nid'=>$nid,'sid'=>$submission->sid,'cid'=>76,'data' => 'ACTIVE'))->execute();
+    }
+    drupal_set_message("The register was activated");
     drupal_goto('admin/conference/290/report');
 }
 
@@ -3571,9 +3598,7 @@ function  block_submission_form($form){
         $form['submitted']['payment_method']['#attributes']['disabled'] = 'disabled';
         $form['actions']['submit']['#attributes']['disabled'] = 'disabled';
         hide($form['actions']['submit']);
-
-
-    return $form;
+        return $form;
 }
 
 function update_conference_submission($submission,$field_total,$field_to_check,$price){
