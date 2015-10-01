@@ -2931,7 +2931,7 @@ function _conference_reports($nid) {
         if($submission->data[76][0]=='ACTIVE' or !isset($submission->data[76])){
             $action = l(t('Cancel '), "admin/conference/$node->nid/registration/$submission->sid/cancel");
         }else{
-            $action = l(t('Active '), "admin/conference/$node->nid/registration/$submission->sid/active");
+            $action = l(t('Activate'), "admin/conference/$node->nid/registration/$submission->sid/active");
         }
 
 
