@@ -53,7 +53,7 @@
                                                         <tbody>
                                                             <tr>
                                                                 <td colspan="2">
-                                                                    Thank you for registering. We have received your check payment for the following products:
+                                                                    Thank you for registering. We have received your payment for the following products:
                                                                 </td>
                                                             </tr>
                                                             <tr>

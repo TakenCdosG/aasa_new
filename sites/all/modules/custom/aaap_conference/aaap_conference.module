@@ -1137,19 +1137,19 @@ function aaap_conference_webform_submission_update($node, $submission) {
                             node_save($node_general_sessions);
                             //-> Confirmacion (Para este caso solo se puede confirmar de added).
                             if ($node_general_sessions->field_payment_method['und'][0]['value'] == "mail_check") {
-
                                 $key_id = $submission_sid;
                                 $item_id = $conference_nid;
                                 set_status_invoice($key_id, $item_id, 'completed');
-
-                                $confirmed_email = $submission->data[65][0];
-                                if ($confirmed_email == "confirmed_email") {
-                                    $params["general_sessions_confirmation_add_email"] = $node_general_sessions;
-                                    $submission->data[65][0] = "";
-                                    $send_confirmation_email = TRUE;
-                                    $update_submission = TRUE;
-                                }
                             }
+
+                            $confirmed_email = $submission->data[65][0];
+                            if ($confirmed_email == "confirmed_email") {
+                                $params["general_sessions_confirmation_add_email"] = $node_general_sessions;
+                                $submission->data[65][0] = "";
+                                $send_confirmation_email = TRUE;
+                                $update_submission = TRUE;
+                            }
+
                         }
                     }
                 }
@@ -1247,6 +1247,15 @@ function aaap_conference_webform_submission_update($node, $submission) {
                         $send_confirmation_email = TRUE;
                         $update_submission = TRUE;
                     }
+
+                    $confirmed_new_administrator_workshop_email = $submission->data[66][0];
+                    if ($confirmed_new_administrator_workshop_email == "confirmed_new_administrator_workshop_email") {
+                        $params["general_precourse_confirmation_add_email"] = $node_precourse;
+                        $submission->data[66][0] = "";
+                        $send_confirmation_email = TRUE;
+                        $update_submission = TRUE;
+                    }
+
                 }
                 //  +==============================+
                 //  | Celia King Dinner Guest      |
@@ -1339,6 +1348,15 @@ function aaap_conference_webform_submission_update($node, $submission) {
                         $send_confirmation_email = TRUE;
                         $update_submission = TRUE;
                     }
+
+                    $confirmed_celia_king_dinner_guest_email = $submission->data[67][0];
+                    if ($confirmed_celia_king_dinner_guest_email == "confirmed_celia_king_dinner_guest_email") {
+                        $params["general_celia_king_dinner_guest_confirmation_add_email"] = $node_celia_king_dinner_guest;
+                        $submission->data[67][0] = "";
+                        $send_confirmation_email = TRUE;
+                        $update_submission = TRUE;
+                    }
+
                 }
                 //  +===================+
                 //  | Dinner Groups     |
@@ -1437,6 +1455,14 @@ function aaap_conference_webform_submission_update($node, $submission) {
                         $send_confirmation_email = TRUE;
                         $update_submission = TRUE;
                     }
+
+                    $confirmed_dinner_groups_email = $submission->data[68][0];
+                    if ($confirmed_dinner_groups_email == "confirmed_dinner_groups_email") {
+                        $params["general_dinner_groups_confirmation_add_email"] = $node_dinner_groups;
+                        $submission->data[68][0] = "";
+                        $send_confirmation_email = TRUE;
+                        $update_submission = TRUE;
+                    }
                 }
                 //  +===================+
                 //  | Golf Outing       |
@@ -1529,6 +1555,15 @@ function aaap_conference_webform_submission_update($node, $submission) {
                         $send_confirmation_email = TRUE;
                         $update_submission = TRUE;
                     }
+
+                    $confirmed_golf_outing_email = $submission->data[69][0];
+                    if ($confirmed_golf_outing_email == "confirmed_golf_outing_email") {
+                        $params["general_golf_outing_confirmation_add_email"] = $node_golf_outing;
+                        $submission->data[69][0] = "";
+                        $send_confirmation_email = TRUE;
+                        $update_submission = TRUE;
+                    }
+
                 }
 
                 if ($update_submission) {

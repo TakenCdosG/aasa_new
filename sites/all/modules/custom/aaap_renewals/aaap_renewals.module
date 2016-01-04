@@ -291,6 +291,9 @@ function get_price($user){
             case 'emeritus':
                 $price = $config_data['amount_emeritus_member_init'];
                 break;
+			default:
+				$price = $config_data['amount_regular_member_init'];
+			break;
         }
 
     }else{
