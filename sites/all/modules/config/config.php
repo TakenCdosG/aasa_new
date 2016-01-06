@@ -13,7 +13,7 @@ define('PRODUCT_MEMBERSHIP_RENEWAL_ID', '146');
 //Private Pages
 define('SYSTEM_MAIL', 'aasa1@aasa1.org');
 
-define('ADMIN_MAIL', 'dawn@thinkcreativegroup.com, meyerjr@musc.edu, stephanie.farmer@ucdenver.edu, cmoore62@jhmi.edu, bensonwon88@gmail.com'); //execute change_admin_callback as well
+define('ADMIN_MAIL', 'dawn@thinkcreativegroup.com,stephanie.farmer@ucdenver.edu, cmoore62@jhmi.edu, bensonwon88@gmail.com'); //execute change_admin_callback as well
 define('ADMIN_MAIL_TEST', 'dawn@thinkcreativegroup.com, melanie@thinkcreativegroup.com, keeler@surgery.wisc.edu, slkearne@bcm.edu, bwon@ucdavis.edu, adrian.morelos@akendos.com');
 //define('ADMIN_MAIL','giovanny.sayas@akendos.com, maicol.lopez@akendos.com, dawn@thinkcreativegroup.com,melanie@thinkcreativegroup.com ');//execute change_admin_callback as well
 
@@ -74,4 +74,4 @@ define('BRONZE', '500');
 //testing
 global $user_test;
 
-$user_test = array(671, 1166, 1167, 1168, 1169, 1170, 1182, 810, 1053);
+$user_test = array(1, 1305);
