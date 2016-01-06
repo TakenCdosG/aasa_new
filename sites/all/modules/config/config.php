@@ -74,4 +74,4 @@ define('BRONZE', '500');
 //testing
 global $user_test;
 
-$user_test = array(671, 1166, 1167, 1168, 1169, 1170, 1182, 810, 1053);
+$user_test = array(1, 1305);
