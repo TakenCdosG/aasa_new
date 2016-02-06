@@ -369,6 +369,9 @@ function aaap_form_alter(&$form, &$form_state, $form_id)
 
         unset($form['#metatags']);
         unset($form['redirect']);
+
+        // custom validate
+        die(var_dump($form['#validate']));
     }//end if
 
     if ($form_id == 'user_register_form') {
