@@ -203,7 +203,7 @@ function aaap_events_webform_submission_insert($node, $submission) {
             
             global $base_url;
                 
-            include(DRUPAL_ROOT . '/sites/all/modules/config/event_payment_instructions.php');
+            //include(DRUPAL_ROOT . '/sites/all/modules/config/event_payment_instructions.php');
 
             global $base_root;
 
