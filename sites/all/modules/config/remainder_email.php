@@ -14,7 +14,7 @@
   .SITE_NAME, HEADERS);*/
 
 mail($user->mail,'Reminder Email','Happy New Year AASA Members! '."\r\n \r\n"
-    .'It�s time to renew your membership for 2016.  If you have not already renewed please submit your dues to maintain access to all the web tools, member queries, webinars, and free mid-year retreats.  Annual dues are $200 before February 16th, 2016 and then the amount increases to $225 after February 16th.'. "\r\n \r\n"
+    .'It\'s time to renew your membership for 2016.  If you have not already renewed please submit your dues to maintain access to all the web tools, member queries, webinars, and free mid-year retreats.  Annual dues are $200 before February 16th, 2016 and then the amount increases to $225 after February 16th.'. "\r\n \r\n"
     .'Please go here to pay by Credit Card: '.$base_root.'/renewal-membership If you want to pay by check, please make the check payable to: "'.SITE_NAME.'" and mail to:'."\r\n \r\n"
     .'Benson Won'."\r\n"
     .'Department of Surgery'. "\r\n"
