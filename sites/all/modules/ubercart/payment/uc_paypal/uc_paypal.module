@@ -986,6 +986,11 @@ function uc_paypal_api_request($request, $server) {
   }
   $data = substr($data, 0, -1);
 
+  die(var_dump(array(
+      'data' => $data,
+      'server' => $server,
+  )));
+  
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $server);
   curl_setopt($ch, CURLOPT_VERBOSE, 0);
