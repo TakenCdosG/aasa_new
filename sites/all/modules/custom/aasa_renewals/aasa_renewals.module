@@ -1,0 +1,129 @@
+<?php
+
+define('EXPIRED_MEMBER_RID', '8');
+define('ACTIVE_MEMBER_RID', '5');
+
+/**
+ * Implements hook_menu().
+ */
+function aasa_renewals_menu(){
+
+    $items = array();
+	$items['manage/renewal/process'] = array(
+	  'title' => 'Admin Page to manage Renewal Process.',
+	  'type' => MENU_CALLBACK,
+	  'page callback' => 'aasa_manage_renewal_process',
+	  'page arguments' => array(),
+	  'access arguments' => array('access content'),
+	  'file' => 'aasa_renewals.pages.inc',
+	  "theme callback" => 'get_admin_theme'
+	);
+
+	$items['renewal/send_reminder_email/%'] = array(
+	  'title' => 'Admin Page to manage Renewal Process.',
+	  'type' => MENU_CALLBACK,
+	  'page callback' => 'send_reminder_email_page',
+	  'page arguments' => array(2),
+	  'access arguments' => array('access content'),
+	  'file' => 'aasa_renewals.pages.inc',
+	  "theme callback" => 'get_admin_theme'
+	);
+	
+	$items['renewal/re_send_reminder_email/%'] = array(
+	  'title' => 'Admin Page to manage Renewal Process.',
+	  'type' => MENU_CALLBACK,
+	  'page callback' => 're_send_reminder_email_page',
+	  'page arguments' => array(2),
+	  'access arguments' => array('access content'),
+	  'file' => 'aasa_renewals.pages.inc',
+	  "theme callback" => 'get_admin_theme'
+	);
+    
+    $items['renewal/expire_user/%'] = array(
+      'title' => 'Expire Specific User.',
+      'type' => MENU_CALLBACK,
+      'page callback' => 'renewal_expire_user_page',
+      'page arguments' => array(2),
+      'access arguments' => array('access content'),
+      'file' => 'aasa_renewals.pages.inc',
+      "theme callback" => 'get_admin_theme'
+    );
+    
+    return $items;
+
+}
+
+/**
+ * Implements hook_theme().
+ */
+function aasa_renewals_theme($existing, $type, $theme, $path) {
+    return array(
+        'aasa_renewals_manage_renewal_process' => array(
+            'template' => 'templates/manage-renewal-process',
+            'variables' => array('info' => NULL),
+        ),
+    );
+}
+
+/**
+ *  function returning the machine-readable name of the admin theme that will be used to render the page.
+ */
+function get_admin_theme(){
+	return 'seven';
+}
+
+
+/**
+ * Ajax Submit for test Reminder Emails Form.
+ */
+
+function aasa_renewals_form_submit_send_test_reminder_email($form, &$form_state){
+	module_load_include('inc', 'aasa_renewals', 'aasa_renewals.functions');
+    $formulario = $form_state['values'];
+    $emails = $formulario["emails"];
+    $emails_array = explode(",", $emails);
+    // Validar campos
+    $message = "";
+    $validate = TRUE;
+    $response = new stdClass();
+    $error_msg = 'Enter one or more comma-separated emails: email1@example.com, email2@example.com...';
+
+    // Validaciones en el Email.
+    if (empty($emails)) {
+        $validate = FALSE;
+        $message['emails'] = $error_msg;
+    }
+    elseif(strlen($emails) < 5){
+        $validate = FALSE;
+        $message['emails'] = $error_msg;
+    }
+    else{
+        foreach ($emails_array as $key => $email) {
+           if(!valid_email_address($email)){
+            $message['emails'] = $error_msg;
+            $validate = FALSE;
+            break;
+           }
+        }
+    }
+    $response = new stdClass();
+    if ($validate) {
+        $renewal_config_info = get_renewal_config_info();
+        $subject = $renewal_config_info->field_reminder_email_subject_value;
+        $body = $renewal_config_info->field_reminder_email_body_value;
+        $from = 'AASA';
+        $from_name = 'AASA';
+        $response = send_reminder_email($from, $from_name, $emails, $subject, $body);
+    }else{
+    	$response->sent = FALSE;
+		$response->msg = $error_msg;
+    }
+
+    return array(
+        '#type' => 'ajax',
+        '#commands' => array(
+            array('command' => 'responseRenewalSendTestReminderEmailform', 'data' => $response),
+        ),
+    );
+
+}

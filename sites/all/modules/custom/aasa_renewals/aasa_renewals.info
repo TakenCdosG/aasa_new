@@ -1,0 +1,9 @@
+name = AASA Renewals
+description = AASA Helper Module for Renewal aspects.
+package = AASA
+core = 7.x
+
+
+version = "7.x"
+core = "7.x"
+project = "aasa"
