@@ -673,10 +673,17 @@ function get_checkbox_field($uid = "", $all = FALSE){
 	return $checkbox;
 }
 
-function send_reminder_email($from, $from_name, $to, $subject, $body){
+function send_reminder_email($from, $from_name, $to, $subject, $body, $sent = TRUE){
 	//  +=====================================+
 	//  | Mail                                |
 	//  +=====================================+ 
+	$response->from = $from;
+	$response->from_name = $from_name;
+	$response->to = $to;
+	$response->subject = $subject;
+	$response->body = $body;
+	$response->sent = $sent;
+
 	$message = $body;
     $email = new PHPMailer();
     $email->From = $from;
@@ -686,13 +693,20 @@ function send_reminder_email($from, $from_name, $to, $subject, $body){
     $email->IsHTML(true);
     $email->AddAddress($to, '');
     $response = new stdClass();
-    if(!$email->Send()) {
-    	$response->sent = FALSE;
-		$response->msg = "Mailer Error: " . $mail->ErrorInfo;
-	} else {
-		$response->msg = "Mail Message sent!";
-		$response->sent = TRUE;
-	}
+    if($sent){
+	    if(!$email->Send()) {
+	    	$response->sent = FALSE;
+			$response->msg = "Mailer Error: " . $mail->ErrorInfo;
+		} else {
+			$response->msg = "Mail Message sent!";
+			$response->sent = TRUE;
+		}
+    }else{
+			$response->msg = "Mail Message sent<Simulation>!";
+			$response->sent = TRUE;
+    }
+    $json_encode = json_encode($response);
+    watchdog('reminder_email', '<b>Detail: </b><br><pre>'.$json_encode.'</pre>');
 	return $response;
 }
 
@@ -818,7 +832,7 @@ function aasa_renewals_send_reminder_email_do_process($user_info, $renewal_confi
       $emails = $user_info->mail;
       $from = 'AASA';
       $from_name = 'AASA';
-      $response = send_reminder_email($from, $from_name, $emails, $subject, $body);
+      $response = send_reminder_email($from, $from_name, $emails, $subject, $body, FALSE);
     }else{
        $response->sent = FALSE;
        $response->msg = 'Reminder email already sent to this user.';
