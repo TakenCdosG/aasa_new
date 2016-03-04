@@ -44,8 +44,21 @@ function aaap_events_webform_submission_insert($node, $submission) {
     //dsm($submission);
     if(!empty($submission->data[EVENT_PAYMENT_FIELD_ID]) and $node->type == PRODUCT_EVENT_TYPE) {
 
+        $is_active_member = _ap_is_active_member(true);
         $event_fee = _ap_get_final_price($node, $submission);
-        $reg_fee = _ap_is_active_member(true) ? $node->field_member_registration_fee['und'][0]['value'] : $node->field_non_member_registration_fe['und'][0]['value'];
+        $reg_fee = $is_active_member ? $node->field_member_registration_fee['und'][0]['value'] : $node->field_non_member_registration_fe['und'][0]['value'];
+
+        $is_free_for_member = FALSE;
+        $is_free_for_current_submission = FALSE;
+        if(intval($node->field_member_registration_fee['und'][0]['value']) == 0){
+            $is_free_for_member = TRUE;
+        }
+
+        if($is_active_member){
+            if($event_fee == 0){
+                $is_free_for_current_submission = TRUE;
+            }
+        }
 
         $additional_price = NULL;
         $additional_amount = NULL;
@@ -76,12 +89,17 @@ function aaap_events_webform_submission_insert($node, $submission) {
 
         //dsm($submission);
         //dsm($submission->data[12]['value'][0]);
+        $order_status = 'pending';
+        if($is_free_for_current_submission){
+             $order_status = 'completed';
+        }
+
         $order_id = insert_invoice(array(
             'uid'=> $submission->uid,
             'order_total' => $reg_fee,
             'item_id' => $submission->nid,
             'key_id' => $submission->sid,
-            'order_status' => 'pending',
+            'order_status' => $order_status,
             'payment_method' => $submission->data[EVENT_PAYMENT_FIELD_ID][0],
             'primary_email' => $submission->data[12][0],
             'additional_price' => $additional_price,
@@ -117,7 +135,10 @@ function aaap_events_webform_submission_insert($node, $submission) {
         }
         //-> End Looking for discount code 
 
-        if ($submission->data[EVENT_PAYMENT_FIELD_ID][0] == 'credit_card') {
+        if($is_free_for_current_submission){
+            // set_status_invoice($submission->sid, $submission->nid, 'completed');
+            $submission = _confirm_submission_webform($submission->nid, $submission->sid, EVENT_CONFIRMED_FIELD_ID);
+        }elseif ($submission->data[EVENT_PAYMENT_FIELD_ID][0] == 'credit_card') {
             
             //-> Empties a cart of its contents.
             if(!$discount_code){
