@@ -5,20 +5,25 @@
 function aasa_renewals_environment_form($form, &$form_state) {
     $form['#prefix'] = '';
     $form['#suffix'] = '';
-
-    $form['environment'] = array(
+    $form['wrapper_environment'] = array(
+        '#title' => t('Environment'),
+        '#description' => t(''),
+        '#type' => 'fieldset',
+        '#collapsible' => FALSE,
+        '#collapsed' => FALSE,
+    );
+    $form['wrapper_environment']['environment'] = array(
       '#type' => 'select',
-      '#title' => 'Environment', 
+      //'#title' => 'Environment', 
       '#default_value' => variable_get($name="aasa_renewals_environment", $default = 'live'), 
       '#options' => array('live' => t('Live'),'test' => t('Test')), 
     );
 
-    $form['submit_set_environment'] = array(
+    $form['wrapper_environment']['submit_set_environment'] = array(
       '#type' => 'submit',
       '#value' => t('Save Environment.'),
       '#submit' => array('aasa_renewals_environment_form_submit'),
     );
-
     return $form;
 }
 
