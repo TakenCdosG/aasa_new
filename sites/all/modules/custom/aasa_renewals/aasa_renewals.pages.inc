@@ -9,12 +9,14 @@ function aasa_manage_renewal_process(){
   $info["renewal_period"] = get_renewal_period_mockup($renewal_config_info);
   $info["current_available_reminder_date_and_amount"] = get_current_available_reminder_date_and_amount_mockup($renewal_config_info);
   $info["user_membership_renewal_table"] = get_user_membership_renewal_table_mockup($renewal_config_info);
+  $info["environment"] = get_environment_mockup($renewal_config_info);
   $html = theme('aasa_renewals_manage_renewal_process', array('info' => $info));
   return $html;
 }
 
 function send_reminder_email_page($uid){
   module_load_include('inc', 'aasa_renewals', 'aasa_renewals.functions');
+  $test_environment = (variable_get("aasa_renewals_environment")  == "test");
   $response = new stdClass();
   if(!empty($uid)){
       $renewal_config_info = get_renewal_config_info();
@@ -51,10 +53,12 @@ function send_reminder_email_page($uid){
   }
   
   if($response->sent){
-    $now_time = strtotime('now');
-    $user_object = user_load($uid);
-    $user_object->field_reminder_email['und'][0]['value'] = $now_time;
-    user_save($user_object);
+    if(!$test_environment){
+      $now_time = strtotime('now');
+      $user_object = user_load($uid);
+      $user_object->field_reminder_email['und'][0]['value'] = $now_time;
+      user_save($user_object);
+    }
     drupal_set_message($message = $response->msg, $type = 'status', $repeat = FALSE);
   }else{
     drupal_set_message($message = $response->msg, $type = 'warning', $repeat = FALSE);
@@ -65,6 +69,7 @@ function send_reminder_email_page($uid){
 function re_send_reminder_email_page($uid){
   module_load_include('inc', 'aasa_renewals', 'aasa_renewals.functions');
   $response = new stdClass();
+  $test_environment = (variable_get("aasa_renewals_environment")  == "test");
   if(!empty($uid)){
       $user_info = get_user_info($uid);
       if(isset($user_info->mail)){
@@ -85,10 +90,12 @@ function re_send_reminder_email_page($uid){
   }
   
   if($response->sent){
-    $now_time = strtotime('now');
-    $user_object = user_load($uid);
-    $user_object->field_reminder_email['und'][0]['value'] = $now_time;
-    user_save($user_object);
+    if(!$test_environment){
+      $now_time = strtotime('now');
+      $user_object = user_load($uid);
+      $user_object->field_reminder_email['und'][0]['value'] = $now_time;
+      user_save($user_object);
+    }
     drupal_set_message($message = $response->msg, $type = 'status', $repeat = FALSE);
   }else{
     drupal_set_message($message = $response->msg, $type = 'warning', $repeat = FALSE);
@@ -97,7 +104,10 @@ function re_send_reminder_email_page($uid){
 }
 
 function renewal_expire_user_page($uid){
-  custom_add_role_to_user($uid, 'Expired Member');
+  $test_environment = (variable_get("aasa_renewals_environment")  == "test");
+  if(!$test_environment){
+    custom_add_role_to_user($uid, 'Expired Member');
+  }
   drupal_goto('manage/renewal/process');
   return '';
 }

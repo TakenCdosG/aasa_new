@@ -674,6 +674,7 @@ function get_checkbox_field($uid = "", $all = FALSE){
 }
 
 function send_reminder_email($from, $from_name, $to, $subject, $body, $sent = TRUE){
+	$test_environment = (variable_get("aasa_renewals_environment") == "test");
 	//  +=====================================+
 	//  | Mail                                |
 	//  +=====================================+ 
@@ -694,13 +695,18 @@ function send_reminder_email($from, $from_name, $to, $subject, $body, $sent = TR
     $email->AddAddress($to, '');
     $response = new stdClass();
     if($sent){
-	    if(!$email->Send()) {
-	    	$response->sent = FALSE;
-			$response->msg = "Mailer Error: " . $mail->ErrorInfo;
-		} else {
-			$response->msg = "Mail Message sent!";
+    	if(!$test_environment){
+		    if(!$email->Send()) {
+		    	$response->sent = FALSE;
+				$response->msg = "Mailer Error: " . $mail->ErrorInfo;
+			} else {
+				$response->msg = "Mail Message sent!";
+				$response->sent = TRUE;
+			}
+    	}else{
+    		$response->msg = "Mail Message sent<Test Environment>!";
 			$response->sent = TRUE;
-		}
+    	}
     }else{
 			$response->msg = "Mail Message sent<Simulation>!";
 			$response->sent = TRUE;
@@ -865,4 +871,12 @@ function aasa_renewals_send_reminder_email_process_finished_callback($success, $
   drupal_set_message($message);
 }
 
+/*
+*  
+*/
+function get_environment_mockup($renewal_config_info){
+	$form = drupal_get_form('aasa_renewals_environment_form');
+  	$aasa_renewals_options_form = drupal_render($form);
+  	return $aasa_renewals_options_form;
+}
 

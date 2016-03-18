@@ -1,5 +1,34 @@
 <?php
+/**
+ * Formulario operaciones aasa renewals.
+ */
+function aasa_renewals_environment_form($form, &$form_state) {
+    $form['#prefix'] = '';
+    $form['#suffix'] = '';
 
+    $form['environment'] = array(
+      '#type' => 'select',
+      '#title' => 'Environment', 
+      '#default_value' => variable_get($name="aasa_renewals_environment", $default = 'live'), 
+      '#options' => array('live' => t('Live'),'test' => t('Test')), 
+    );
+
+    $form['submit_set_environment'] = array(
+      '#type' => 'submit',
+      '#value' => t('Save Environment.'),
+      '#submit' => array('aasa_renewals_environment_form_submit'),
+    );
+
+    return $form;
+}
+
+function aasa_renewals_environment_form_submit($form, &$form_state){
+  if(isset($form_state['values']['environment'])){
+    $value = $form_state['values']['environment'];
+    variable_set($name="aasa_renewals_environment", $value);
+  }
+  dpm(variable_get("aasa_renewals_environment"));
+}
 /**
  * Formulario operaciones aasa renewals.
  */
