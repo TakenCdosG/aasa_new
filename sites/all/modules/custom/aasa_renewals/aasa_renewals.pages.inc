@@ -18,7 +18,7 @@ function send_reminder_email_page($uid){
   module_load_include('inc', 'aasa_renewals', 'aasa_renewals.functions');
   $test_environment = (variable_get("aasa_renewals_environment") == "test");
   $test_emails = variable_get($name="aasa_renewals_environment_test_emails", '');
-  $test_emails_array =  explode(',', $test_emails);
+  $test_emails_array =  explode(',', str_replace(" ", "",$test_emails));
   $allow = TRUE;
   $response = new stdClass();
   if(!empty($uid)){
@@ -77,7 +77,7 @@ function re_send_reminder_email_page($uid){
   $response = new stdClass();
   $test_environment = (variable_get("aasa_renewals_environment")  == "test");
   $test_emails = variable_get($name="aasa_renewals_environment_test_emails", '');
-  $test_emails_array =  explode(',', $test_emails);
+  $test_emails_array =  explode(',', str_replace(" ", "",$test_emails));
   $allow = TRUE;
   if(!empty($uid)){
       $user_info = get_user_info($uid);
@@ -118,7 +118,7 @@ function re_send_reminder_email_page($uid){
 function renewal_expire_user_page($uid){
   $test_environment = (variable_get("aasa_renewals_environment") == "test");
   $test_emails = variable_get($name="aasa_renewals_environment_test_emails", '');
-  $test_emails_array =  explode(',', $test_emails);
+  $test_emails_array =  explode(',', str_replace(" ", "",$test_emails));
   $allow = TRUE;
   $user = user_load($uid);
   $email = (isset($user->mail))?$user->mail:'';

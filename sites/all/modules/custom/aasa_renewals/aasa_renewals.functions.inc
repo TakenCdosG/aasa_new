@@ -676,7 +676,7 @@ function get_checkbox_field($uid = "", $all = FALSE){
 function send_reminder_email($from, $from_name, $to, $subject, $body, $sent = TRUE){
 	$test_environment = (variable_get("aasa_renewals_environment") == "test");
 	$test_emails = variable_get($name="aasa_renewals_environment_test_emails", '');
-	$test_emails_array =  explode(',', $test_emails);
+	$test_emails_array =  explode(',', str_replace(" ", "",$test_emails));
 	$allow = TRUE;
 	if(!in_array($to, $test_emails_array) && $test_environment){
 		$allow = FALSE;
