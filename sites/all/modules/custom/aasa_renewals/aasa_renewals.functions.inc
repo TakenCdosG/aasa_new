@@ -684,6 +684,7 @@ function send_reminder_email($from, $from_name, $to, $subject, $body, $sent = TR
 	//  +=====================================+
 	//  | Mail                                |
 	//  +=====================================+ 
+	$response = new stdClass();
 	$response->from = $from;
 	$response->from_name = $from_name;
 	$response->to = $to;
@@ -699,7 +700,7 @@ function send_reminder_email($from, $from_name, $to, $subject, $body, $sent = TR
     $email->Body = $message;
     $email->IsHTML(true);
     $email->AddAddress($to, '');
-    $response = new stdClass();
+    
     if($sent){
     	if($allow){
 		    if(!$email->Send()) {
