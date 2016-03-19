@@ -12,11 +12,24 @@ function aasa_renewals_environment_form($form, &$form_state) {
         '#collapsible' => FALSE,
         '#collapsed' => FALSE,
     );
+
     $form['wrapper_environment']['environment'] = array(
       '#type' => 'select',
       //'#title' => 'Environment', 
       '#default_value' => variable_get($name="aasa_renewals_environment", $default = 'live'), 
       '#options' => array('live' => t('Live'),'test' => t('Test')), 
+    );
+
+    $form['wrapper_environment']['emails'] = array(
+        '#title' => t('Test Emails'),
+        '#type' => 'textfield',
+        '#description' => t('Enter one or more comma-separated user emails: email1@example.com, email2@example.com...'),
+        '#default_value' => variable_get($name="aasa_renewals_environment_test_emails", ''),
+        '#attributes' => array('placeholder' => 'email1@example.com, email2@example.com...', 'size' => 50),
+        '#required' => FALSE,
+        '#maxlength' => 100,
+        '#prefix'=> '',
+        '#suffix' => '',
     );
 
     $form['wrapper_environment']['submit_set_environment'] = array(
@@ -32,7 +45,10 @@ function aasa_renewals_environment_form_submit($form, &$form_state){
     $value = $form_state['values']['environment'];
     variable_set($name="aasa_renewals_environment", $value);
   }
-  dpm(variable_get("aasa_renewals_environment"));
+  if(isset($form_state['values']['emails'])){
+    $value = $form_state['values']['emails'];
+    variable_set($name="aasa_renewals_environment_test_emails", $value);
+  }
 }
 /**
  * Formulario operaciones aasa renewals.

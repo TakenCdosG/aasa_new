@@ -16,7 +16,10 @@ function aasa_manage_renewal_process(){
 
 function send_reminder_email_page($uid){
   module_load_include('inc', 'aasa_renewals', 'aasa_renewals.functions');
-  $test_environment = (variable_get("aasa_renewals_environment")  == "test");
+  $test_environment = (variable_get("aasa_renewals_environment") == "test");
+  $test_emails = variable_get($name="aasa_renewals_environment_test_emails", '');
+  $test_emails_array =  explode(',', $test_emails);
+  $allow = TRUE;
   $response = new stdClass();
   if(!empty($uid)){
       $renewal_config_info = get_renewal_config_info();
@@ -38,6 +41,9 @@ function send_reminder_email_page($uid){
           $from = 'AASA';
           $from_name = 'AASA';
           $response = send_reminder_email($from, $from_name, $emails, $subject, $body);
+          if(!in_array($emails, $test_emails_array) && $test_environment){
+            $allow = FALSE;
+          }
         }else{
            $response->sent = FALSE;
            $response->msg = 'Reminder email already sent to this user.';
@@ -53,7 +59,7 @@ function send_reminder_email_page($uid){
   }
   
   if($response->sent){
-    if(!$test_environment){
+    if($allow){
       $now_time = strtotime('now');
       $user_object = user_load($uid);
       $user_object->field_reminder_email['und'][0]['value'] = $now_time;
@@ -70,6 +76,9 @@ function re_send_reminder_email_page($uid){
   module_load_include('inc', 'aasa_renewals', 'aasa_renewals.functions');
   $response = new stdClass();
   $test_environment = (variable_get("aasa_renewals_environment")  == "test");
+  $test_emails = variable_get($name="aasa_renewals_environment_test_emails", '');
+  $test_emails_array =  explode(',', $test_emails);
+  $allow = TRUE;
   if(!empty($uid)){
       $user_info = get_user_info($uid);
       if(isset($user_info->mail)){
@@ -80,6 +89,9 @@ function re_send_reminder_email_page($uid){
         $from = 'AASA';
         $from_name = 'AASA';
         $response = send_reminder_email($from, $from_name, $emails, $subject, $body);
+        if(!in_array($emails, $test_emails_array) && $test_environment){
+          $allow = FALSE;
+        }
       }else{
         $response->sent = FALSE;
         $response->msg = 'Please specify a valid username';
@@ -90,7 +102,7 @@ function re_send_reminder_email_page($uid){
   }
   
   if($response->sent){
-    if(!$test_environment){
+    if($allow){
       $now_time = strtotime('now');
       $user_object = user_load($uid);
       $user_object->field_reminder_email['und'][0]['value'] = $now_time;
@@ -104,8 +116,16 @@ function re_send_reminder_email_page($uid){
 }
 
 function renewal_expire_user_page($uid){
-  $test_environment = (variable_get("aasa_renewals_environment")  == "test");
-  if(!$test_environment){
+  $test_environment = (variable_get("aasa_renewals_environment") == "test");
+  $test_emails = variable_get($name="aasa_renewals_environment_test_emails", '');
+  $test_emails_array =  explode(',', $test_emails);
+  $allow = TRUE;
+  $user = user_load($uid);
+  $email = (isset($user->mail))?$user->mail:'';
+  if(!in_array($email, $test_emails_array) && $test_environment){
+    $allow = FALSE;
+  }
+  if($allow){
     custom_add_role_to_user($uid, 'Expired Member');
   }
   drupal_goto('manage/renewal/process');

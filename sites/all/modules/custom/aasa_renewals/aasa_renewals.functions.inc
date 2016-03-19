@@ -675,6 +675,12 @@ function get_checkbox_field($uid = "", $all = FALSE){
 
 function send_reminder_email($from, $from_name, $to, $subject, $body, $sent = TRUE){
 	$test_environment = (variable_get("aasa_renewals_environment") == "test");
+	$test_emails = variable_get($name="aasa_renewals_environment_test_emails", '');
+	$test_emails_array =  explode(',', $test_emails);
+	$allow = TRUE;
+	if(!in_array($to, $test_emails_array) && $test_environment){
+		$allow = FALSE;
+	}
 	//  +=====================================+
 	//  | Mail                                |
 	//  +=====================================+ 
@@ -695,7 +701,7 @@ function send_reminder_email($from, $from_name, $to, $subject, $body, $sent = TR
     $email->AddAddress($to, '');
     $response = new stdClass();
     if($sent){
-    	if(!$test_environment){
+    	if($allow){
 		    if(!$email->Send()) {
 		    	$response->sent = FALSE;
 				$response->msg = "Mailer Error: " . $mail->ErrorInfo;
