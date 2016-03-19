@@ -776,6 +776,13 @@ function aasa_renewals_expire_all_user_process(){
 }
 
 function aasa_renewals_expire_all_user_do_process($user_info, $renewal_config_info, &$context){
+  $test_environment = (variable_get("aasa_renewals_environment") == "test");
+  $test_emails = variable_get($name="aasa_renewals_environment_test_emails", '');
+  $test_emails_array =  explode(',', str_replace(" ", "",$test_emails));
+  $allow = TRUE;
+  if(!in_array($user_info->mail, $test_emails_array) && $test_environment){
+	$allow = FALSE;
+  }
 
   $name = $user_info->first_name." ".$user_info->last_name." - ";
   $item = $name.l($user_info->mail, 'user/'. $user_info->uid);;
@@ -804,7 +811,7 @@ function aasa_renewals_expire_all_user_do_process($user_info, $renewal_config_in
 		}
    }
 
-   if($apply){
+   if($apply && $allow){
     	custom_add_role_to_user($user_info->uid, 'Expired Member');
    }
 
@@ -825,6 +832,12 @@ function aasa_renewals_expire_all_user_process_finished_callback($success, $resu
 
 
 function aasa_renewals_send_reminder_email_do_process($user_info, $renewal_config_info, &$context){
+
+  $test_environment = (variable_get("aasa_renewals_environment") == "test");
+  $test_emails = variable_get($name="aasa_renewals_environment_test_emails", '');
+  $test_emails_array =  explode(',', str_replace(" ", "",$test_emails));
+  $allow = TRUE;
+
   $name = $user_info->first_name." ".$user_info->last_name." - ";
   $item = $name.l($user_info->mail, 'user/'. $user_info->uid);;
   $context['results'][] = 'User : ' . $item;
@@ -846,6 +859,9 @@ function aasa_renewals_send_reminder_email_do_process($user_info, $renewal_confi
       $from = 'AASA';
       $from_name = 'AASA';
       $response = send_reminder_email($from, $from_name, $emails, $subject, $body, FALSE);
+      if(!in_array($emails, $test_emails_array) && $test_environment){
+		$allow = FALSE;
+	  }
     }else{
        $response->sent = FALSE;
        $response->msg = 'Reminder email already sent to this user.';
@@ -857,10 +873,12 @@ function aasa_renewals_send_reminder_email_do_process($user_info, $renewal_confi
   }
 
   if($response->sent){
-    $now_time = strtotime('now');
-    $user_object = user_load($user_info->uid);
-    $user_object->field_reminder_email['und'][0]['value'] = $now_time;
-    user_save($user_object);
+  	if($allow){
+	  	$now_time = strtotime('now');
+	    $user_object = user_load($user_info->uid);
+	    $user_object->field_reminder_email['und'][0]['value'] = $now_time;
+	    user_save($user_object);
+  	}
     drupal_set_message($message = $response->msg, $type = 'status', $repeat = FALSE);
   }
 
