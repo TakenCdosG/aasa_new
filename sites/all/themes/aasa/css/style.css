@@ -2612,3 +2612,12 @@ a.bold-link{
     font-size: 17px;
     font-weight: 300;
 }
+
+#block-block-1{
+    width: auto;
+    overflow: hidden;
+    float: right;
+    position: absolute;
+    right: 0px;
+    top: -53px;
+}
