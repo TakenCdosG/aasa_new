@@ -701,6 +701,7 @@ input:-moz-placeholder {
     float: left;
     width: 100%;
     margin-top: 42px;
+    position: relative;
 }
 
 #menu_footer {
