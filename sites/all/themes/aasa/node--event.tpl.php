@@ -121,7 +121,14 @@
                         print $node->field_short_description['und'][0]['value'];
                     } ?></div>
                 <?php if (!empty($node->field_is_open) and $node->field_is_open['und'][0]['value'] == 'yes') {
-                    print '<a href="/event/' . $node->nid . '/registration" class="button_event_action">Register Now</a>';
+                    $external = '/event/' . $node->nid . '/registration';
+                    $target = '';
+                    if(isset($node->field_external_link['und'][0]['value'])){
+                        $external = $node->field_external_link['und'][0]['value'];
+                        $target = ' target="_blank" ';
+                    }
+
+                    print '<a href="' . $external . '" '. $target .' class="button_event_action">Register Now</a>';
                 } ?>
             </div>
         </div>
