@@ -116,7 +116,7 @@ div.ctools-modal-content .modal-header {
 }
 
 .formulario-conferencias .webform-component--hot-topics label{
-    margin-bottom: 25px;
+    /*margin-bottom: 25px;*/
 }
 
 .formulario-conferencias .webform-component--hot-topics label span.form-required{
