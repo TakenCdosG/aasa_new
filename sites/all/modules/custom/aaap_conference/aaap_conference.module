@@ -554,9 +554,14 @@ function aaap_conference_form_alter(&$form, &$form_state, $form_id) {
             //  | Field Guest Dietary Restrictions    |
             //  +=====================================+
             //-> (radio buttons, multiple selections permitted)
-            $form['submitted']['guest_dietary_restrictions']['#title'] = '<p><span class="dark_blue">Guest Dietary Restrictions </span></p>';
-            $guest_dietary_restrictions_copy = "<div class='guest_dietary_restrictions_wrappers'><div class='guest_dietary_restrictions_copy select_copy'><i>Please note that every effort will be made to accommodate the dietary restrictions of your guest at the Celia King dinner.</i></div></div>";
-            $form['submitted']['guest_dietary_restrictions']['#suffix'] = $guest_dietary_restrictions_copy;
+            //$form['submitted']['guest_dietary_restrictions']['#title'] = '<p><span class="dark_blue">Guest Dietary Restrictions </span></p>';
+            $guest_dietary_restrictions_copy = "<div class='guest_dietary_restrictions_wrappers'><div class='guest_dietary_restrictions_copy select_copy'><span><b>Guest Information</b></span><i>Please note that every effort will be made to accommodate the dietary restrictions of your guest at the Celia King dinner.</i></div></div>";
+            //$form['submitted']['guest_dietary_restrictions']['#suffix'] = $guest_dietary_restrictions_copy;
+            
+            $form['submitted']['guest_name']['#title']  = '<p><span class="dark_blue">Guest Dietary Restrictions </span></p>';
+            $form['submitted']['guest_name']['#suffix'] = $guest_dietary_restrictions_copy;
+            $form['submitted']['guest_dietary_restrictions']['#title'] = '';
+            
 
             //  +=====================================+
             //  | Free Membership Application         |
