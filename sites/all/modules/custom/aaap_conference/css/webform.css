@@ -123,6 +123,10 @@ div.ctools-modal-content .modal-header {
     display: none;
 }
 
+.formulario-conferencias .webform-component--hot-topics label p span.form-required{
+    display: block;
+}
+
 .formulario-conferencias p span.dark_blue{
     color: #00738F;
     font-weight: bold;

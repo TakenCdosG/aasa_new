@@ -328,7 +328,7 @@ function aaap_conference_form_alter(&$form, &$form_state, $form_id) {
             $form['submitted']['preferred_name_on_badge']['#suffix'] = '</div></div>';
             // $form['submitted']['i_am_a_first_time_attendee_and_wish_to_be_paired_with_an_aasa_buddy']['#suffix'] = $hr;
             $form['submitted']['hot_topics']['#prefix'] = '<div><hr/></div>';
-            $form['submitted']['hot_topics']['#suffix'] = '<div><hr/></div>';
+            $form['submitted']['hot_topics']['#suffix'] = '<div><div>(Please let us know what hot topic you are interested in participating in).</div><br/><hr/></div>';
             $form['submitted']['hot_topics']['#title'] = '<p><span class="dark_blue">Hot Topics </span>(select one via radio buttons) <span class="form-required" title="This field is required.">*</span></p>';
             // hide($form['submitted']['hot_topics']);
 
