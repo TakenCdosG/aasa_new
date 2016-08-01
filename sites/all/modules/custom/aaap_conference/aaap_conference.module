@@ -365,7 +365,7 @@ function aaap_conference_form_alter(&$form, &$form_state, $form_id) {
                 $non_members_descripcion = "Non-member attendees are eligible for discounted registration for a limited time. Register before August 31st to enjoy your discounted rate.<br/> <i> The non-member  rate will increase after August 31st</i>";
 
                 $members_only_price = "<span class='select_price'> Early - $$member_reg_early_bird_fee.00</span>";
-                $non_members_only_price = "<span class='select_price'>Reg - $$non_member_registration_fe.00 </span>";
+                $non_members_only_price = "<span class='select_price'>Early - $$non_member_early_bird_fee.00</span>";
 
             }
 
