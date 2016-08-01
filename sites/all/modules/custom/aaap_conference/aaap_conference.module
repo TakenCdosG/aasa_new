@@ -2950,8 +2950,8 @@ function _conference_do_filter_report($filter, &$submissions) {
             }
             break;
         case 'members-pending': 
-            foreach ($submissions as $sid => $submission) {
-                if ($submission->uid != 0  and user_load($submission->uid) != NULL) {
+           foreach ($submissions as $sid => $submission) {
+                if ($submission->uid == 0 or user_load($submission->uid) == NULL) {
                     unset($submissions[$sid]);
                 }
                 if ($submission->data[21][0] == "confirmed") {
@@ -3022,6 +3022,11 @@ function _conference_reports($nid) {
     //  +====================+
     //  | Set Filter         |
     //  +====================+
+    if (isset($_GET['filter'])) {
+        $filter = $_GET['filter'];
+    } else {
+        $filter = "";
+    }
     $all = isset($_GET['filter']) ? "<a href='/admin/conference/" . $nid . "/report'>All participants</a>" : "All participants";
     $members = $filter != 'members' ? "<a href='?filter=members'>Members Registered</a>" : "Members Registered";
     $non_members = $filter != 'non-members' ? "<a href='?filter=non-members'>Non-Members Registered</a>" : "Non-Members Registered";
