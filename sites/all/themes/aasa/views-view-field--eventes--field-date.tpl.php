@@ -42,7 +42,7 @@ if ($star != $end) {
 }
 
 $date = $date_star . $date_end . $year . $hour;
-print "<strong>Save the Date - </strong>" . $date;
-
+print $date;
+//print "<strong>Save the Date - </strong>" . $date;
 
 ?>
