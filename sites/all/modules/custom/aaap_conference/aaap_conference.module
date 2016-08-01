@@ -2940,10 +2940,26 @@ function _conference_do_filter_report($filter, &$submissions) {
             }
             break;
         case 'non-members-pending':
+            foreach ($submissions as $sid => $submission) {
+                if ($submission->uid != 0  and user_load($submission->uid) != NULL) {
+                    unset($submissions[$sid]);
+                }
+                if ($submission->data[21][0] == "confirmed") {
+                    unset($submissions[$sid]);
+                }
+            }
             break;
-        case 'members-pending':
+        case 'members-pending': 
+            foreach ($submissions as $sid => $submission) {
+                if ($submission->uid != 0  and user_load($submission->uid) != NULL) {
+                    unset($submissions[$sid]);
+                }
+                if ($submission->data[21][0] == "confirmed") {
+                    unset($submissions[$sid]);
+                }
+            }
             break;
-    }
+    } 
 }
 
 /**
