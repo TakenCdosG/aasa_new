@@ -356,17 +356,23 @@ function aaap_conference_form_alter(&$form, &$form_state, $form_id) {
 
                 $members_only_descripcion = "Early bird registration is available for a limited time. Register before August 31st to take advantage of your discount.<br/>";
                 $non_members_descripcion = "Non-member attendees are eligible for discounted registration for a limited time. Register before August 31st to enjoy your discounted rate.<br/>";
+                $members_only_price = "<span class='select_price'>Reg - $$member_registration_fee.00 </span>";
+                $non_members_only_price = "<span class='select_price'>Reg - $$non_member_registration_fe.00 </span>";
             } else {
                 $members_price = $form['#node']->field_member_reg_early_bird_fee["und"][0]["value"];
                 $non_members_price = $form['#node']->field_non_member_early_bird_fee["und"][0]["value"];
-                $members_only_descripcion = "Early bird registration is available for a limited time. Register before August 31st to take advantage of your discount.<br/> <i>The members only rate will increase to $$member_registration_fee after August 31st</i>";
-                $non_members_descripcion = "Non-member attendees are eligible for discounted registration for a limited time. Register before August 31st to enjoy your discounted rate.<br/> <i> The non-member  rate will increase to $$non_member_registration_fe after August 31st</i>";
+                $members_only_descripcion = "Early bird registration is available for a limited time. Register before August 31st to take advantage of your discount.<br/> <i>The members only rate will increase after August 31st</i>";
+                $non_members_descripcion = "Non-member attendees are eligible for discounted registration for a limited time. Register before August 31st to enjoy your discounted rate.<br/> <i> The non-member  rate will increase after August 31st</i>";
+
+                $members_only_price = "<span class='select_price'> Early - $$member_reg_early_bird_fee.00</span>";
+                $non_members_only_price = "<span class='select_price'>Reg - $$non_member_registration_fe.00 </span>";
+
             }
 
-            $members_only_price = "<span class='select_price'> Early - $$member_reg_early_bird_fee.00; Reg - $$member_registration_fee.00 </span>";
+            //$members_only_price = "<span class='select_price'> Early - $$member_reg_early_bird_fee.00; Reg - $$member_registration_fee.00 </span>";
             $members_only_copy = "<div class='members_only_wrappers'><div class='members_only_copy select_copy'>" . $members_only_price . $members_only_descripcion . "</div></div>";
 
-            $non_members_only_price = "<span class='select_price'> Early - $$non_member_early_bird_fee.00; Reg - $$non_member_registration_fe.00 </span>";
+            //$non_members_only_price = "<span class='select_price'> Early - $$non_member_early_bird_fee.00; Reg - $$non_member_registration_fe.00 </span>";
             $non_members_only_copy = "<div class='non_members_only_wrappers'><div class='non_members_only_copy select_copy'>" . $non_members_only_price . $non_members_descripcion . "</div></div>";
 
             if ($user_is_admin) {
