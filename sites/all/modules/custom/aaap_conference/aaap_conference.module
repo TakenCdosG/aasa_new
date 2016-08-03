@@ -152,6 +152,11 @@ function aaap_conference_webform_client_form_validate($form, &$form_state) {
                 if ($completed_submission == "FALSE") {
                     //remove incomplete submission.
                     webform_submission_delete($node, $submission);
+                    //-> remove all submission data
+                    db_delete('webform_submitted_data')
+                        ->condition('nid', $nid)
+                        ->condition('sid', $sid)
+                        ->execute();
                     //-> Remove products nodes of this submission;
                     $query = new EntityFieldQuery;
                     $products_nodes = $query->entityCondition('entity_type', 'node')
@@ -160,8 +165,10 @@ function aaap_conference_webform_client_form_validate($form, &$form_state) {
                             ->entityCondition('bundle', 'national_conference_add_ons')
                             ->execute();
                     $nid_to_delete = array();
-                    foreach ($products_nodes as $key => $tmpNode) {
-                        $nid_to_delete[] = $tmpNode->nid;
+                    if($products_nodes['node']){
+                        foreach ($products_nodes['node'] as $key => $tmpNode) {
+                            $nid_to_delete[] = $tmpNode->nid;
+                        }
                     }
                     if (count($nid_to_delete) > 0) {
                         node_delete_multiple($nid_to_delete);
