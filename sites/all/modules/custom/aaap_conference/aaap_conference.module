@@ -148,6 +148,12 @@ function aaap_conference_webform_client_form_validate($form, &$form_state) {
                 $nid = $row->nid;
                 $sid = $row->sid;
                 $submission = webform_get_submission($nid, $sid, $reset = FALSE);
+                if($submission == FALSE){
+                     $db_delete_result = db_delete('webform_submitted_data')
+                        ->condition('nid', $nid)
+                        ->condition('sid', $sid)
+                        ->execute();
+                }
                 $completed_submission = $submission->data[70][0];
                 if ($completed_submission == "FALSE") {
    
