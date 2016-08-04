@@ -146,54 +146,57 @@ function aaap_extra_webform_submission_presave($node, &$submission) {
         global $base_root;
         //dsm($submission);
         //dsm($node);
-        if($submission_after[$submission->sid]->data[BECOME_SPONSOR_CONFIRMED_FIELD_ID][0] == 'not-confirmed'
-            and $submission->data[BECOME_SPONSOR_CONFIRMED_FIELD_ID][0]=='confirmed'
-            and $submission->data[BECOME_SPONSOR_PAYMENT_FIELD_ID][0]== 'mail_check' and $node->nid == BECOME_SPONSOR_FORM_ID){
+        if(isset($submission_after[$submission->sid])){
+            if($submission_after[$submission->sid]->data[BECOME_SPONSOR_CONFIRMED_FIELD_ID][0] == 'not-confirmed'
+                and $submission->data[BECOME_SPONSOR_CONFIRMED_FIELD_ID][0]=='confirmed'
+                and $submission->data[BECOME_SPONSOR_PAYMENT_FIELD_ID][0]== 'mail_check' and $node->nid == BECOME_SPONSOR_FORM_ID){
 
-            $sponsorship_fee = get_sponsorship_price($submission->data[10][0]);
-            set_status_invoice($submission->sid,$submission->nid,'completed');
-
-
-            mail($submission->data[BECOME_SPONSOR_EMAIL_FIELD_ID][0],SITE_NAME.' Sponsorship Payment Received' ,
-                'Payment for your sponsorship has been received.'."\r\n"
-                .'Sponsorship Payment Receipt'. "\r\n"
-                .'Payment Type: Check'. "\r\n \r\n"
-                .'Order: Sponsorship'. "\r\n"
-                .'Fee: $'.sprintf("%.2f",$sponsorship_fee)."\r\n  \r\n"
-                .'Name: '.$submission->data[1][0]." ".$submission->data[2][0]. "\r\n"
-                .'Institution: '.$submission->data[8][0]. "\r\n"
-                .'Email: '.$submission->data[BECOME_SPONSOR_EMAIL_FIELD_ID][0]. "\r\n"
-                .'Address: '.$submission->data[3][0]. "\r\n"
-                .'City: '.$submission->data[4][0]. "\r\n"
-                .'State/Province: '.$submission->data[5][0]. "\r\n"
-                .'Zip/Postal Code: '.$submission->data[6][0]. "\r\n \r\n"
-                .'Thank you,'. "\r\n \r\n"
-                .SITE_NAME, HEADERS);
+                $sponsorship_fee = get_sponsorship_price($submission->data[10][0]);
+                set_status_invoice($submission->sid,$submission->nid,'completed');
 
 
+                mail($submission->data[BECOME_SPONSOR_EMAIL_FIELD_ID][0],SITE_NAME.' Sponsorship Payment Received' ,
+                    'Payment for your sponsorship has been received.'."\r\n"
+                    .'Sponsorship Payment Receipt'. "\r\n"
+                    .'Payment Type: Check'. "\r\n \r\n"
+                    .'Order: Sponsorship'. "\r\n"
+                    .'Fee: $'.sprintf("%.2f",$sponsorship_fee)."\r\n  \r\n"
+                    .'Name: '.$submission->data[1][0]." ".$submission->data[2][0]. "\r\n"
+                    .'Institution: '.$submission->data[8][0]. "\r\n"
+                    .'Email: '.$submission->data[BECOME_SPONSOR_EMAIL_FIELD_ID][0]. "\r\n"
+                    .'Address: '.$submission->data[3][0]. "\r\n"
+                    .'City: '.$submission->data[4][0]. "\r\n"
+                    .'State/Province: '.$submission->data[5][0]. "\r\n"
+                    .'Zip/Postal Code: '.$submission->data[6][0]. "\r\n \r\n"
+                    .'Thank you,'. "\r\n \r\n"
+                    .SITE_NAME, HEADERS);
 
-        }elseif($submission_after[$submission->sid]->data[POST_JOB_CONFIRMED_FIELD_ID][0] == 'not-confirmed'
-            and $submission->data[POST_JOB_CONFIRMED_FIELD_ID][0]=='confirmed'
-            and $submission->data[POST_JOB_PAYMENT_FIELD_ID][0]== 'mail_check' and $node->nid == POST_JOB_FORM_ID){
 
-            set_status_invoice($submission->sid,$submission->nid,'completed');
 
-            $post_job_product = node_load(POST_JOB_PRODUCT);
-            $post_job_price = $post_job_product->sell_price;
-            mail($submission->data[POST_JOB_EMAIL_FIELD_ID][0],SITE_NAME.' Job Posting Payment Received' ,
-                'Payment for your Job Posting has been received.'."\r\n \r\n"
-                .'Your job will be posted within 2 business days and will remain in our site for 60 days. '."\r\n \r\n"
-                .'Job Posting Receipt'. "\r\n"
-                .'Payment Type: Check'. "\r\n \r\n"
-                .'Order: Job Posting'. "\r\n"
-                .'Fee: $'.sprintf("%.2f",$post_job_price)."\r\n  \r\n"
-                .'Name: '.$submission->data[3][0]." ".$submission->data[10][0]. "\r\n"
-                .'Institution: '.$submission->data[2][0]. "\r\n"
-                .'Email: '.$submission->data[POST_JOB_EMAIL_FIELD_ID][0]. "\r\n  \r\n"
-                .'Thank you,'. "\r\n \r\n"
-                .SITE_NAME, HEADERS);
+            }elseif($submission_after[$submission->sid]->data[POST_JOB_CONFIRMED_FIELD_ID][0] == 'not-confirmed'
+                and $submission->data[POST_JOB_CONFIRMED_FIELD_ID][0]=='confirmed'
+                and $submission->data[POST_JOB_PAYMENT_FIELD_ID][0]== 'mail_check' and $node->nid == POST_JOB_FORM_ID){
 
+                set_status_invoice($submission->sid,$submission->nid,'completed');
+
+                $post_job_product = node_load(POST_JOB_PRODUCT);
+                $post_job_price = $post_job_product->sell_price;
+                mail($submission->data[POST_JOB_EMAIL_FIELD_ID][0],SITE_NAME.' Job Posting Payment Received' ,
+                    'Payment for your Job Posting has been received.'."\r\n \r\n"
+                    .'Your job will be posted within 2 business days and will remain in our site for 60 days. '."\r\n \r\n"
+                    .'Job Posting Receipt'. "\r\n"
+                    .'Payment Type: Check'. "\r\n \r\n"
+                    .'Order: Job Posting'. "\r\n"
+                    .'Fee: $'.sprintf("%.2f",$post_job_price)."\r\n  \r\n"
+                    .'Name: '.$submission->data[3][0]." ".$submission->data[10][0]. "\r\n"
+                    .'Institution: '.$submission->data[2][0]. "\r\n"
+                    .'Email: '.$submission->data[POST_JOB_EMAIL_FIELD_ID][0]. "\r\n  \r\n"
+                    .'Thank you,'. "\r\n \r\n"
+                    .SITE_NAME, HEADERS);
+
+            }
         }
+
     }
 }
 

@@ -150,9 +150,10 @@ function aaap_conference_webform_client_form_validate($form, &$form_state) {
                 $submission = webform_get_submission($nid, $sid, $reset = FALSE);
                 $completed_submission = $submission->data[70][0];
                 if ($completed_submission == "FALSE") {
-   
+                    //remove incomplete submission.
+                    webform_submission_delete($node, $submission);
                     //-> remove all submission data
-                    $db_delete_result = db_delete('webform_submitted_data')
+                    db_delete('webform_submitted_data')
                         ->condition('nid', $nid)
                         ->condition('sid', $sid)
                         ->execute();
@@ -169,18 +170,11 @@ function aaap_conference_webform_client_form_validate($form, &$form_state) {
                             $nid_to_delete[] = $tmpNode->nid;
                         }
                     }
-
                     if (count($nid_to_delete) > 0) {
                         node_delete_multiple($nid_to_delete);
                     }
-
                     //-> Empties a cart of its contents.
                     uc_cart_empty(uc_cart_get_id());
-
-                    //remove incomplete submission.
-                    webform_submission_delete($node, $submission);
-                    dpm(array("Lleo aqui."));
-
                 } else {
                     $already_submitted = TRUE;
                 }
@@ -266,13 +260,11 @@ function aaap_conference_form_alter(&$form, &$form_state, $form_id) {
             //  +===========================================+
 
             //Block the form if was canceled
-            if(isset($form['#submission']->data[76][0])){
-                if($form['#submission']->data[76][0]== 'CANCELED' && !$user_is_admin){
-                    $form = block_submission_form($form);
-                    $messages_status = '<div class="messages_status">Notice: This register was canceled.You are not available to edit it.</div>';
-                    $messages_status .= '<h4 class="section_title">Background Information</h4>';
+            if($form['#submission']->data[76][0]== 'CANCELED' && !$user_is_admin){
+                $form = block_submission_form($form);
+                $messages_status = '<div class="messages_status">Notice: This register was canceled.You are not available to edit it.</div>';
+                $messages_status .= '<h4 class="section_title">Background Information</h4>';
 
-                }
             }
 
             if (isset($form['#submission']->sid) && isset($form['#submission']->nid)) {
@@ -560,7 +552,7 @@ function aaap_conference_form_alter(&$form, &$form_state, $form_id) {
             //  +=====================================+
             //  | Field Mentoring Program             |
             //  +=====================================+
-            if (isset($form['submitted']['mentoring_program'])) { 
+            if (isset($form['submitted']['mentoring_program'])) {
                 $member_attendee_paired_with_mentor_copy = "<div class='member_attendee_paired_with_mentor_wrappers'><div class='member_attendee_paired_with_mentor_copy select_copy'>We invite all new members and conference attendees to be matched with an AASA veteran for at least one meeting during the conference.  Information on matches will be sent in early October.</div></div>";
                 $member_attendee_serving_as_mentor_copy = "<div class='member_attendee_serving_as_mentor_wrappers'><div class='member_attendee_serving_as_mentor_copy select_copy'>We invite all veteran members and conference attendees to pair with a new member or attendee for at least one meeting during the conference.  Information on matches will be sent in early October.</div></div>";
                 $form['submitted']['mentoring_program']['#suffix'] = $member_attendee_paired_with_mentor_copy . $member_attendee_serving_as_mentor_copy . $hr;
@@ -1603,23 +1595,22 @@ function aaap_conference_webform_submission_update($node, $submission) {
                     $submission->discard = true;
                     webform_submission_update($node, $submission);
                 }
-                if(isset($send_confirmation_email)){
-                    if ($send_confirmation_email) {
-                        //  +=====================================+
-                        //  | Mail To Member                      |
-                        //  +=====================================+ 
-                        $text_for_user = " Confirmation of Change to Registration";
-                        $message = theme('aaap_conference_event_update_confirmation_notification_to_user', array('params' => $params));
-                        $subject = $params["site_name"] . $text_for_user;
-                        $email = new PHPMailer();
-                        $email->From = $params["system_mail"];
-                        $email->FromName = $params["site_name"];
-                        $email->Subject = $subject;
-                        $email->Body = $message;
-                        $email->IsHTML(true);
-                        $email->AddAddress($email_address, '');
-                        $email->Send();
-                    }
+
+                if ($send_confirmation_email) {
+                    //  +=====================================+
+                    //  | Mail To Member                      |
+                    //  +=====================================+ 
+                    $text_for_user = " Confirmation of Change to Registration";
+                    $message = theme('aaap_conference_event_update_confirmation_notification_to_user', array('params' => $params));
+                    $subject = $params["site_name"] . $text_for_user;
+                    $email = new PHPMailer();
+                    $email->From = $params["system_mail"];
+                    $email->FromName = $params["site_name"];
+                    $email->Subject = $subject;
+                    $email->Body = $message;
+                    $email->IsHTML(true);
+                    $email->AddAddress($email_address, '');
+                    $email->Send();
                 }
             }
         }

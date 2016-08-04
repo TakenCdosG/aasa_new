@@ -4,7 +4,7 @@
  *
  */
 (function ($) {
-    $(document).ready(function () { 
+    $(document).ready(function () {
 
         var members_only_copy = $('.formulario-conferencias .members_only_wrappers').html();
         $(members_only_copy).appendTo('.formulario-conferencias .general-sessions .form-radios .form-item:first-child');
@@ -27,8 +27,8 @@
         var dinner_groups_copy = $('.formulario-conferencias .dinner_groups_wrappers').html();
         $(dinner_groups_copy).appendTo('.formulario-conferencias .networking_events_dinner_groups .form-checkboxes .form-item:first-child');
 
-        var golf_outing_copy = $('.formulario-conferencias .golf_outing_wrappers').html();
-        $(golf_outing_copy).appendTo('.formulario-conferencias .networking_events_golf_outing .form-checkboxes .form-item:first-child');
+        var golf_outing__copy = $('.formulario-conferencias .golf_outing_wrappers').html();
+        $(golf_outing__copy).appendTo('.formulario-conferencias .networking_events_golf_outing .form-checkboxes .form-item:first-child');
 
         var member_attendee_paired_with_mentor_copy = $('.formulario-conferencias .member_attendee_paired_with_mentor_wrappers').html();
         $(member_attendee_paired_with_mentor_copy).appendTo('.formulario-conferencias .mentoring_program .form-radios .form-item:first-child');

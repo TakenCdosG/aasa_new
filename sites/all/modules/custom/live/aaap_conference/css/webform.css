@@ -1,0 +1,406 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : May 22, 2015, 5:16:03 PM
+    Author     : Adrian
+*/
+.formulario-conferencias{
+
+}
+
+.formulario-conferencias .box.free-membership-application-request{
+    display: none;
+}
+
+.formulario-conferencias .free-membership-application-request label {
+    font-weight: bold;
+    color: #2A2A2A;
+}
+
+.formulario-conferencias .free-membership-application-request .label-title{
+    font-weight: bold;
+    color: #00738F;
+    font-family: Georgia;
+    font-size: 16px;
+    margin-bottom: 15px;
+    margin-top: 15px;
+}
+
+.formulario-conferencias .free-membership-application-request .form-type-radio label,
+.formulario-conferencias .free-membership-application-request .form-type-checkbox label{
+    font-weight: normal;
+}
+
+.formulario-conferencias .messages_status{
+    background: #007490;
+    padding: 10px;
+    color: #fff;
+    font-family: Georgia;
+    font-size: 17px;
+    font-weight: 300;
+}
+
+.formulario-conferencias .messages_status.bg-warning{
+    background-color: #fcf8e3;
+    border: 1px solid #ddd;
+    color: #333;
+}
+
+.ctools-use-modal-processed .messages_status{
+    background: #007490;
+    padding: 10px;
+    color: #fff;
+    font-family: Georgia;
+    font-size: 16px;
+    font-weight: 300;
+    text-align: left;
+    margin-bottom: 15px;
+    margin-top: 5px;
+}
+
+div.ctools-modal-content .modal-header {
+    background-color: #007490;
+    padding: 0 .25em 0 1em;
+    padding: 5px 10px;
+}
+
+.ctools-use-modal-processed input{
+    background: none repeat scroll 0 0 white;
+    border: 1px solid #000000;
+    color: black;
+    font-family: "allerregular";
+    font-weight: normal;
+    padding: 8px;
+    margin-top: 5px; 
+}
+
+.ctools-use-modal-processed  .btn-ctools-close-modal{
+    margin-left: 20px;
+    border-bottom: 1px dashed #ccc;
+}
+
+.formulario-conferencias .section_title{
+    color: #00738F;
+    font-family: Georgia;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.formulario-conferencias hr {
+    border: 1px solid #dfdfdf;
+    height: 0px;
+}
+
+.formulario-conferencias .form-item.form-type-radio {
+    display: block;
+}
+
+.formulario-conferencias .webform-component-radios{
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.formulario-conferencias p{
+    color: #2A2A2A;
+    font-family: Georgia;
+    font-size: 16px;
+    font-weight: normal;
+    margin-bottom: 6px;
+}
+
+.formulario-conferencias .webform-component--hot-topics{
+    margin-top: 0px;
+}
+
+.formulario-conferencias .webform-component--hot-topics label{
+    /*margin-bottom: 25px;*/
+}
+
+.formulario-conferencias .webform-component--hot-topics label span.form-required{
+    display: none;
+}
+
+.formulario-conferencias .webform-component--hot-topics label p span.form-required{
+    display: inline-block;
+}
+
+.formulario-conferencias p span.dark_blue{
+    color: #00738F;
+    font-weight: bold;
+}
+
+.formulario-conferencias .members_only_wrappers,
+.formulario-conferencias .non_members_only_wrappers,
+.formulario-conferencias .precourse_wrappers,
+.formulario-conferencias .celia_king_dinner_wrappers,
+.formulario-conferencias .celia_king_dinner_guest_wrappers,
+.formulario-conferencias .dinner_groups_wrappers,
+.formulario-conferencias .golf_outing_wrappers,
+.formulario-conferencias .member_attendee_paired_with_mentor_wrappers,
+.formulario-conferencias .member_attendee_serving_as_mentor_wrappers,
+.formulario-conferencias .dietary_restrictions_wrappers,
+.formulario-conferencias .guest_dietary_restrictions_wrappers{
+    display: none;
+}
+
+.formulario-conferencias .general-sessions  .members_only_wrappers,
+.formulario-conferencias .general-sessions  .non_members_only_wrappers,
+.formulario-conferencias .precourse .precourse_wrappers,
+.formulario-conferencias .networking_events .celia_king_dinner_wrappers,
+.formulario-conferencias .networking_events .celia_king_dinner_guest_wrappers,
+.formulario-conferencias .networking_events .dinner_groups_wrappers,
+.formulario-conferencias .networking_events .golf_outing_wrappers,
+.formulario-conferencias .networking_events .member_attendee_paired_with_mentor_wrappers,
+.formulario-conferencias .dietary_restrictions .dietary_restrictions_wrappers,
+.formulario-conferencias .guest_dietary_restrictions .guest_dietary_restrictions_wrappers{
+    display: block;
+}
+
+.formulario-conferencias .general-sessions .form-radios,
+.formulario-conferencias .precourse .form-checkboxes,
+.formulario-conferencias .networking_events .form-radios,
+.formulario-conferencias .networking_events .form-radios,
+.formulario-conferencias .mentoring_program .form-radios,
+.formulario-conferencias .dietary_restrictions .form-radios,
+.formulario-conferencias .networking_events_celia_king_dinner .form-checkboxes{
+    margin-top: 12px;
+}
+
+.formulario-conferencias .general-sessions .form-radios .form-item,
+.formulario-conferencias .precourse .form-checkboxes .form-item,
+.formulario-conferencias .mentoring_program .form-radios .form-item,
+.formulario-conferencias .networking_events .form-radios .form-item,
+.formulario-conferencias .networking_events_celia_king_dinner .form-checkboxes .form-item,
+.formulario-conferencias .networking_events_celia_king_dinner_guest .form-checkboxes .form-item,
+.formulario-conferencias .networking_events_golf_outing .form-checkboxes .form-item{
+    margin-bottom: 32px;
+    position: relative;
+}
+
+.formulario-conferencias .networking_events_dinner_groups .form-checkboxes .form-item{
+    margin-left: 25px;
+    margin-bottom: 0px;
+    margin-top: 10px;
+    position: relative;
+}
+
+.formulario-conferencias .networking_events_dinner_groups .form-checkboxes .form-item label {
+    font-weight: normal;
+    color: #2A2A2A;
+}
+
+.formulario-conferencias .networking_events_dinner_groups #edit-submitted-networking-events-dinner-groups {
+    margin-top: 16px;
+    margin-bottom: 16px;
+    position:relative;
+}
+
+.formulario-conferencias .dietary_restrictions .form-checkboxes .form-item{
+    margin-bottom: 0px;
+    position: relative;
+}
+
+.formulario-conferencias .general-sessions .form-radios .form-item:first-child{
+
+}
+
+.formulario-conferencias .general-sessions .form-radios .form-item:last-child{
+
+}
+
+.formulario-conferencias .general-sessions label,
+.formulario-conferencias .precourse label,
+.formulario-conferencias .networking_events label,
+.formulario-conferencias .mentoring_program label,
+.formulario-conferencias .networking_events_celia_king_dinner label,
+.formulario-conferencias .networking_events_celia_king_dinner_guest label,
+.formulario-conferencias .networking_events_golf_outing label{
+    font-weight: bold;
+    color: #00738F;
+}
+
+.formulario-conferencias .networking_events_dinner_groups label{
+    font-weight: bold;
+    color: #2A2A2A;
+}
+
+.formulario-conferencias .networking_events_dinner_groups .form-radios .form-item label{
+    font-weight: normal;
+    color: #2A2A2A;
+}
+
+.formulario-conferencias .networking_events_dinner_groups .form-radios .form-item{
+    margin-bottom: 12px;
+    position: relative;
+}
+
+.formulario-conferencias .networking_events_dinner_groups .form-radios .form-item .select_price{
+    font-weight: bold;
+    color: #2A2A2A;
+    position: absolute;
+    top: 0px;
+    right: 120px;
+    line-height: 18px;
+    font-size: 19px;
+}
+
+.formulario-conferencias .networking_events_dinner_groups .form-radios{
+    margin-left: 20px;
+    margin-bottom: 30px;
+    margin-top: 20px;
+}
+
+.formulario-conferencias .guest_name label,
+.formulario-conferencias .guest_dietary_restrictions label,
+.formulario-conferencias .payment_method label{
+    font-weight: normal;
+    color: #2A2A2A;
+    font-style: normal;
+}
+
+.formulario-conferencias .guest_name label{
+    display: inline-block;
+    margin-right: 12px;
+}
+
+.formulario-conferencias .dietary_restrictions label{
+    color: #00738F;
+    font-weight: bold;
+}
+
+.formulario-conferencias .general-sessions .form-type-radio label,
+.formulario-conferencias .precourse .form-checkboxes label,
+.formulario-conferencias .networking_events .form-type-radio label,
+.formulario-conferencias .mentoring_program .form-type-radio label,
+.formulario-conferencias .networking_events_celia_king_dinner .form-checkboxes label,
+.formulario-conferencias .networking_events_celia_king_dinner_guest .form-checkboxes label,
+.formulario-conferencias .networking_events_dinner_groups .form-checkboxes label,
+.formulario-conferencias .networking_events_golf_outing .form-checkboxes label{
+    font-weight: bold;
+    color: #2A2A2A;
+}
+.formulario-conferencias .dietary_restrictions .form-type-checkbox{
+
+}
+
+
+
+.formulario-conferencias .dietary_restrictions .form-type-checkbox label,
+.formulario-conferencias .guest_dietary_restrictions .form-type-radio label,
+.formulario-conferencias .payment_method .form-type-radio label{
+    color: #2A2A2A;
+    font-weight: normal;
+}
+
+.formulario-conferencias .select_copy {
+    color: #2A2A2A;
+    font-family: Georgia;
+    font-size: 16px;
+    font-weight: normal;
+    margin-bottom: 6px;
+    line-height: 29px;
+    margin-top: 4px;
+}
+
+.formulario-conferencias .select_price{
+    font-weight: bold;
+    color: #2A2A2A;
+    position: absolute;
+    top: 0px;
+    right: 120px;
+    line-height: 18px;
+    font-size: 19px;
+}
+
+.formulario-conferencias .row {
+
+}
+
+.formulario-conferencias .row:after, 
+.formulario-conferencias .row:before {
+    display: table;
+    content: "";
+}
+
+.formulario-conferencias .row:after {
+    clear: both;
+}
+
+.formulario-conferencias .col-md-6 {
+    position: relative;
+    min-height: 1px;
+}
+
+.formulario-conferencias .webform-submit{
+    background-color: #007490;
+    background-image: none;
+    border: 0 none;
+    border-radius: 5px;
+    color: #ffffff;
+    cursor: pointer;
+    font-family: Georgia;
+    font-size: 14px;
+    height: 24px;
+    width: 80px;
+}
+
+.formulario-conferencias .box{
+    margin-right: 0;
+    margin-left: 0;
+    background-color: #fff;
+    border-color: #ddd;
+    border-width: 1px;
+    border-radius: 4px 4px 4px 4px;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    display: block;
+    position: relative;
+    border-style: solid;
+    padding: 15px 15px 0px 15px;
+    margin: 0 -15px 10px -15px;
+}
+
+.formulario-conferencias .box .highlight{
+    margin-top: -16px;
+    margin-right: -15px;
+    margin-left: -15px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+    padding: 9px 14px;
+    margin-bottom: 0px;
+    background-color: #f7f7f9;
+    border-top: 1px solid #e1e1e8;
+    display: block;
+    position: relative;
+    width: 100%;
+    clear: both;
+}
+
+.formulario-conferencias .box .highlight:before {
+    display: table;
+    content: " ";
+}
+
+.formulario-conferencias .box .highlight .component_inline{
+    display: inline-block;
+    position: relative;
+    margin-right: 30px;
+}
+
+@media (min-width: 992px){
+    .formulario-conferencias .col-md-6 {
+        width: 50%;
+        float: left;
+    }
+    .formulario-conferencias .col-md-6.contact-information{
+        margin-top: -290px;
+    }
+}
+
+.formulario-conferencias .networking-events-dinner-groups-prices,
+.formulario-conferencias .networking-events-dinner-groups-labels{
+    display: none;
+}
