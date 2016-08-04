@@ -150,8 +150,7 @@ function aaap_conference_webform_client_form_validate($form, &$form_state) {
                 $submission = webform_get_submission($nid, $sid, $reset = FALSE);
                 $completed_submission = $submission->data[70][0];
                 if ($completed_submission == "FALSE") {
-                    //remove incomplete submission.
-                    webform_submission_delete($node, $submission);
+   
                     //-> remove all submission data
                     db_delete('webform_submitted_data')
                         ->condition('nid', $nid)
@@ -170,11 +169,17 @@ function aaap_conference_webform_client_form_validate($form, &$form_state) {
                             $nid_to_delete[] = $tmpNode->nid;
                         }
                     }
+                    
                     if (count($nid_to_delete) > 0) {
                         node_delete_multiple($nid_to_delete);
                     }
+
                     //-> Empties a cart of its contents.
                     uc_cart_empty(uc_cart_get_id());
+
+                    //remove incomplete submission.
+                    webform_submission_delete($node, $submission);
+
                 } else {
                     $already_submitted = TRUE;
                 }
