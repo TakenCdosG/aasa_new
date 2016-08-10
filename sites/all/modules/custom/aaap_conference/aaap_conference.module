@@ -3597,9 +3597,15 @@ function _render_conference_webform($nid) {
     global $user;
     $filters = array('nid' => $nid, 'uid' => $user->uid);
     $submissions = webform_get_submissions($filters, $header = NULL, $pager_count = 0);
-    if (count($submissions) > 0) {
-        reset($submissions);
-        $sid = key($submissions);
+    reset($submissions);
+    $sid = key($submissions);
+    $completed_submission = FALSE;
+    if(isset($submissions[$sid]->data[70][0])){
+        if($submissions[$sid]->data[70][0] != "FALSE"){
+           $completed_submission = TRUE;
+        }
+    }
+    if (count($submissions) > 0 && $completed_submission) {
         drupal_goto($path = "conference/$nid/registration/$sid/edit");
     } else {
         $node = node_load($nid);
