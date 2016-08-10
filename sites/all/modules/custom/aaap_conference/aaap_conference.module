@@ -185,7 +185,7 @@ function aaap_conference_webform_client_form_validate($form, &$form_state) {
 
                     //remove incomplete submission.
                     webform_submission_delete($node, $submission);
-                    dpm(array("Lleo aqui."));
+                    // dpm(array("Lleo aqui."));
 
                 } else {
                     $already_submitted = TRUE;
