@@ -13,7 +13,16 @@
 
 
 .accordion-members{
+  margin-bottom: 25px;
+}
 
+.accordion-members label{
+	font-family: 'allerbold';
+    color: #41738D;
+    font-size: 20px;
+    text-decoration: none;
+    line-height: 16px;
+    margin-bottom: 15px
 }
 
 .accordion-members h3{
@@ -27,4 +36,5 @@
 	padding: 15px;
     font-size: 13px;	
     border: 1px solid #e0e0e0;
+    margin-bottom: 12px;
 }
