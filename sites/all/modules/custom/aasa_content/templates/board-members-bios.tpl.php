@@ -3,7 +3,7 @@
 * $bios
 */
 ?>
-
+<h1 class="title_blue_one">Board Members Bios</h1>
 <div class="board-members-bios-container">
 	<?php foreach ($bios as $key => $bio): ?>
 		<?php $members = $bio['category_bios']; ?>
