@@ -53,5 +53,7 @@ function aasa_content_board_member_bios_page(){
 		$items[] = $item;
 	}
 	$htmt_output = theme('board_members_bios', array('bios' => $items));
+	drupal_add_js(drupal_get_path('module', 'aasa_content') . '/js/board-members-bios.js');
+	drupal_add_css(drupal_get_path('module', 'aasa_content') . '/css/board-members-bios.css');
 	return array('#markup' => $htmt_output);
 }
