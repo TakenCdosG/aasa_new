@@ -13,13 +13,45 @@ function aasa_content_menu() {
     );
     return $items;
 }
+
+/**
+ * Implements hook_theme().
+ */
+function aasa_content_theme($existing, $type, $theme, $path) {
+    return array('board_members_bios' => array(
+            'template' => 'templates/board-members-bios',
+            'variables' => array('bios' => NULL),
+        ),
+    );
+}
  
+function aasa_content_get_bios_by_category($tid){
+	$query = new EntityFieldQuery();
+	$query->entityCondition('entity_type', 'node')
+		->entityCondition('bundle', 'bios')
+		->propertyCondition('status', NODE_PUBLISHED)
+		->fieldCondition('field_bio_category', 'tid', $tid);
+	$result = $query->execute();
+	$bios = array();
+	if (isset($result['node'])) {
+	  $news_items_nids = array_keys($result['node']);
+	  $bios = entity_load('node', $news_items_nids);
+	}	
+	return $bios;
+}
+
 function aasa_content_board_member_bios_page(){
 	$categories =  taxonomy_get_tree($vid = 2);
 	$items = array();
 	foreach ($categories as $key => $category) {
-		
-
+		$tid = $category->tid;
+		$item = array();
+		$item['category_label'] =  $category->name;
+		$item['category_tid'] =  $category->tid;
+		$item['category_bios'] =  array();
+		$item['category_bios'] =  aasa_content_get_bios_by_category($tid);
+		$items[] = $item;
 	}
-	return "";
+	$htmt_output = theme('board_members_bios', array('bios' => $items));
+	return array('#markup' => $htmt_output);
 }
