@@ -8,6 +8,7 @@
 
 jQuery( function() {
     jQuery( ".accordion-members" ).accordion({
-      heightStyle: "content"
+      heightStyle: "content",
+      collapsible: true
     });
   } );
