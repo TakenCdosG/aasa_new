@@ -9,7 +9,7 @@
 jQuery( document ).ready(function() {
 	jQuery( ".accordion-members" ).accordion({
       heightStyle: "content",
-      collapsible: false
+      collapsible: true
     });
     jQuery('.accordion-members h3 a.accordion-toggle').trigger('click');
 });
