@@ -12,5 +12,5 @@ jQuery( document ).ready(function() {
       collapsible: true,
       active: false
     });
-    //jQuery('.accordion-members h3.ui-state-active a.accordion-toggle').trigger('click');
+    jQuery('.accordion-members h3.ui-state-active a.item_0_0').trigger('click');
 });
