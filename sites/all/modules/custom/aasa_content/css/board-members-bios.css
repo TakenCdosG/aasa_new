@@ -23,3 +23,10 @@
     border-bottom: 1px solid #e0e0e0;
     padding: 10px 15px;
 }
+
+.accordion-members .panel-body{
+	padding: 15px;
+    font-size: 13px;	
+    border-top: 1px solid #e0e0e0;
+    border-top-color: #e0e0e0;
+}
