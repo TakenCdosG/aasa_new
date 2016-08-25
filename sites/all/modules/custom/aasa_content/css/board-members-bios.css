@@ -51,5 +51,7 @@
 }
 
 .page-board-member-bios h1.title_blue_one{
-
+    padding-top: 0px;
+    margin-top: 10px;
+    margin-bottom: 20px;
 }
