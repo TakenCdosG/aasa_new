@@ -1,0 +1,4 @@
+name = AASA Content
+description = AASA Content Module.
+package = AASA
+core = 7.x

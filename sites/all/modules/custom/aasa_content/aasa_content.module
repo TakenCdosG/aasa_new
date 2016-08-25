@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function aaap_conference_menu() {
+
+    $items['board-member-bios'] = array(
+        'page callback' => 'aasa_content_board_member_bios_page',
+        'page arguments' => array(),
+        'access callback' => TRUE,
+        'title' => 'Board Member Bios'
+    );
+    return $items;
+}
+
+function aasa_content_board_member_bios_page(){
+	
+	return "";
+}
