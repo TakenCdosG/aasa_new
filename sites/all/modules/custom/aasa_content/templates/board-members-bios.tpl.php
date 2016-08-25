@@ -5,11 +5,11 @@
 ?>
 
 <?php foreach ($bios as $key => $bio): ?>
-<div class="board-members-bios-container">
+<div id="accordion-members" class="board-members-bios-container">
 	<label for="edit-submitted-vice-president"><?php echo $bio['category_label']; ?></label>
 	<?php $members = $bio['category_bios']; ?>
 	<?php foreach ($members as $k => $member): ?>
-		<div id="accordion-members" class="panel panel-default">
+		<div class="panel panel-default">
 	       <div class="panel-heading">
 	          <h4 class="panel-title">
 	             <a href="#accordion<?php echo $bio['category_tid']; ?>" data-parent="#accordion<?php echo $bio['category_tid']; ?>" data-toggle="collapse" class="accordion-toggle" aria-expanded="true">
