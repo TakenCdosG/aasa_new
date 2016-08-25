@@ -4,9 +4,9 @@
 */
 ?>
 
-<div id="accordion-members">
+<div class="accordion-members">
 	<?php foreach ($bios as $key => $bio): ?>
-	<div class="board-members-bios-container">
+	<div class="accordion-members board-members-bios-container">
 		<label for="edit-submitted-vice-president"><?php echo $bio['category_label']; ?></label>
 		<?php $members = $bio['category_bios']; ?>
 		<?php foreach ($members as $k => $member): ?>
