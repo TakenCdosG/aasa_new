@@ -17,12 +17,12 @@
 }
 
 .board-members-bios-container label{
-	font-family: 'allerbold';
-    color: #41738D;
-    font-size: 20px;
+    font-family: 'allerbold';
+    color: #000000;
+    font-size: 18px;
     text-decoration: none;
-    line-height: 16px;
-    margin-bottom: 15px
+    margin-bottom: 15px;
+    line-height: 22px;
 }
 
 .accordion-members h3{
