@@ -12,7 +12,7 @@ jQuery( document ).ready(function() {
       collapsible: true,
       active: false
     });
-    jQuery('.accordion-members h3 a.item_0_0').trigger('click');
+    //jQuery('.accordion-members h3 a.item_0_0').trigger('click');
     jQuery( ".accordion-members h3 a" ).click(function() {
     	var item_href = jQuery(this).attr('href');
 	  	var a_actives = jQuery('.accordion-members h3.ui-state-active a');

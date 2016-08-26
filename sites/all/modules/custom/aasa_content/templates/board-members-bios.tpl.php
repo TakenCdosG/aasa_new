@@ -18,7 +18,7 @@
 			         </a>
 		      	</h3>
 		      	<div class="panel-body">
-		         <span class="node aller"><p><?php echo $member->body['und'][0]['value']; ?></p></span>
+		         <span class="node aller"><?php echo $member->body['und'][0]['value']; ?></span>
 		     	</div>
 		     <?php $item = $item+1; ?>
 			<?php endforeach; ?>
