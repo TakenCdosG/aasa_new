@@ -21,6 +21,10 @@ jQuery( document ).ready(function() {
 	  	  if(item_href != current_item_href){
 	  	  		jQuery(this).trigger('click');
 	  	  }
-		});
-	});
+		});		
+	});	
+	var item_hash = window.location.hash.substring(1);
+	if (item_hash != ""){
+		jQuery(".accordion-members a#"+item_hash).trigger('click');
+	}
 });

@@ -12,8 +12,9 @@
 		<div class="accordion-members">
 			<?php $item = 0; ?>
 			<?php foreach ($members as $k => $member): ?>
+			<?php $machine_name = preg_replace('@[^a-z0-9-]+@','-', strtolower($member->title)); ?>
 				<h3 class="panel-title">
-			         <a href="#accordion<?php echo $bio['category_tid']; ?>" data-parent="#accordion<?php echo $bio['category_tid']; ?>" data-toggle="collapse" class="accordion-toggle <?php echo 'item_'.$key.'_'.$item ; ?>" aria-expanded="true">
+			         <a id="<?php echo $machine_name; ?>" href="#accordion<?php echo $bio['category_tid']; ?>" data-parent="#accordion<?php echo $bio['category_tid']; ?>" data-toggle="collapse" class="accordion-toggle <?php echo 'item_'.$key.'_'.$item ; ?>" aria-expanded="true">
 			           <?php echo $member->title; ?>
 			         </a>
 		      	</h3>
