@@ -3670,7 +3670,7 @@ function _conference_active_individual_registration($nid,$sid){
         db_insert('webform_submitted_data')->fields(array('nid'=>$nid,'sid'=>$submission->sid,'cid'=>76,'data' => 'ACTIVE'))->execute();
     }
     drupal_set_message("The register was activated");
-    drupal_goto('admin/conference/290/report');
+    drupal_goto('admin/conference/'.$nid.'/report');
 }
 
 /**
