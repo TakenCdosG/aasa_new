@@ -14,11 +14,11 @@
 			<?php foreach ($members as $k => $member): ?>
 				<h3 class="panel-title">
 			         <a href="#accordion<?php echo $bio['category_tid']; ?>" data-parent="#accordion<?php echo $bio['category_tid']; ?>" data-toggle="collapse" class="accordion-toggle <?php echo 'item_'.$key.'_'.$item ; ?>" aria-expanded="true">
-			           <span class="node aller"><p><?php echo $member->title; ?></p></span>
+			           <?php echo $member->title; ?>
 			         </a>
 		      	</h3>
 		      	<div class="panel-body">
-		         <?php echo $member->body['und'][0]['value']; ?>
+		         <span class="node aller"><p><?php echo $member->body['und'][0]['value']; ?></p></span>
 		     	</div>
 		     <?php $item = $item+1; ?>
 			<?php endforeach; ?>
