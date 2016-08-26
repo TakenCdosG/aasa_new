@@ -31,7 +31,7 @@ function aasa_content_get_bios_by_category($tid){
 		->entityCondition('bundle', 'bios')
 		->propertyCondition('status', NODE_PUBLISHED)
 		->fieldCondition('field_bio_category', 'tid', $tid)
-		->propertyOrderBy('title','Asc');
+		->fieldOrderBy('field_bio_last_name', 'value', 'ASC');
 	$result = $query->execute();
 	$bios = array();
 	if (isset($result['node'])) {
