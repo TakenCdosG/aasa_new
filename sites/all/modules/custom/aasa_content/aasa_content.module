@@ -9,7 +9,7 @@ function aasa_content_menu() {
         'page callback' => 'aasa_content_board_member_bios_page',
         'page arguments' => array(),
         'access callback' => TRUE,
-        'title' => 'Board Member Bios'
+        'title' => '2016 Executive Committee Nomination Bios'
     );
     return $items;
 }

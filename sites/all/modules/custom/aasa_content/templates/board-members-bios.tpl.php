@@ -3,7 +3,7 @@
 * $bios
 */
 ?>
-<h1 class="title_blue_one">Board Members Bios</h1>
+<h1 class="title_blue_one">2016 Executive Committee Nomination Bios</h1>
 <div class="board-members-bios-container">
 	<?php foreach ($bios as $key => $bio): ?>
 		<?php $members = $bio['category_bios']; ?>
@@ -14,7 +14,7 @@
 			<?php foreach ($members as $k => $member): ?>
 				<h3 class="panel-title">
 			         <a href="#accordion<?php echo $bio['category_tid']; ?>" data-parent="#accordion<?php echo $bio['category_tid']; ?>" data-toggle="collapse" class="accordion-toggle <?php echo 'item_'.$key.'_'.$item ; ?>" aria-expanded="true">
-			           <?php echo $member->title; ?>
+			           <span class="node aller"><p><?php echo $member->title; ?></p></span>
 			         </a>
 		      	</h3>
 		      	<div class="panel-body">
