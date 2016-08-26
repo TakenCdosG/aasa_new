@@ -3019,12 +3019,14 @@ function _conference_reports($nid) {
         $view = l(t('View '), "view/$node->nid/conference/$submission->sid");
         $edit = l(t('Edit '), "conference/$node->nid/registration/$submission->sid/edit", array('query' => $destination));
 
-        if($submission->data[76][0]=='ACTIVE' or !isset($submission->data[76])){
-            $action = l(t('Cancel '), "admin/conference/$node->nid/registration/$submission->sid/cancel");
-        }else{
-            $action = l(t('Activate'), "admin/conference/$node->nid/registration/$submission->sid/active");
-        }
-
+        $action = "";
+        /*
+            if($submission->data[76][0]=='ACTIVE' or !isset($submission->data[76])){
+                $action = l(t('Cancel '), "admin/conference/$node->nid/registration/$submission->sid/cancel");
+            }else{
+                $action = l(t('Activate'), "admin/conference/$node->nid/registration/$submission->sid/active");
+            }
+        */
 
         $operations = $view . " - " . $edit. " - " .$action;
         $row = array($name, $organization, $street_address, $city_state_zip, $email, $operations);
