@@ -180,6 +180,10 @@ div.ctools-modal-content .modal-header {
     position: relative;
 }
 
+.formulario-conferencias .general-sessions .form-radios .form-item:first-child{
+    margin-bottom: 12px;
+}
+
 .formulario-conferencias .networking_events_dinner_groups .form-checkboxes .form-item{
     margin-left: 25px;
     margin-bottom: 0px;
