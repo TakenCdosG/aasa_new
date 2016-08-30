@@ -680,6 +680,30 @@ function aaap_conference_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
+ * Implements hook_webform_submission_presave().
+ */
+function aaap_conference_submission_presave($node, &$submission) {
+  if ($node->type == "conference") {
+      // Update some component's value before it is saved.
+      $component_id = 7;
+      $email_address = $submission->data[$component_id][0];
+      if(!empty($email_address)){
+          $not_allowes = array("'");
+          $contains_special_characters = false;
+          foreach ($not_allowes as $key => $item) {
+            if (strpos($email_address, $item) !== false) {
+                $contains_special_characters = true;
+            }   
+          }
+          if($contains_special_characters){
+            $email_address = check_plain($email_address); 
+            $submission->data[$component_id][0] = $email_address;
+          }
+      }
+  }
+}
+
+/**
  * Implements hook_webform_submission_update().
  */
 function aaap_conference_webform_submission_update($node, $submission) {
