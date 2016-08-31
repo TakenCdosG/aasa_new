@@ -408,3 +408,16 @@ div.ctools-modal-content .modal-header {
 .formulario-conferencias .networking-events-dinner-groups-labels{
     display: none;
 }
+
+
+.formulario-conferencias .webform-component--discount-codes{
+    margin-bottom: 8px;
+}
+
+.formulario-conferencias .webform-component--cancellations-text{
+    margin-bottom: 12px;
+}
+
+.formulario-conferencias .webform-component--cancellations-text p{
+    margin-top: 0px;
+}
