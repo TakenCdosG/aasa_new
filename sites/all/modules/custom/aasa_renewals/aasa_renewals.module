@@ -14,7 +14,7 @@ function aasa_renewals_menu(){
 	  'type' => MENU_CALLBACK,
 	  'page callback' => 'aasa_manage_renewal_process',
 	  'page arguments' => array(),
-	  'access arguments' => array('access content'),
+	  'access arguments' => array('administrator user'),
 	  'file' => 'aasa_renewals.pages.inc',
 	  "theme callback" => 'get_admin_theme'
 	);
