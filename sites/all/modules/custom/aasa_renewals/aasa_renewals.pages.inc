@@ -16,8 +16,8 @@ function aasa_manage_renewal_process(){
 
 function send_reminder_email_page($uid){
   module_load_include('inc', 'aasa_renewals', 'aasa_renewals.functions');
-  $test_environment = (variable_get("aasa_renewals_environment") == "test");
-  $test_emails = variable_get($name="aasa_renewals_environment_test_emails", '');
+  $test_environment = (variable_get("aasa_renewals_environment", "test") == "test");
+  $test_emails = variable_get("aasa_renewals_environment_test_emails", 'adrian.morelos@akendos.com');
   $test_emails_array =  explode(',', str_replace(" ", "",$test_emails));
   $allow = TRUE;
   $response = new stdClass();
@@ -76,7 +76,7 @@ function re_send_reminder_email_page($uid){
   module_load_include('inc', 'aasa_renewals', 'aasa_renewals.functions');
   $response = new stdClass();
   $test_environment = (variable_get("aasa_renewals_environment")  == "test");
-  $test_emails = variable_get($name="aasa_renewals_environment_test_emails", '');
+  $test_emails = variable_get("aasa_renewals_environment_test_emails", 'adrian.morelos@akendos.com');
   $test_emails_array =  explode(',', str_replace(" ", "",$test_emails));
   $allow = TRUE;
   if(!empty($uid)){
@@ -117,7 +117,7 @@ function re_send_reminder_email_page($uid){
 
 function renewal_expire_user_page($uid){
   $test_environment = (variable_get("aasa_renewals_environment") == "test");
-  $test_emails = variable_get($name="aasa_renewals_environment_test_emails", '');
+  $test_emails = variable_get("aasa_renewals_environment_test_emails", 'adrian.morelos@akendos.com');
   $test_emails_array =  explode(',', str_replace(" ", "",$test_emails));
   $allow = TRUE;
   $user = user_load($uid);

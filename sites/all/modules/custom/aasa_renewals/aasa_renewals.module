@@ -1,7 +1,7 @@
 <?php
 
-define('EXPIRED_MEMBER_RID', '8');
-define('ACTIVE_MEMBER_RID', '5');
+define('EXPIRED_MEMBER_RID', '8'); // Expired Member Role Id
+define('ACTIVE_MEMBER_RID', '5'); // Active Member Role Id
 
 /**
  * Implements hook_menu().

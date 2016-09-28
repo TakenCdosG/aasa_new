@@ -674,8 +674,8 @@ function get_checkbox_field($uid = "", $all = FALSE){
 }
 
 function send_reminder_email($from, $from_name, $to, $subject, $body, $sent = TRUE){
-	$test_environment = (variable_get("aasa_renewals_environment") == "test");
-	$test_emails = variable_get($name="aasa_renewals_environment_test_emails", '');
+	$test_environment = (variable_get("aasa_renewals_environment", "test") == "test");
+	$test_emails = variable_get("aasa_renewals_environment_test_emails", 'adrian.morelos@akendos.com');
 	$test_emails_array =  explode(',', str_replace(" ", "",$test_emails));
 	$allow = TRUE;
 	if(!in_array($to, $test_emails_array) && $test_environment){
@@ -776,8 +776,8 @@ function aasa_renewals_expire_all_user_process(){
 }
 
 function aasa_renewals_expire_all_user_do_process($user_info, $renewal_config_info, &$context){
-  $test_environment = (variable_get("aasa_renewals_environment") == "test");
-  $test_emails = variable_get($name="aasa_renewals_environment_test_emails", '');
+  $test_environment = (variable_get("aasa_renewals_environment", "test") == "test");
+  $test_emails = variable_get("aasa_renewals_environment_test_emails", 'adrian.morelos@akendos.com');
   $test_emails_array =  explode(',', str_replace(" ", "",$test_emails));
   $allow = TRUE;
   if(!in_array($user_info->mail, $test_emails_array) && $test_environment){
@@ -833,8 +833,8 @@ function aasa_renewals_expire_all_user_process_finished_callback($success, $resu
 
 function aasa_renewals_send_reminder_email_do_process($user_info, $renewal_config_info, &$context){
 
-  $test_environment = (variable_get("aasa_renewals_environment") == "test");
-  $test_emails = variable_get($name="aasa_renewals_environment_test_emails", '');
+  $test_environment = (variable_get("aasa_renewals_environment", "test") == "test");
+  $test_emails = variable_get("aasa_renewals_environment_test_emails", 'adrian.morelos@akendos.com');
   $test_emails_array =  explode(',', str_replace(" ", "",$test_emails));
   $allow = TRUE;
 
