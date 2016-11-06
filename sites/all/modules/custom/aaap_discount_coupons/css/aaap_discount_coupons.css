@@ -90,6 +90,12 @@ and open the template in the editor.
 .aaap_discount_coupons .box-content .label-title{
     font-weight: bold;
     color: #00738F;
+    font-family: Georgia;
+    font-size: 16px;
+    margin-bottom: 6px;
+    padding-left: 2px;
+    margin-top: 5px;
+    font-style: italic;
 }
 
 .aaap_discount_coupons .box-content .label-title small{
