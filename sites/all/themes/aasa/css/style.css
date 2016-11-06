@@ -2622,3 +2622,7 @@ a.bold-link{
     right: 0px;
     top: -38px;
 }
+
+#field-discount-codes-add-more-wrapper .form-item-field-discount-codes-und-0-value{
+    display: none;
+}
