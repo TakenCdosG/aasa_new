@@ -373,9 +373,7 @@ function aaap_form_alter(&$form, &$form_state, $form_id)
     }//end if
 
     if ($form_id == 'user_register_form') {
-
-        dsm($form);
-
+        //dsm($form);
         if (!array_key_exists(ADMINISTRATOR, $user->roles) and !array_key_exists(SUPER, $user->roles)) {
             $form['field_new_or_renewal']['#prefix'] = '<div class="custom_legend">MEMBERSHIP INFORMATION</div>';
             $form['#prefix'] = '<div class="heading_title">Become a Member</div><div class="heading_text">Please complete the form below to become a member of ' . SITE_NAME . '.</div>';
