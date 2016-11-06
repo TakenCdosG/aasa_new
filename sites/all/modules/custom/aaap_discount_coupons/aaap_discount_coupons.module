@@ -87,6 +87,10 @@ function aaap_discount_coupons_theme($existing, $type, $theme, $path) {
  */
 function aaap_discount_coupons_form_alter(&$form, &$form_state, $form_id) {
   if($form_id == 'user_register_form'){
+    if(isset($form['field_discount_codes']['und']['#suffix'])){
+      $block = module_invoke('aaap_discount_coupons', 'block_view', 'aaap_discount_coupons');
+      $form['field_discount_codes']['und']['#suffix'] = render($block['content']);
+    }
     dpm($form);
   }
 }
