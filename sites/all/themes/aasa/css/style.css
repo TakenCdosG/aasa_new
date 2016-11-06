@@ -2637,3 +2637,129 @@ a.bold-link{
     padding: 0px 15px 0px 15px;
 }
 
+/*
+* aaap_discount_coupons styles
+*/
+.aaap_discount_coupons{
+
+}
+
+.aaap_discount_coupons .red{
+    color: #db3c35;
+    font-weight: 300;
+    font-style: normal;
+    text-decoration: underline;
+    font-size: 14px;
+}
+
+.aaap_discount_coupons .box-coupon{
+    display: block;
+    color: #234600;
+    padding: 6px 15px 6px 40px;
+    background-color: #f8fff0;
+    margin: 0;
+    background-image: url(../../../../../../misc/message-24-ok.png);
+    margin-bottom: 12px;
+    border: solid #ddd 1px;
+    background-position: 8px 4px;
+    background-repeat: no-repeat;
+}
+
+.aaap_discount_coupons .box-codes .info.hide{
+    display: none;
+}
+
+.aaap_discount_coupons .box-codes .info{
+    color: #2A2A2A;
+    font-weight: 300;
+    font-style: normal;
+    font-family: Georgia;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.aaap_discount_coupons .box-coupon small{
+    float: right;
+}
+
+.aaap_discount_coupons .box-content div.messages {
+    float: left;
+    width: 90%;
+    padding-left: 40px;
+    padding-right: 1%;
+    margin: 0;
+    border: 0px;
+    margin-bottom: 12px;
+}
+
+.aaap_discount_coupons .row:after, 
+.aaap_discount_coupons .row:before {
+    display: table;
+    content: "";
+}
+
+@media (min-width: 992px){
+    .aaap_discount_coupons .col-md-6 {
+        width: 50%;
+    }
+}
+
+.aaap_discount_coupons .box-content{
+    margin-right: 0;
+    margin-left: 0;
+    background-color: #fff;
+    border-color: #ddd;
+    border-width: 1px;
+    border-radius: 4px 4px 4px 4px;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    display: block;
+    position: relative;
+    border-style: solid;
+    padding: 15px 15px 15px 15px;
+    margin: 0 -15px 10px -15px;
+}
+
+.aaap_discount_coupons .box-content .label-title{
+    font-weight: bold;
+    color: #00738F;
+    font-family: Georgia;
+    font-size: 16px;
+    margin-bottom: 6px;
+    padding-left: 2px;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+.aaap_discount_coupons .box-content .label-title small{
+    color: #2A2A2A;
+    font-weight: normal;
+}
+
+.aaap_discount_coupons .box-content .description{
+    color: #6c6963;
+    font-weight: normal;
+    margin-bottom: 10px;
+    margin-top: 4px;
+}
+
+.aaap_discount_coupons .box-content a.form-submit-aaap-discount-coupons{
+    background-color: #007490;
+    background-image: none;
+    border: 0 none;
+    border-radius: 5px;
+    color: #ffffff;
+    cursor: pointer;
+    font-family: Georgia;
+    font-size: 14px;
+    height: 24px;
+    width: auto;
+    padding: 0px 15px 0px 15px;
+}
+#field-discount-codes-add-more-wrapper .aaap_discount_coupons .box-content{
+    margin: 0px 0px 10px 0px!important;
+}
+#field-discount-codes-add-more-wrapper .form-item-field-discount-codes-und-0-value{
+    display: none;
+}
+
