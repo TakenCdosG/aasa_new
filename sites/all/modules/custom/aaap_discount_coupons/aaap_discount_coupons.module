@@ -83,11 +83,11 @@ function aaap_discount_coupons_theme($existing, $type, $theme, $path) {
 }
 
 /**
- * Implements hook_preprocess_field().
+ * Implements hook_form_alter().
  */
-function aaap_discount_coupons_preprocess_field(&$vars) {
-  if($vars['element']['#field_name'] == 'field_discount_codes') {
-    $vars['items']['0']['#markup'] = 'Adrian';
+function aaap_discount_coupons_form_alter(&$form, &$form_state, $form_id) {
+  if($form_id == 'user_register_form'){
+    dpm($form);
   }
 }
 
