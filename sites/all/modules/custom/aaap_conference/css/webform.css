@@ -421,6 +421,7 @@ div.ctools-modal-content .modal-header {
 .formulario-conferencias .webform-component--cancellations-text p{
     margin-top: 0px;
 }
-.field-discount-codes-add-more-wrapper .form-item-field-discount-codes-und-0-value{
+
+#field-discount-codes-add-more-wrapper .form-item-field-discount-codes-und-0-value{
     display: none;
 }
