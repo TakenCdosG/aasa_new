@@ -123,3 +123,6 @@ and open the template in the editor.
     width: auto;
     padding: 0px 15px 0px 15px;
 }
+#field-discount-codes-add-more-wrapper .aaap_discount_coupons .box-content{
+    margin: 0px!important;
+}
