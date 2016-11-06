@@ -124,7 +124,7 @@ and open the template in the editor.
     padding: 0px 15px 0px 15px;
 }
 #field-discount-codes-add-more-wrapper .aaap_discount_coupons .box-content{
-    margin: 0px!important;
+    margin: 0px 0px 10px 0px!important;
 }
 #field-discount-codes-add-more-wrapper .form-item-field-discount-codes-und-0-value{
     display: none;
