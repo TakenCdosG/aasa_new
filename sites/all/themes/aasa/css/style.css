@@ -2623,6 +2623,17 @@ a.bold-link{
     top: -38px;
 }
 
-#field-discount-codes-add-more-wrapper .form-item-field-discount-codes-und-0-value{
-    display: none;
+#user-register-form .form-actions input[type="submit"]{
+    background-color: #007490;
+    background-image: none;
+    border: 0 none;
+    border-radius: 5px;
+    color: #ffffff;
+    cursor: pointer;
+    font-family: Georgia;
+    font-size: 14px;
+    height: 24px;
+    width: auto;
+    padding: 0px 15px 0px 15px;
 }
+
