@@ -52,8 +52,4 @@
  * @see default.settings.php
  * @see conf_path()
  * @see http://drupal.org/documentation/install/multi-site
- *
- * test
  */
-
-
