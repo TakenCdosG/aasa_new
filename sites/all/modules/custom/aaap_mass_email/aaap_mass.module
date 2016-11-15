@@ -244,12 +244,7 @@ function aaap_mass_send($subject, $message, $recipients, $to, $file){
     }
 
         $file_to_attach = file_create_url($file->uri);
-       /* $secure_connection = !empty($_SERVER['HTTPS']);
-        if(  $secure_connection ){
-            $file_to_attach = str_replace('https://', '', $file_to_attach);
-        }else{
-            $file_to_attach = str_replace('http://', '', $file_to_attach);
-        }*/
+        $realpath = drupal_realpath($file->uri);
 
         $file_to_attach = str_replace('https://', '', $file_to_attach);
         
@@ -257,8 +252,7 @@ function aaap_mass_send($subject, $message, $recipients, $to, $file){
         unset($file_to_attach[0]);
         $file_to_attach = implode('/', $file_to_attach);
 
-
-        $email->AddAttachment($file_to_attach, $file->filename);
+        $email->AddAttachment($realpath, $file->filename);
 
         return $email->Send();
 
