@@ -844,6 +844,7 @@ function aasa_renewals_send_reminder_email_do_process($user_info, $renewal_confi
   $context['results'][] = 'User : ' . $item;
   $context['message'] =  'Processing User: ' . $item . ' - <'. $user_info->uid .'>';
   $apply = FALSE;
+  $response = new stdClass();
   if(isset($user_info->mail)){
     if(!empty($user_info->field_reminder_email_value)){
       if(apply_to_send_email($user_info->field_reminder_email_value, $renewal_config_info)){
