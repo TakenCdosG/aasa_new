@@ -22,27 +22,30 @@
  * the view is modified.
  */
 
+if(isset($row->field_field_date[0]['raw']['value'])){
+	
+	$star = strtotime($row->field_field_date[0]['raw']['value']);
+	if($star != FALSE){
+		$end = strtotime($row->field_field_date[0]['raw']['value2']);
 
-$star = strtotime($row->field_field_date[0]['raw']['value']);
-$end = strtotime($row->field_field_date[0]['raw']['value2']);
-
-$date_star = date('M d', $star);
-$year = date('Y', $star);
-$date_end = ", ";
-$hour = date(';g A', $date_star);
+		$date_star = date('M d', $star);
+		$year = date('Y', $star);
+		$date_end = ", ";
+		$hour = date(';g A', $date_star);
 
 
-if ($star != $end) {
-    if (date('M', $star) == date('M', $end)) {
-        $date_end = " - " . date('d', $end) . ", ";
-    } else {
-        $date_end = " - " . date('M d', $end) . ", ";
-    }
+		if ($star != $end) {
+		    if (date('M', $star) == date('M', $end)) {
+		        $date_end = " - " . date('d', $end) . ", ";
+		    } else {
+		        $date_end = " - " . date('M d', $end) . ", ";
+		    }
 
+		}
+
+		$date = $date_star . $date_end . $year . $hour;
+		print $date;
+		//print "<strong>Save the Date - </strong>" . $date;
+	}
 }
-
-$date = $date_star . $date_end . $year . $hour;
-print $date;
-//print "<strong>Save the Date - </strong>" . $date;
-
 ?>
