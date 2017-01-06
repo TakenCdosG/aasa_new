@@ -657,11 +657,11 @@ function get_user_roles($uid){
 }
 
 function set_format_timestamp_date($timestamp){
-	return format_date($timestamp, 'custom', 'Y-m-d H:i', drupal_get_user_timezone());
+	return format_date($timestamp, 'custom', 'Y-m-d H:i:s', drupal_get_user_timezone());
 }
 
 function set_format_date($strtime){
-	return format_date(strtotime($strtime), 'custom', 'Y-m-d H:i', drupal_get_user_timezone());
+	return format_date(strtotime($strtime), 'custom', 'Y-m-d H:i:s', drupal_get_user_timezone());
 }
 
 function get_checkbox_field($uid = "", $all = FALSE){
@@ -721,6 +721,8 @@ function send_reminder_email($from = 'aasa1@aasa1.org', $from_name, $to, $subjec
     }
     $json_encode = json_encode($response);
     watchdog('reminder_email', '<b>Detail: </b><br><pre>'.$json_encode.'</pre>');
+    // dormir durante 10 segundos
+  	sleep(10);
 	return $response;
 }
 
@@ -744,6 +746,33 @@ function aasa_renewals_send_reminder_email_process(){
 	  'title' => t('Manage Renewal Process - Sending reminder emails...'),
 	  'operations' => $operations,
 	  'finished' => 'aasa_renewals_send_reminder_email_process_finished_callback',
+	  'file' => drupal_get_path("module", "aasa_renewals").'/aasa_renewals.functions.inc',
+	  'progressive' => FALSE,
+	);
+  }
+  return $batch;
+}
+
+function aasa_renewals_reset_send_reminder_email_process(){
+  $operations = array();
+  $sort = 'ASC';
+  $order = 'mail';	
+  $limit = -1;
+  $renewal_config_info = get_renewal_config_info();
+  $users = get_users_info($limit, $order, $sort);
+  $rows = array();
+  // Looping for filling the table rows
+  foreach ($users as $ord) {
+	 $operation =  array('aasa_renewals_reset_send_reminder_email_do_process', array($ord, $renewal_config_info));
+     $operations[] = $operation;
+  }
+  $batch = array();
+  $num_operations = count($operations); 
+  if($num_operations > 0){
+	$batch = array(
+	  'title' => t('Manage Reset reminder emails date...'),
+	  'operations' => $operations,
+	  'finished' => 'aasa_renewals_reset_send_reminder_email_process_finished_callback',
 	  'file' => drupal_get_path("module", "aasa_renewals").'/aasa_renewals.functions.inc',
 	);
   }
@@ -830,7 +859,60 @@ function aasa_renewals_expire_all_user_process_finished_callback($success, $resu
   drupal_set_message($message);
 }
 
+function aasa_renewals_reset_send_reminder_email_do_process($user_info, $renewal_config_info, &$context){
+  $name = $user_info->first_name." ".$user_info->last_name." - ";
+  $item = $name.l($user_info->mail, 'user/'. $user_info->uid);;
+  $context['results'][] = 'User : ' . $item;
+  $context['message'] =  'Processing User: ' . $item . ' - <'. $user_info->uid .'>';
 
+  $from = $renewal_config_info->field_renewal_period_from;
+  $from_time = strtotime($from);
+  $to = $renewal_config_info->field_renewal_period_to;
+  $to_time = strtotime($to);
+
+  $status = "";
+  $ord = $user_info;
+  $user_roles = array();
+  $user_roles_key = array();
+  foreach ($ord->user_roles as $key => $role) {
+	$user_roles[] = $role->name;
+	$user_roles_key[] = $role->rid;
+  }
+
+  if(in_array(ACTIVE_MEMBER_RID, $user_roles_key)){
+	if(!empty($ord->field_renewal_date_value)){
+		$user_last_renewal_date = strtotime($ord->field_renewal_date_value);
+		if($user_last_renewal_date >= $from_time){
+			$status = "Renewed";
+		}else{
+			$status = "No Renewed";
+		}
+	}else{
+		$status = "No Renewed";
+	}
+  }else{
+   $status = "No Renewed";
+  }
+
+  if($status != "Renewed"){
+	  $user_object = user_load($ord->uid);
+	  $user_object->field_reminder_email['und'][0]['value'] = "";
+	  user_save($user_object);
+  }
+
+}
+
+function aasa_renewals_reset_send_reminder_email_process_finished_callback($success, $results, $operations) {
+  // The 'success' parameter means no fatal PHP errors were detected. All
+  // other error management should be handled using 'results'.
+  if ($success) {
+    $message = format_plural(count($results), 'One user processed.', '@count users processed.');
+  }
+  else {
+    $message = t('Finished with an error.');
+  }
+  drupal_set_message($message);
+}
 
 function aasa_renewals_send_reminder_email_do_process($user_info, $renewal_config_info, &$context){
 
@@ -842,7 +924,7 @@ function aasa_renewals_send_reminder_email_do_process($user_info, $renewal_confi
   $name = $user_info->first_name." ".$user_info->last_name." - ";
   $item = $name.l($user_info->mail, 'user/'. $user_info->uid);;
   $context['results'][] = 'User : ' . $item;
-  $context['message'] =  'Processing User: ' . $item . ' - <'. $user_info->uid .'>';
+  $context['message'] =  'Processing User: ' . $item . ' - <'. $user_info->uid .'> '.date('h:i:s') ;
   $apply = FALSE;
   $response = new stdClass();
   if(isset($user_info->mail)){
@@ -881,9 +963,8 @@ function aasa_renewals_send_reminder_email_do_process($user_info, $renewal_confi
 	    $user_object->field_reminder_email['und'][0]['value'] = $now_time;
 	    user_save($user_object);
   	}
-    drupal_set_message($message = $response->msg, $type = 'status', $repeat = FALSE);
   }
-
+  drupal_set_message($message = $response->msg, $type = 'status', $repeat = FALSE);
 }
 
 function aasa_renewals_send_reminder_email_process_finished_callback($success, $results, $operations) {

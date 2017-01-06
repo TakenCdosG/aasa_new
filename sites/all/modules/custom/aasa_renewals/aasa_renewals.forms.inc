@@ -69,6 +69,12 @@ function aasa_renewals_options_form($form, &$form_state) {
       '#submit' => array('aasa_renewals_form_submit_expire_all_user'),
     );
 
+    $form['submit_reset_send_reminder_email'] = array(
+      '#type' => 'submit',
+      '#value' => t('Reset Reminder Emails.'),
+      '#submit' => array('aasa_renewals_form_submit_reset_send_reminder_email'),
+    );
+
     return $form;
 }
 
@@ -97,6 +103,20 @@ function aasa_renewals_form_submit_expire_all_user(){
 function aasa_renewals_form_submit_send_reminder_email($form, &$form_state) {
    module_load_include('inc', 'aasa_renewals', 'aasa_renewals.functions');
    $batch = aasa_renewals_send_reminder_email_process();
+   batch_set($batch);
+}
+
+/**
+ * Submit handler.
+ *
+ * @param array $form
+ *   Form API form.
+ * @param array $form_state
+ *   Form API form.
+ */
+function aasa_renewals_form_submit_reset_send_reminder_email($form, &$form_state) {
+   module_load_include('inc', 'aasa_renewals', 'aasa_renewals.functions');
+   $batch = aasa_renewals_reset_send_reminder_email_process();
    batch_set($batch);
 }
 
