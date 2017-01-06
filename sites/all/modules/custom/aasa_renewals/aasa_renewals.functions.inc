@@ -942,7 +942,7 @@ function aasa_renewals_send_reminder_email_do_process($user_info, $renewal_confi
       $emails = $user_info->mail;
       $from = 'aasa1@aasa1.org';
       $from_name = 'AASA';
-      $response = send_reminder_email($from, $from_name, $emails, $subject, $body, FALSE);
+      $response = send_reminder_email($from, $from_name, $emails, $subject, $body, TRUE);
       if(!in_array($emails, $test_emails_array) && $test_environment){
 		$allow = FALSE;
 	  }
