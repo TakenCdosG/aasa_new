@@ -511,7 +511,7 @@ function profile_validate($form, &$form_state)
 }
 
 function custom_submit_user_register($form, &$form_state){
-    die(var_dump($form_state));
+    //die(var_dump($form_state));
     $old_uid = '';
     $new_uid = '';
     $mail = '';
