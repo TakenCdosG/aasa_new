@@ -1,7 +1,7 @@
 <?php
 
 //Payment and Email Fields in Event Registration forms need to have a constant position in the form because the ID changes
-define('EVENT_PAYMENT_FIELD_ID','19');
+define('EVENT_PAYMENT_FIELD_ID', variable_get('EVENT_PAYMENT_FIELD_ID', '19'));
 define('EVENT_EMAIL_FIELD_ID','12');
 define('EVENT_CONFIRMED_FIELD_ID','27');
 //define('MEMBERSHIP_TYPE_FIELD_ID','20');
@@ -672,7 +672,7 @@ function aaap_events_form_alter(&$form, &$form_state, $form_id){
                     hide($form['submitted']['discount_codes']);
                 }
             }
-            
+
 
         }
     }
