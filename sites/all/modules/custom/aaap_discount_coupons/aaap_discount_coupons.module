@@ -106,11 +106,19 @@ function aaap_discount_coupons_apply(){
             
             $node_discount_code = new stdClass();
             $node_discount_code->type = 'discount_code';
+            $node_discount_code->language = LANGUAGE_NONE; 
             $node_discount_code->status = 1;
             $node_discount_code->title = "Temporal Node For Discount Code";
             $node_discount_code->price = 0;
             $node_discount_code->sell_price = 0;
+            node_object_prepare($node_discount_code);  //Set some default values
+
+            $node_discount_code->status = 1;   // (1 or 0): published or unpublished
+            $node_discount_code->promote = 0;  // (1 or 0): promoted to front page or not
+            $node_discount_code->sticky = 0;  // (1 or 0): sticky at top of lists or not
+
             node_save($node_discount_code);
+            
             //-> Empties a cart of its contents.
             uc_cart_empty(uc_cart_get_id());
             //-> Adds an item to a user's cart.
