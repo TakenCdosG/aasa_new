@@ -634,6 +634,8 @@ function aaap_events_form_alter(&$form, &$form_state, $form_id){
     if (isset($form['#node']->type) && isset($form['submitted'])) {
         if ($form['#node']->type == "event") {
 
+            dpm($form['#attached']['js']);
+
             $messages_status = '';
             $lock_form = FALSE;
 
