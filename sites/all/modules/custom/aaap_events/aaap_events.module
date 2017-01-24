@@ -634,7 +634,7 @@ function aaap_events_form_alter(&$form, &$form_state, $form_id){
     if (isset($form['#node']->type) && isset($form['submitted'])) {
         if ($form['#node']->type == "event") {
 
-            dpm($form['#attached']['js']);
+            $form['#attached']['js'][] = drupal_get_path('module', 'aaap_events') . '/js/aaap_events.js';
 
             $messages_status = '';
             $lock_form = FALSE;

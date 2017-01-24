@@ -2637,4 +2637,7 @@ a.bold-link{
     padding: 0px 15px 0px 15px;
 }
 
+.hidden{
+    display: none;
+}
 
