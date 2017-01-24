@@ -139,21 +139,23 @@ function aaap_events_webform_submission_insert($node, $submission) {
             // set_status_invoice($submission->sid, $submission->nid, 'completed');
             $submission = _confirm_submission_webform($submission->nid, $submission->sid, EVENT_CONFIRMED_FIELD_ID);
         }elseif ($submission->data[EVENT_PAYMENT_FIELD_ID][0] == 'credit_card') {
-            
+
             //-> Empties a cart of its contents.
             if(!$discount_code){
                 uc_cart_empty(uc_cart_get_id()); 
             }
+
             $node->sell_price = $event_fee;
             node_save($node);
             $data = array('atributes' => array('sid' => $submission->sid));
             //dsm($data);
 
             uc_cart_add_item($node->nid, $qty = 1, $data, $cid = NULL, $msg = TRUE, $check_redirect = TRUE, $rebuild = TRUE);
+
             if(count($nid_to_remove)>0){
                 node_delete_multiple($nid_to_remove);
             }
-            
+
             drupal_get_messages('status', $clear_queue = TRUE);
             drupal_goto('cart/checkout');
             
@@ -223,9 +225,7 @@ function aaap_events_webform_submission_insert($node, $submission) {
             }
             
             global $base_url;
-                
             //include(DRUPAL_ROOT . '/sites/all/modules/config/event_payment_instructions.php');
-
             global $base_root;
 
             $subject =  SITE_NAME . ' Meeting: New Registrant Notification';
