@@ -662,6 +662,18 @@ function aaap_events_form_alter(&$form, &$form_state, $form_id){
                 //dpm($info);
             }
 
+            //  +==============================================+
+            //  | Hide Discount Codes                          |
+            //  +==============================================+
+
+            if (isset($form['#node']->field_hide_discount_codes['und'][0]['value'])) {
+                $field_hide_discount_codes = $form['#node']->field_hide_discount_codes['und'][0]['value'];
+                if ($field_hide_discount_codes == "1") {
+                    hide($form['submitted']['discount_codes']);
+                }
+            }
+            
+
         }
     }
 
