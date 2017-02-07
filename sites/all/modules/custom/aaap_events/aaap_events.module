@@ -563,18 +563,20 @@ function aaap_events_form_alter(&$form, &$form_state, $form_id){
         $form['submitted']['enter_pediatrics_used_to_prevent_spam']['#title'] = 'Enter <i>'.CAPTCHA.'</i> (used to prevent spam)' ;
 
         //Check if event is free for members or non-members and hides the payment field in that case
+        $_guests_price = isset($event->field_fee_for_guests['und'][0]['value'])?intval($event->field_fee_for_guests['und'][0]['value']):0;
+
         $is_active_member = _ap_is_active_member(true);
         if(!empty($event->field_member_registration_fee)){
             $member_fee = $event->field_member_registration_fee['und'][0]['value'];
 
-            if(isset($event) && $event->type == 'event' && $is_active_member && $member_fee === "0"){
+            if(isset($event) && $event->type == 'event' && $is_active_member && $member_fee === "0" && ($_guests_price == 0) ){
                 $form['submitted']['payment_method']['#type'] = 'hidden';
                 $form['submitted']['payment_method']['#required'] = '0';
             }
         }
         if(!empty($event->field_non_member_registration_fee)){
             $non_member_fee = $event->field_non_member_registration_fee['und'][0]['value'];
-            if(isset($event) && $event->type == 'event' && user_is_anonymous() && $non_member_fee === "0"){
+            if(isset($event) && $event->type == 'event' && user_is_anonymous() && $non_member_fee === "0" && ($_guests_price == 0) ){
                 $form['submitted']['payment_method']['#type'] = 'hidden';
                 $form['submitted']['payment_method']['#required'] = '0';
             }
