@@ -25,13 +25,16 @@
     });
 })(jQuery);
 
-
 jQuery(document).ready(function () { 
-	jQuery('.webform-component--payment-method').addClass('hidden');
+	jQuery('.webform-component--payment-method').css( "display", "none" );
 	var select = ".webform-component--how-many-of-your-guests-will-be-attending-the-evening-event select";
 	jQuery( select ).change(function() {
-	  $( select + " option:selected" ).val();
+	  var number_guess = jQuery( select + " option:selected" ).val();
+	  number_guess = Number(number_guess);
+	  if(number_guess > 0){
+	  	jQuery('.webform-component--payment-method').css( "display", "block" );
+	  }else{
+	  	jQuery('.webform-component--payment-method').css( "display", "none" );
+	  }
 	});
-	alert("Hello!");
-
 });
