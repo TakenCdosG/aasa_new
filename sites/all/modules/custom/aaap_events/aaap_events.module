@@ -592,31 +592,30 @@ function aaap_events_form_alter(&$form, &$form_state, $form_id){
         }
 
         if($track_on_guests_price_change){
-
-            $script = "jQuery(document).ready(function () { 
-                            var select = '.webform-component--how-many-of-your-guests-will-be-attending-the-evening-event select';
-                            var webform_component_payment_method = '.webform-component--payment-method';
-                            jQuery('form.webform-client-form select#edit-submitted-payment-method').attr('disabled', 'disabled');
-                            jQuery( webform_component_payment_method ).css( 'display', 'none' );
-
-                            jQuery( select ).change(function() {
-                              var number_guess = jQuery( select + ' option:selected' ).val();
-                              number_guess = Number(number_guess);
-                              if(number_guess > 0){
-                                jQuery( webform_component_payment_method ).css( 'display', 'block' );
-                                jQuery('form.webform-client-form select[name='submitted[payment_method]']').removeAttr('disabled');
-                              }else{
+            
+            $script = " jQuery(document).ready(function () { 
+                                var select = '.webform-component--how-many-of-your-guests-will-be-attending-the-evening-event select';
+                                var webform_component_payment_method = '.webform-component--payment-method';
+                                jQuery('form.webform-client-form select#edit-submitted-payment-method').attr('disabled', 'disabled');
                                 jQuery( webform_component_payment_method ).css( 'display', 'none' );
-                                jQuery('form.webform-client-form select[name='submitted[payment_method]']').attr('disabled', 'disabled');
-                              }
+
+                                jQuery( select ).change(function() {
+                                  var number_guess = jQuery( select + ' option:selected' ).val();
+                                  number_guess = Number(number_guess);
+                                  if(number_guess > 0){
+                                    jQuery( webform_component_payment_method ).css( 'display', 'block' );
+                                    jQuery('form.webform-client-form select#edit-submitted-payment-method').removeAttr('disabled');
+                                  }else{
+                                    jQuery( webform_component_payment_method ).css( 'display', 'none' );
+                                    jQuery('form.webform-client-form select#edit-submitted-payment-method').attr('disabled', 'disabled');
+                                  }
+                                });
                             });
-                        });
-                    ";
-                    
+                        ";
             drupal_add_js($script,
                 array('type' => 'inline', 'scope' => 'footer', 'weight' => 5)
             );
-            
+
         }
 
         //TODO: THIS SHOULD BE GONE SOON
