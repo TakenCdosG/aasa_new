@@ -564,23 +564,39 @@ function aaap_events_form_alter(&$form, &$form_state, $form_id){
 
         //Check if event is free for members or non-members and hides the payment field in that case
         $_guests_price = isset($event->field_fee_for_guests['und'][0]['value'])?intval($event->field_fee_for_guests['und'][0]['value']):0;
+        $track_on_guests_price_change = FALSE;
 
         $is_active_member = _ap_is_active_member(true);
         if(!empty($event->field_member_registration_fee)){
             $member_fee = $event->field_member_registration_fee['und'][0]['value'];
 
-            if(isset($event) && $event->type == 'event' && $is_active_member && $member_fee === "0" && ($_guests_price == 0) ){
-                $form['submitted']['payment_method']['#type'] = 'hidden';
-                $form['submitted']['payment_method']['#required'] = '0';
+            if(isset($event) && $event->type == 'event' && $is_active_member && $member_fee === "0" ){
+                if($_guests_price == 0){
+                    $form['submitted']['payment_method']['#type'] = 'hidden';
+                    $form['submitted']['payment_method']['#required'] = '0';
+                }else{
+                    $track_on_guests_price_change = TRUE;
+                }
             }
         }
         if(!empty($event->field_non_member_registration_fee)){
             $non_member_fee = $event->field_non_member_registration_fee['und'][0]['value'];
-            if(isset($event) && $event->type == 'event' && user_is_anonymous() && $non_member_fee === "0" && ($_guests_price == 0) ){
-                $form['submitted']['payment_method']['#type'] = 'hidden';
-                $form['submitted']['payment_method']['#required'] = '0';
+            if(isset($event) && $event->type == 'event' && user_is_anonymous() && $non_member_fee === "0" ){
+                if($_guests_price == 0){
+                    $form['submitted']['payment_method']['#type'] = 'hidden';
+                    $form['submitted']['payment_method']['#required'] = '0';
+                }else{
+                    $track_on_guests_price_change = TRUE;
+                }
             }
         }
+
+        if($track_on_guests_price_change){
+            drupal_add_js('jQuery(document).ready(function () { alert("Hello!"); });',
+                array('type' => 'inline', 'scope' => 'footer', 'weight' => 5)
+            );
+        }
+
         //TODO: THIS SHOULD BE GONE SOON
         if(!array_key_exists(ACTIVE, $user->roles) && !array_key_exists(SUPER, $user->roles) && !array_key_exists(ADMINISTRATOR, $user->roles) ) {
             //$form['submitted']['add_aaap_membership_if_applicable']['#type'] = 'hidden'; //REMOVED FIELD FROM FORM

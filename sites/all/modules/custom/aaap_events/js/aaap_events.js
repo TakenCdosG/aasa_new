@@ -24,3 +24,14 @@
     	updateBoxDiscountCoupons();
     });
 })(jQuery);
+
+
+jQuery(document).ready(function () { 
+	jQuery('.webform-component--payment-method').addClass('hidden');
+	var select = ".webform-component--how-many-of-your-guests-will-be-attending-the-evening-event select";
+	jQuery( select ).change(function() {
+	  $( select + " option:selected" ).val();
+	});
+	alert("Hello!");
+
+});
