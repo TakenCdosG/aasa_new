@@ -6,7 +6,7 @@ define('EVENT_EMAIL_FIELD_ID','12');
 define('EVENT_CONFIRMED_FIELD_ID','27');
 //define('MEMBERSHIP_TYPE_FIELD_ID','20');
 //define('ADD_MEMBERSHIP_FIELD_ID','23');
-define('EVENT_NUMBER_GUESTS_FIELD_ID', '16');
+define('EVENT_NUMBER_GUESTS_FIELD_ID', variable_get('EVENT_NUMBER_GUESTS_FIELD_ID', '16'));
 define('EVENT_TYPE_OF_GUEST','29');
 
 module_load_include('inc', 'webform', 'webform.submissions');
@@ -43,14 +43,15 @@ function aaap_events_webform_submission_insert($node, $submission) {
 
     //dsm($submission);
     if(!empty($submission->data[EVENT_PAYMENT_FIELD_ID]) and $node->type == PRODUCT_EVENT_TYPE) {
-
+        
         $is_active_member = _ap_is_active_member(true);
         $event_fee = _ap_get_final_price($node, $submission);
         $reg_fee = $is_active_member ? $node->field_member_registration_fee['und'][0]['value'] : $node->field_non_member_registration_fe['und'][0]['value'];
-
+        
         $is_free_for_member = FALSE;
         $is_free_for_current_submission = FALSE;
-        if(intval($node->field_member_registration_fee['und'][0]['value']) == 0){
+
+        if((isset($node->field_member_registration_fee['und'][0]['value'])) && (intval($node->field_member_registration_fee['und'][0]['value']) == 0)){
             $is_free_for_member = TRUE;
         }
 
@@ -59,7 +60,7 @@ function aaap_events_webform_submission_insert($node, $submission) {
                 $is_free_for_current_submission = TRUE;
             }
         }
-
+        
         $additional_price = NULL;
         $additional_amount = NULL;
         if(!empty($submission->data[EVENT_NUMBER_GUESTS_FIELD_ID][0])){
