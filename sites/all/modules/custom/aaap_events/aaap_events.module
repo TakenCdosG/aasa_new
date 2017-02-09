@@ -137,6 +137,8 @@ function aaap_events_webform_submission_insert($node, $submission) {
         //-> End Looking for discount code 
 
         if($is_free_for_current_submission){
+            //-> Empties a cart of its contents.
+            uc_cart_empty(uc_cart_get_id()); 
             // set_status_invoice($submission->sid, $submission->nid, 'completed');
             $submission = _confirm_submission_webform($submission->nid, $submission->sid, EVENT_CONFIRMED_FIELD_ID);
         }elseif ($submission->data[EVENT_PAYMENT_FIELD_ID][0] == 'credit_card') {
@@ -247,6 +249,8 @@ function aaap_events_webform_submission_insert($node, $submission) {
             }
             $email->Send();
 
+            //-> Empties a cart of its contents.
+            uc_cart_empty(uc_cart_get_id()); 
 
         }
     }
@@ -673,7 +677,10 @@ function aaap_events_form_alter(&$form, &$form_state, $form_id){
 
     if (isset($form['#node']->type) && isset($form['submitted'])) {
         if ($form['#node']->type == "event") {
-
+            
+            //Empties a cart of its contents.
+            uc_cart_empty(uc_cart_get_id(FALSE));
+            
             $form['#attached']['js'][] = drupal_get_path('module', 'aaap_events') . '/js/aaap_events.js';
 
             $messages_status = '';
