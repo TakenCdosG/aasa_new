@@ -597,7 +597,7 @@ function aaap_events_form_alter(&$form, &$form_state, $form_id){
         }
 
         if($track_on_guests_price_change){
-            
+
             $form['submitted']['track_on_guests_price_change'] = array('#type' => 'hidden', '#value' => TRUE);
             $script = " jQuery(document).ready(function () { 
                                 var select = '.webform-component--how-many-of-your-guests-will-be-attending-the-evening-event select';
@@ -767,6 +767,12 @@ function aaap_events_form_uc_cart_checkout_form_alter(&$form, &$form_state) {
 
 
 function event_exist($form, &$form_state) {
+    global $user;
+    if($user->uid == 1){
+        dpm($form_state['values']);
+        form_set_error('Email', 'You have already registered in this event.');
+    }
+   
 
     $email = $form_state['values']['submitted']['email'];
     $event_submissions = webform_get_submissions($form_state['build_info']['args'][0]->nid);
