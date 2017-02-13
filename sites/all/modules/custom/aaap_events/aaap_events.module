@@ -598,6 +598,7 @@ function aaap_events_form_alter(&$form, &$form_state, $form_id){
 
         if($track_on_guests_price_change){
             
+            $form['submitted']['track_on_guests_price_change'] = array('#type' => 'hidden', '#value' => TRUE);
             $script = " jQuery(document).ready(function () { 
                                 var select = '.webform-component--how-many-of-your-guests-will-be-attending-the-evening-event select';
                                 var webform_component_payment_method = '.webform-component--payment-method';
