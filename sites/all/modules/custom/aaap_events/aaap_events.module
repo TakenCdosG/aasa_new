@@ -767,12 +767,13 @@ function aaap_events_form_uc_cart_checkout_form_alter(&$form, &$form_state) {
 
 
 function event_exist($form, &$form_state) {
-    global $user;
-    if($user->uid == 1){
-        dpm($form_state['values']);
-        form_set_error('Email', 'You have already registered in this event.');
+          
+    if( isset($form_state['values']['submitted']['track_on_guests_price_change']) && isset($form_state['values']['submitted']['how_many_of_your_guests_will_be_attending_the_evening_event']) ){
+        $_guests = intval($form_state['values']['submitted']['how_many_of_your_guests_will_be_attending_the_evening_event']);
+        if( ($_guests > 0) && isset($form_state['values']['submitted']['payment_method']) && empty($form_state['values']['submitted']['payment_method']) ){
+            form_set_error('payment_method', 'Payment Method is required.');
+        }
     }
-   
 
     $email = $form_state['values']['submitted']['email'];
     $event_submissions = webform_get_submissions($form_state['build_info']['args'][0]->nid);
