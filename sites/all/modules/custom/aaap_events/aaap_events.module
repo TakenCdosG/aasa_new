@@ -605,7 +605,7 @@ function aaap_events_form_alter(&$form, &$form_state, $form_id){
                                 jQuery('form.webform-client-form select#edit-submitted-payment-method').attr('disabled', 'disabled');
                                 jQuery( webform_component_payment_method ).css( 'display', 'none' );
 
-                                jQuery( select ).change(function() {
+                                function ShowHiddenPaymentMethod(){
                                   var number_guess = jQuery( select + ' option:selected' ).val();
                                   number_guess = Number(number_guess);
                                   if(number_guess > 0){
@@ -615,9 +615,16 @@ function aaap_events_form_alter(&$form, &$form_state, $form_id){
                                     jQuery( webform_component_payment_method ).css( 'display', 'none' );
                                     jQuery('form.webform-client-form select#edit-submitted-payment-method').attr('disabled', 'disabled');
                                   }
+                                }
+                                
+                                jQuery( select ).change(function() {
+                                  ShowHiddenPaymentMethod();
                                 });
+
+                                ShowHiddenPaymentMethod();
                             });
                         ";
+                        
             drupal_add_js($script,
                 array('type' => 'inline', 'scope' => 'footer', 'weight' => 5)
             );
