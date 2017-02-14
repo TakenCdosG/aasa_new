@@ -270,7 +270,7 @@ function get_current_available_reminder_date_and_amount($renewal_config_info){
 		$current_item_reminder_date_time = strtotime($current_item_reminder_date);
 		// We verify that the date is within the range of the renewal period.
 		$set_val = FALSE;
-		if($current_item_reminder_date_time >= $from_time && $current_item_reminder_date_time <= $to_time && $current_item_reminder_date_time <= $now_time){
+		if($current_item_reminder_date_time >= $from_time && $current_item_reminder_date_time <= $to_time && $current_item_reminder_date_time >= $now_time ){
 			if(!empty($current_available_reminder_date_and_amount->reminder_date_time)){
 				if($current_available_reminder_date_and_amount->reminder_date_time < $current_item_reminder_date_time){
 					$set_val = TRUE;
@@ -280,7 +280,6 @@ function get_current_available_reminder_date_and_amount($renewal_config_info){
 			}
 		}
 		if($set_val){
-
 			$current_available_reminder_date_and_amount->reminder_date_time = $current_item_reminder_date_time;
 			$current_available_reminder_date_and_amount->field_amount_adjunct_member = $item->field_amount_adjunct_member;
 			$current_available_reminder_date_and_amount->field_amount_emeritus_member = $item->field_amount_emeritus_member;
