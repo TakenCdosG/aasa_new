@@ -303,7 +303,7 @@ function get_price($user){
     if(isset($config_data['node_config']->field_reminder_emails['und'])){
         foreach($config_data['node_config']->field_reminder_emails['und'] as $value) {
             $renewal_dates = strtotime(field_collection_item_load($value['value'])->field_reminder_date['und'][0]['value']);
-            if($config_data['now'] >= $renewal_dates){
+            if($config_data['now'] <= $renewal_dates){
                 if(isset($user->field_type_of_member['und'][0]['value'])){
                     switch ($user->field_type_of_member['und'][0]['value']) {
                         case 'regular':
