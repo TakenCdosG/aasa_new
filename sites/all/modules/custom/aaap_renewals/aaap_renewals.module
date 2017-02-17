@@ -120,7 +120,7 @@ function aaap_renewals_user_update(&$edit, $account, $category){
     // dsm($account);
     if ($account->field_created_by['und'][0]['value'] == 'user_form') {
         global $base_root;
-        $price = '250'; //get_price($account);
+        $price = get_price($account); // '250'; 
         $renewal_membership_node = node_load(PRODUCT_MEMBERSHIP_RENEWAL_ID);
         $user_data = user_load($account->uid);
 
