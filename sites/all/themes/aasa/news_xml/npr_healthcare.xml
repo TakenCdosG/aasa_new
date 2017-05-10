@@ -1,151 +1,148 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss xmlns:npr="http://www.npr.org/rss/" xmlns:nprml="http://api.npr.org/nprml" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
+<rss xmlns:npr="https://www.npr.org/rss/" xmlns:nprml="https://api.npr.org/nprml" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
   <channel>
     <title>Health Care : NPR</title>
     <link>http://www.npr.org/templates/story/story.php?storyId=1027</link>
     <description>The state of health care, health insurance, new medical research, disease prevention, and drug treatments. Interviews, news, and commentary from NPR's correspondents. Subscribe to podcasts.</description>
     <language>en</language>
-    <copyright>Copyright 2016 NPR - For Personal Use Only</copyright>
+    <copyright>Copyright 2017 NPR - For Personal Use Only</copyright>
     <generator>NPR API RSS Generator 0.94</generator>
-    <lastBuildDate>Sat, 02 Jan 2016 07:54:56 -0500</lastBuildDate>
+    <lastBuildDate>Sat, 06 May 2017 16:56:00 -0400</lastBuildDate>
     <image>
-      <url>http://media.npr.org/images/podcasts/primary/npr_generic_image_300.jpg?s=200</url>
+      <url>https://media.npr.org/images/podcasts/primary/npr_generic_image_300.jpg?s=200</url>
       <title>Health Care</title>
       <link>http://www.npr.org/templates/story/story.php?storyId=1027</link>
     </image>
     <item>
-      <title>Cleveland Pressures Hospitals To Keep ERs Open To All Ambulances</title>
-      <description>When you call an ambulance, you expect to go to the nearest hospital. But patients are often diverted to more distant emergency rooms. Cleveland wants hospitals to stop the practice.</description>
-      <pubDate>Sat, 02 Jan 2016 07:54:56 -0500</pubDate>
-      <link>http://www.npr.org/sections/health-shots/2016/01/02/460162575/cleveland-pressures-hospitals-to-keep-ers-open-to-all-ambulances?utm_medium=RSS&amp;utm_campaign=healthcare</link>
-      <guid>http://www.npr.org/sections/health-shots/2016/01/02/460162575/cleveland-pressures-hospitals-to-keep-ers-open-to-all-ambulances?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
-      <content:encoded><![CDATA[<p>When you call an ambulance, you expect to go to the nearest hospital. But patients are often diverted to more distant emergency rooms. Cleveland wants hospitals to stop the practice.</p>]]></content:encoded>
-      <dc:creator>Sarah Jane Tribble</dc:creator>
+      <title>As GOP Health Care Push Moves To Senate, White House Questions Value of CBO Analysis</title>
+      <description>"I think I know the gospel pretty well," a White House spokeswoman said after the House passed a health care bill without the official legislative scoring, "and I'd say the CBO is not the gospel."</description>
+      <pubDate>Sat, 06 May 2017 16:56:00 -0400</pubDate>
+      <link>http://www.npr.org/2017/05/06/526866697/as-gop-health-care-push-moves-to-senate-white-house-questions-value-of-cbo-analy?utm_medium=RSS&amp;utm_campaign=healthcare</link>
+      <guid>http://www.npr.org/2017/05/06/526866697/as-gop-health-care-push-moves-to-senate-white-house-questions-value-of-cbo-analy?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
+      <content:encoded><![CDATA[<img src='https://media.npr.org/assets/img/2017/05/05/ap_17125062049779_wide-1a6d480463481a18aa788079518d2b7aa4285fac.jpg?s=600' alt='President Donald Trump celebrates with House Speaker Paul Ryan in the White House Rose Garden Thursday after the House voted to pass the American Health Care Act.'/><p>"I think I know the gospel pretty well," a White House spokeswoman said after the House passed a health care bill without the official legislative scoring, "and I'd say the CBO is not the gospel."</p><p>(Image credit: Evan Vucci/AP)</p><img src='https://media.npr.org/include/images/tracking/npr-rss-pixel.png?story=526866697' />]]></content:encoded>
+      <dc:creator>Miles Parks</dc:creator>
     </item>
     <item>
-      <title>N.J. Factory Turns To Medicaid To Insure Lowest-Paid Employees</title>
-      <description>Starting Jan. 1, midsize companies must offer health insurance to their workers or risk a penalty. A firm that has already faced that problem is helping low-paid employees enroll in Medicaid, instead.</description>
-      <pubDate>Fri, 01 Jan 2016 16:26:56 -0500</pubDate>
-      <link>http://www.npr.org/sections/health-shots/2016/01/01/460944790/n-j-factory-turns-to-medicaid-to-insure-lowest-paid-employees?utm_medium=RSS&amp;utm_campaign=healthcare</link>
-      <guid>http://www.npr.org/sections/health-shots/2016/01/01/460944790/n-j-factory-turns-to-medicaid-to-insure-lowest-paid-employees?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
-      <content:encoded><![CDATA[<p>Starting Jan. 1, midsize companies must offer health insurance to their workers or risk a penalty. A firm that has already faced that problem is helping low-paid employees enroll in Medicaid, instead.</p>]]></content:encoded>
-      <dc:creator>Fred Mogul</dc:creator>
+      <title>What Are 'High-Risk Pools' And Do They Lower Health Care Costs?</title>
+      <description>Attorney Ryan Burt talks with NPR's Scott Simon about whether high-risk pools proposed in the House Republicans' health care plan, for people with pre-existing conditions, are enough to meet the need.</description>
+      <pubDate>Sat, 06 May 2017 07:48:31 -0400</pubDate>
+      <link>http://www.npr.org/2017/05/06/527140030/what-are-high-risk-pools-and-do-they-lower-health-care-costs?utm_medium=RSS&amp;utm_campaign=healthcare</link>
+      <guid>http://www.npr.org/2017/05/06/527140030/what-are-high-risk-pools-and-do-they-lower-health-care-costs?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
+      <content:encoded><![CDATA[<p>Attorney Ryan Burt talks with NPR's Scott Simon about whether high-risk pools proposed in the House Republicans' health care plan, for people with pre-existing conditions, are enough to meet the need.</p><img src='https://media.npr.org/include/images/tracking/npr-rss-pixel.png?story=527140030' />]]></content:encoded>
     </item>
     <item>
-      <title>Obamacare Insurers Sweeten Plans With Free Doctor Visits</title>
-      <description>Some insurers are betting that lowering the barrier to seeing a doctor will encourage people to get needed care sooner. If it works, the health plans could save more than they spend on the benefit.</description>
-      <pubDate>Thu, 31 Dec 2015 06:01:00 -0500</pubDate>
-      <link>http://www.npr.org/sections/health-shots/2015/12/31/460844113/obamacare-insurers-sweeten-plans-with-free-doctor-visits?utm_medium=RSS&amp;utm_campaign=healthcare</link>
-      <guid>http://www.npr.org/sections/health-shots/2015/12/31/460844113/obamacare-insurers-sweeten-plans-with-free-doctor-visits?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
-      <content:encoded><![CDATA[<p>Some insurers are betting that lowering the barrier to seeing a doctor will encourage people to get needed care sooner. If it works, the health plans could save more than they spend on the benefit.</p>]]></content:encoded>
-      <dc:creator>Phil Galewitz</dc:creator>
+      <title>The Future Of The GOP Health Care Plan</title>
+      <description>The White House claimed a victory this week with the House passage of the bill to replace the Affordable Care Act. NPR's Ron Elving joins Scott Simon to talk about the bill's prospects in the Senate.</description>
+      <pubDate>Sat, 06 May 2017 07:48:31 -0400</pubDate>
+      <link>http://www.npr.org/2017/05/06/527140016/the-future-of-the-gop-health-care-plan?utm_medium=RSS&amp;utm_campaign=healthcare</link>
+      <guid>http://www.npr.org/2017/05/06/527140016/the-future-of-the-gop-health-care-plan?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
+      <content:encoded><![CDATA[<p>The White House claimed a victory this week with the House passage of the bill to replace the Affordable Care Act. NPR's Ron Elving joins Scott Simon to talk about the bill's prospects in the Senate.</p><img src='https://media.npr.org/include/images/tracking/npr-rss-pixel.png?story=527140016' />]]></content:encoded>
+      <dc:creator>Ron Elving</dc:creator>
     </item>
     <item>
-      <title>Doctors Look To Prevent Abuse In Midst Of Opioid Epidemic</title>
-      <description>The U.S. is in the grips of a prescription drug epidemic, fueled in part by an explosion in opioid prescriptions over the past several decades. Roughly half of those prescriptions are written by primary care doctors. NPR's Robert Siegel talks with Dr. Wanda Filer, president of the American Academy of Family Physicians, about her experience prescribing opioids and what doctors can do to prevent abuse.</description>
-      <pubDate>Wed, 30 Dec 2015 16:30:00 -0500</pubDate>
-      <link>http://www.npr.org/2015/12/30/461519814/doctors-look-to-prevent-abuse-in-midst-of-opioid-epidemic?utm_medium=RSS&amp;utm_campaign=healthcare</link>
-      <guid>http://www.npr.org/2015/12/30/461519814/doctors-look-to-prevent-abuse-in-midst-of-opioid-epidemic?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
-      <content:encoded><![CDATA[<p>The U.S. is in the grips of a prescription drug epidemic, fueled in part by an explosion in opioid prescriptions over the past several decades. Roughly half of those prescriptions are written by primary care doctors. NPR's Robert Siegel talks with Dr. Wanda Filer, president of the American Academy of Family Physicians, about her experience prescribing opioids and what doctors can do to prevent abuse.</p>]]></content:encoded>
+      <title>People With Pre-Existing Conditions Worry About Losing Health Coverage</title>
+      <description>As the American Health Care Act moves toward the Senate, many people around the country are reacting to it. Among them, people with pre-existing conditions who worry about losing their coverage.</description>
+      <pubDate>Fri, 05 May 2017 16:31:31 -0400</pubDate>
+      <link>http://www.npr.org/2017/05/05/527092485/people-with-pre-existing-conditions-worry-about-losing-health-coverage?utm_medium=RSS&amp;utm_campaign=healthcare</link>
+      <guid>http://www.npr.org/2017/05/05/527092485/people-with-pre-existing-conditions-worry-about-losing-health-coverage?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
+      <content:encoded><![CDATA[<p>As the American Health Care Act moves toward the Senate, many people around the country are reacting to it. Among them, people with pre-existing conditions who worry about losing their coverage.</p><img src='https://media.npr.org/include/images/tracking/npr-rss-pixel.png?story=527092485' />]]></content:encoded>
     </item>
     <item>
-      <title>2015 Was Another Rough And Tumble Year For Obamacare</title>
-      <description>The Affordable Care Act survived another challenge before the U.S. Supreme Court this year. But the still-fragile marketplace is showing the strain of rising health care costs.</description>
-      <pubDate>Wed, 30 Dec 2015 05:16:00 -0500</pubDate>
-      <link>http://www.npr.org/2015/12/30/461461046/2015-was-another-rough-and-tumble-year-for-the-affordable-care-act?utm_medium=RSS&amp;utm_campaign=healthcare</link>
-      <guid>http://www.npr.org/2015/12/30/461461046/2015-was-another-rough-and-tumble-year-for-the-affordable-care-act?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
-      <content:encoded><![CDATA[<p>The Affordable Care Act survived another challenge before the U.S. Supreme Court this year. But the still-fragile marketplace is showing the strain of rising health care costs.</p>]]></content:encoded>
+      <title>Obamacare Vs. American Health Care Act: Here's Where They Differ</title>
+      <description>NPR looks at how the Affordable Care Act and American Health Care Act differ in terms of insurance marketplaces, the individual mandate, guaranteed coverage and insurance subsidies.</description>
+      <pubDate>Fri, 05 May 2017 16:31:00 -0400</pubDate>
+      <link>http://www.npr.org/2017/05/05/527092478/obamacare-vs-american-health-care-act-heres-where-they-differ?utm_medium=RSS&amp;utm_campaign=healthcare</link>
+      <guid>http://www.npr.org/2017/05/05/527092478/obamacare-vs-american-health-care-act-heres-where-they-differ?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
+      <content:encoded><![CDATA[<p>NPR looks at how the Affordable Care Act and American Health Care Act differ in terms of insurance marketplaces, the individual mandate, guaranteed coverage and insurance subsidies.</p><img src='https://media.npr.org/include/images/tracking/npr-rss-pixel.png?story=527092478' />]]></content:encoded>
+      <dc:creator>Alison Kodjak</dc:creator>
+    </item>
+    <item>
+      <title>House Approval Of Health Care Bill Represents Major Victory For Trump</title>
+      <description>President Trump is still learning the ways of Washington. But House passage of the health care bill is a victory for the novice politician.</description>
+      <pubDate>Fri, 05 May 2017 16:31:00 -0400</pubDate>
+      <link>http://www.npr.org/2017/05/05/527092428/house-approval-of-health-care-bill-represents-major-victory-for-trump?utm_medium=RSS&amp;utm_campaign=healthcare</link>
+      <guid>http://www.npr.org/2017/05/05/527092428/house-approval-of-health-care-bill-represents-major-victory-for-trump?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
+      <content:encoded><![CDATA[<p>President Trump is still learning the ways of Washington. But House passage of the health care bill is a victory for the novice politician.</p><img src='https://media.npr.org/include/images/tracking/npr-rss-pixel.png?story=527092428' />]]></content:encoded>
       <dc:creator>Scott Horsley</dc:creator>
     </item>
     <item>
-      <title>Privacy Violations Rising At Veterans Affairs Medical Facilities</title>
-      <description>Deceased veterans' documents were sent to the wrong widows. VA workers snooped on patients who had committed suicide. And whistleblowers contend the VA violated their medical privacy.</description>
-      <pubDate>Wed, 30 Dec 2015 05:00:00 -0500</pubDate>
-      <link>http://www.npr.org/sections/health-shots/2015/12/30/461400692/patient-privacy-isn-t-safeguarded-at-veterans-medical-facilities?utm_medium=RSS&amp;utm_campaign=healthcare</link>
-      <guid>http://www.npr.org/sections/health-shots/2015/12/30/461400692/patient-privacy-isn-t-safeguarded-at-veterans-medical-facilities?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
-      <content:encoded><![CDATA[<p>Deceased veterans' documents were sent to the wrong widows. VA workers snooped on patients who had committed suicide. And whistleblowers contend the VA violated their medical privacy.</p>]]></content:encoded>
-      <dc:creator>Annie Waldman</dc:creator>
+      <title>Senate Prepares To Consider GOP Health Care Bill</title>
+      <description>The measure passed the House on Thursday, but it's in the hands of the Senate now. Steve Inskeep talks to Democratic Sen. Tim Kaine of Virginia about the bill's chances in the Senate.</description>
+      <pubDate>Fri, 05 May 2017 07:30:00 -0400</pubDate>
+      <link>http://www.npr.org/2017/05/05/527026081/senate-prepares-to-consider-gop-health-care-bill?utm_medium=RSS&amp;utm_campaign=healthcare</link>
+      <guid>http://www.npr.org/2017/05/05/527026081/senate-prepares-to-consider-gop-health-care-bill?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
+      <content:encoded><![CDATA[<p>The measure passed the House on Thursday, but it's in the hands of the Senate now. Steve Inskeep talks to Democratic Sen. Tim Kaine of Virginia about the bill's chances in the Senate.</p><img src='https://media.npr.org/include/images/tracking/npr-rss-pixel.png?story=527026081' />]]></content:encoded>
     </item>
     <item>
-      <title>A Cause For Cautious Celebration: Guinea Is Ebola-Free</title>
-      <description>After two years and over 2,500 deaths, the country's epidemic has officially ended, the World Health Organization says. Health groups will be watching to ensure the virus doesn't re-emerge.</description>
-      <pubDate>Tue, 29 Dec 2015 16:36:00 -0500</pubDate>
-      <link>http://www.npr.org/sections/goatsandsoda/2015/12/29/461392013/a-cause-for-cautious-celebration-guinea-is-ebola-free?utm_medium=RSS&amp;utm_campaign=healthcare</link>
-      <guid>http://www.npr.org/sections/goatsandsoda/2015/12/29/461392013/a-cause-for-cautious-celebration-guinea-is-ebola-free?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
-      <content:encoded><![CDATA[<p>After two years and over 2,500 deaths, the country's epidemic has officially ended, the World Health Organization says. Health groups will be watching to ensure the virus doesn't re-emerge.</p>]]></content:encoded>
-      <dc:creator>Maanvi Singh</dc:creator>
+      <title>What's Next For The Republican Health Care Plan</title>
+      <description>Republicans in the House have passed a bill to change the health care system. But it faces changes in the Senate.</description>
+      <pubDate>Fri, 05 May 2017 05:04:00 -0400</pubDate>
+      <link>http://www.npr.org/2017/05/05/527013797/whats-next-for-the-republican-health-care-plan?utm_medium=RSS&amp;utm_campaign=healthcare</link>
+      <guid>http://www.npr.org/2017/05/05/527013797/whats-next-for-the-republican-health-care-plan?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
+      <content:encoded><![CDATA[<p>Republicans in the House have passed a bill to change the health care system. But it faces changes in the Senate.</p><img src='https://media.npr.org/include/images/tracking/npr-rss-pixel.png?story=527013797' />]]></content:encoded>
+      <dc:creator>Susan Davis</dc:creator>
     </item>
     <item>
-      <title>New VA Clinic Opens For Transgender Vets</title>
-      <description>The Tucson Veterans Affairs hospital is expanding treatment to the needs of trans veterans, one of the first such facilities in the U.S. to do so. The clinic's services include hormone treatment.</description>
-      <pubDate>Tue, 29 Dec 2015 16:07:00 -0500</pubDate>
-      <link>http://www.npr.org/2015/12/29/460955296/new-va-clinic-opens-for-transgender-vets?utm_medium=RSS&amp;utm_campaign=healthcare</link>
-      <guid>http://www.npr.org/2015/12/29/460955296/new-va-clinic-opens-for-transgender-vets?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
-      <content:encoded><![CDATA[<p>The Tucson Veterans Affairs hospital is expanding treatment to the needs of trans veterans, one of the first such facilities in the U.S. to do so. The clinic's services include hormone treatment.</p>]]></content:encoded>
-      <dc:creator>Jimmy Jenkins</dc:creator>
+      <title>Health Care Vote Could Threaten Republican House Majority</title>
+      <description>Some of the most vulnerable House Republicans voted in favor of the GOP health care plan — and Democrats are already trying to use it against them ahead of the 2018 midterm elections.</description>
+      <pubDate>Fri, 05 May 2017 05:00:00 -0400</pubDate>
+      <link>http://www.npr.org/2017/05/05/526969730/health-care-vote-could-threaten-republican-house-majority?utm_medium=RSS&amp;utm_campaign=healthcare</link>
+      <guid>http://www.npr.org/2017/05/05/526969730/health-care-vote-could-threaten-republican-house-majority?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
+      <content:encoded><![CDATA[<img src='https://media.npr.org/assets/img/2017/05/04/gettyimages-678632196_wide-95795b1e92f4564d5082ba0c696c4ab5c7bc0035.jpg?s=600' alt='Protesters shout at lawmakers walking out of the Capitol on Thursday after the House of Representatives narrowly passed a Republican effort to repeal and replace the Affordable Care Act.'/><p>Some of the most vulnerable House Republicans voted in favor of the GOP health care plan — and Democrats are already trying to use it against them ahead of the 2018 midterm elections.</p><p>(Image credit: Nicholas Kamm/AFP via Getty Images)</p><img src='https://media.npr.org/include/images/tracking/npr-rss-pixel.png?story=526969730' />]]></content:encoded>
+      <dc:creator>Jessica Taylor</dc:creator>
     </item>
     <item>
-      <title>How Sound Reveals The Invisible Within Us</title>
-      <description>Microscopes illuminate the tiny. But sound? Scientists didn't really see it as all that important, until an amazing invention came along that opened new worlds: the stethoscope.</description>
-      <pubDate>Tue, 29 Dec 2015 10:59:00 -0500</pubDate>
-      <link>http://www.npr.org/sections/health-shots/2015/12/29/460947387/how-sound-reveals-the-invisible-within-us?utm_medium=RSS&amp;utm_campaign=healthcare</link>
-      <guid>http://www.npr.org/sections/health-shots/2015/12/29/460947387/how-sound-reveals-the-invisible-within-us?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
-      <content:encoded><![CDATA[<p>Microscopes illuminate the tiny. But sound? Scientists didn't really see it as all that important, until an amazing invention came along that opened new worlds: the stethoscope.</p>]]></content:encoded>
-      <dc:creator>Christopher Joyce</dc:creator>
+      <title>5 Things To Watch As GOP Health Bill Moves To The Senate</title>
+      <description>Just three "no" votes by Senate Republicans would likely be enough to sink the GOP health bill. Democrats who lost the battle in the House are still convinced they can win the political war.</description>
+      <pubDate>Thu, 04 May 2017 16:42:00 -0400</pubDate>
+      <link>http://www.npr.org/sections/health-shots/2017/05/04/526922980/gop-health-bill-moves-to-the-senate-5-things-to-watch?utm_medium=RSS&amp;utm_campaign=healthcare</link>
+      <guid>http://www.npr.org/sections/health-shots/2017/05/04/526922980/gop-health-bill-moves-to-the-senate-5-things-to-watch?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
+      <content:encoded><![CDATA[<img src='https://media.npr.org/assets/img/2017/05/04/paul-ryan-ahca_wide-96912a52c5ab5cf7c4f11bf756bd6deb4d33ccd2.jpg?s=600' alt='House Speaker Paul Ryan (center) walks to the House chamber ahead of a budget vote on Capitol Hill. Though Ryan was able to deliver 217 votes Thursday to get his GOP health plan through the House, there are still significant hurdles before the bill becomes law.'/><p>Just three "no" votes by Senate Republicans would likely be enough to sink the GOP health bill. Democrats who lost the battle in the House are still convinced they can win the political war.</p><p>(Image credit: Eric Thayer/Getty Images)</p><img src='https://media.npr.org/include/images/tracking/npr-rss-pixel.png?story=526922980' />]]></content:encoded>
+      <dc:creator>Julie Rovner</dc:creator>
     </item>
     <item>
-      <title>Repeat Violators Of Health Privacy Laws Often Go Unpunished</title>
-      <description>Regulators have logged dozens, even hundreds of complaints against some health providers for violating federal patient privacy law. Warnings are doled out privately, and sanctions are rarely imposed.</description>
-      <pubDate>Tue, 29 Dec 2015 04:00:00 -0500</pubDate>
-      <link>http://www.npr.org/sections/health-shots/2015/12/29/460828382/few-consequences-for-health-privacy-laws-repeat-offenders?utm_medium=RSS&amp;utm_campaign=healthcare</link>
-      <guid>http://www.npr.org/sections/health-shots/2015/12/29/460828382/few-consequences-for-health-privacy-laws-repeat-offenders?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
-      <content:encoded><![CDATA[<p>Regulators have logged dozens, even hundreds of complaints against some health providers for violating federal patient privacy law. Warnings are doled out privately, and sanctions are rarely imposed.</p>]]></content:encoded>
-      <dc:creator>Charles Ornstein</dc:creator>
+      <title>American Hospital Association Head Outlines Opposition To GOP Health Bill</title>
+      <description>NPR's Robert Siegel talks with Rick Pollack, president and CEO of the American Hospital Association, about how the Republican health care plan would affect hospitals and why he opposes it.</description>
+      <pubDate>Thu, 04 May 2017 16:33:00 -0400</pubDate>
+      <link>http://www.npr.org/2017/05/04/526931893/american-hospital-association-head-outlines-opposition-to-gop-health-bill?utm_medium=RSS&amp;utm_campaign=healthcare</link>
+      <guid>http://www.npr.org/2017/05/04/526931893/american-hospital-association-head-outlines-opposition-to-gop-health-bill?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
+      <content:encoded><![CDATA[<p>NPR's Robert Siegel talks with Rick Pollack, president and CEO of the American Hospital Association, about how the Republican health care plan would affect hospitals and why he opposes it.</p><img src='https://media.npr.org/include/images/tracking/npr-rss-pixel.png?story=526931893' />]]></content:encoded>
     </item>
     <item>
-      <title>Gene Editing Tool Hailed As A Breakthrough, And It Really Is One </title>
-      <description>A tool for modifying genes is spreading through the biomedical research world like wildfire. As part of the series Joe's Big Idea, NPR's Joe Palca explores why CRISPR-Cas9 is becoming indispensable.</description>
-      <pubDate>Mon, 28 Dec 2015 15:43:00 -0500</pubDate>
-      <link>http://www.npr.org/sections/health-shots/2015/12/28/460705645/gene-editing-tool-hailed-as-a-breakthrough-and-it-really-is-one?utm_medium=RSS&amp;utm_campaign=healthcare</link>
-      <guid>http://www.npr.org/sections/health-shots/2015/12/28/460705645/gene-editing-tool-hailed-as-a-breakthrough-and-it-really-is-one?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
-      <content:encoded><![CDATA[<p>A tool for modifying genes is spreading through the biomedical research world like wildfire. As part of the series Joe's Big Idea, NPR's Joe Palca explores why CRISPR-Cas9 is becoming indispensable.</p>]]></content:encoded>
-      <dc:creator>Joe Palca</dc:creator>
+      <title>House Passes Revised Version Of Republican Health Care Bill</title>
+      <description>Over a month after abruptly pulling their plan to repeal and replace Obamacare from the floor, House Republicans voted Wednesday on a revised version of that bill.</description>
+      <pubDate>Thu, 04 May 2017 16:33:00 -0400</pubDate>
+      <link>http://www.npr.org/2017/05/04/526931886/house-passes-revised-version-of-republican-health-care-bill?utm_medium=RSS&amp;utm_campaign=healthcare</link>
+      <guid>http://www.npr.org/2017/05/04/526931886/house-passes-revised-version-of-republican-health-care-bill?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
+      <content:encoded><![CDATA[<p>Over a month after abruptly pulling their plan to repeal and replace Obamacare from the floor, House Republicans voted Wednesday on a revised version of that bill.</p><img src='https://media.npr.org/include/images/tracking/npr-rss-pixel.png?story=526931886' />]]></content:encoded>
+      <dc:creator>Scott Horsley</dc:creator>
     </item>
     <item>
-      <title>Alzheimer's Disease Underdiagnosed In Indian Country</title>
-      <description>A Native American family that sees Alzheimer's disease as a natural part of life may be less likely to reach for resources that could help, say Arizona mental health workers. They hope to change that.</description>
-      <pubDate>Mon, 28 Dec 2015 05:21:00 -0500</pubDate>
-      <link>http://www.npr.org/sections/health-shots/2015/12/28/458041798/alzheimers-disease-underdiagnosed-in-indian-country?utm_medium=RSS&amp;utm_campaign=healthcare</link>
-      <guid>http://www.npr.org/sections/health-shots/2015/12/28/458041798/alzheimers-disease-underdiagnosed-in-indian-country?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
-      <content:encoded><![CDATA[<p>A Native American family that sees Alzheimer's disease as a natural part of life may be less likely to reach for resources that could help, say Arizona mental health workers. They hope to change that.</p>]]></content:encoded>
-      <dc:creator>Laurel Morales</dc:creator>
+      <title>Winners And Losers Under The House GOP Health Bill</title>
+      <description>The version of the American Health Care Act passed by the House eliminates taxes on corporations and wealthy people and shrinks Medicaid coverage. A chart breaks down who would be affected and how.</description>
+      <pubDate>Thu, 04 May 2017 16:00:00 -0400</pubDate>
+      <link>http://www.npr.org/sections/health-shots/2017/05/04/526925764/winners-and-losers-under-the-house-gop-health-bill?utm_medium=RSS&amp;utm_campaign=healthcare</link>
+      <guid>http://www.npr.org/sections/health-shots/2017/05/04/526925764/winners-and-losers-under-the-house-gop-health-bill?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
+      <content:encoded><![CDATA[<img src='https://media.npr.org/assets/img/2017/05/04/congress-winners-losers_wide-0ee2e51c59778f468ecf98f39b59eeafe68db190.jpg?s=600' alt='House Republicans passed a version of the American Health Care Act. The bill now goes to the Senate.'/><p>The version of the American Health Care Act passed by the House eliminates taxes on corporations and wealthy people and shrinks Medicaid coverage. A chart breaks down who would be affected and how.</p><p>(Image credit: J. Scott Applewhite/AP)</p><img src='https://media.npr.org/include/images/tracking/npr-rss-pixel.png?story=526925764' />]]></content:encoded>
+      <dc:creator>Joe Neel</dc:creator>
     </item>
     <item>
-      <title>Training The Immune System To Fight Cancer Has 19th-Century Roots</title>
-      <description>When Jimmy Carter said his advanced melanoma was gone, he credited immunotherapy, treatments that harness the immune system to fight cancer cells. This idea dates back to a 19th-century doctor.</description>
-      <pubDate>Mon, 28 Dec 2015 05:03:00 -0500</pubDate>
-      <link>http://www.npr.org/sections/health-shots/2015/12/28/459218765/cutting-edge-cancer-treatment-has-its-roots-in-19th-century-medicine?utm_medium=RSS&amp;utm_campaign=healthcare</link>
-      <guid>http://www.npr.org/sections/health-shots/2015/12/28/459218765/cutting-edge-cancer-treatment-has-its-roots-in-19th-century-medicine?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
-      <content:encoded><![CDATA[<p>When Jimmy Carter said his advanced melanoma was gone, he credited immunotherapy, treatments that harness the immune system to fight cancer cells. This idea dates back to a 19th-century doctor.</p>]]></content:encoded>
-      <dc:creator>Rebecca Davis</dc:creator>
+      <title>Here Is What's In The House-Approved Health Care Bill</title>
+      <description>The House GOP's bill to replace the Affordable Care Act would all but eliminate the requirement that people buy health insurance and shrink Medicaid coverage. It also cuts taxes for the wealthy.</description>
+      <pubDate>Thu, 04 May 2017 15:16:00 -0400</pubDate>
+      <link>http://www.npr.org/sections/health-shots/2017/05/04/526887531/heres-whats-in-the-house-approved-health-care-bill?utm_medium=RSS&amp;utm_campaign=healthcare</link>
+      <guid>http://www.npr.org/sections/health-shots/2017/05/04/526887531/heres-whats-in-the-house-approved-health-care-bill?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
+      <content:encoded><![CDATA[<img src='https://media.npr.org/assets/img/2017/05/04/seema-tom-mike_wide-0c2d0088aa62cc44b211ad52411511af40c21613.jpg?s=600' alt='Seema Verma, the administrator of the Centers for Medicare and Medicaid Services, joins Vice President Pence and Health and Human Services Secretary Tom Price on Capitol Hill to advocate for the GOP health overhaul bill.'/><p>The House GOP's bill to replace the Affordable Care Act would all but eliminate the requirement that people buy health insurance and shrink Medicaid coverage. It also cuts taxes for the wealthy.</p><p>(Image credit: Eric Thayer/Getty Images)</p><img src='https://media.npr.org/include/images/tracking/npr-rss-pixel.png?story=526887531' />]]></content:encoded>
+      <dc:creator>Alison Kodjak</dc:creator>
     </item>
     <item>
-      <title>States Deny Pricey Hepatitis C Drugs To Most Medicaid Patients</title>
-      <description>Effective treatments for hepatitis C cost as much as $95,000. Medicaid in many states, including Indiana, is mostly limiting the drugs' use to very advanced cases. ACLU of Indiana is suing the state.</description>
-      <pubDate>Sun, 27 Dec 2015 05:32:00 -0500</pubDate>
-      <link>http://www.npr.org/sections/health-shots/2015/12/27/460086615/states-deny-pricey-hepatitis-c-drugs-to-most-medicaid-patients?utm_medium=RSS&amp;utm_campaign=healthcare</link>
-      <guid>http://www.npr.org/sections/health-shots/2015/12/27/460086615/states-deny-pricey-hepatitis-c-drugs-to-most-medicaid-patients?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
-      <content:encoded><![CDATA[<p>Effective treatments for hepatitis C cost as much as $95,000. Medicaid in many states, including Indiana, is mostly limiting the drugs' use to very advanced cases. ACLU of Indiana is suing the state.</p>]]></content:encoded>
-      <dc:creator>Jake Harper</dc:creator>
-    </item>
-    <item>
-      <title>ER Docs Say Rule Change Could Raise Patients' Out-Of-Network Bills</title>
-      <description>Two physicians groups say federal government regulations for out-of-network emergency care payments will cost consumers more because insurers will pay less.</description>
-      <pubDate>Thu, 24 Dec 2015 05:30:00 -0500</pubDate>
-      <link>http://www.npr.org/sections/health-shots/2015/12/24/460829936/er-docs-say-rule-change-could-raise-patients-out-of-network-bills?utm_medium=RSS&amp;utm_campaign=healthcare</link>
-      <guid>http://www.npr.org/sections/health-shots/2015/12/24/460829936/er-docs-say-rule-change-could-raise-patients-out-of-network-bills?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
-      <content:encoded><![CDATA[<p>Two physicians groups say federal government regulations for out-of-network emergency care payments will cost consumers more because insurers will pay less.</p>]]></content:encoded>
-      <dc:creator>Michelle Andrews</dc:creator>
+      <title>House Republicans To Bring Healthcare Overhaul Bill Back To The Floor</title>
+      <description>NPR congressional correspondent Sue Davis has the latest on Republican plans to vote on repealing and replace the Affordable Care Act.</description>
+      <pubDate>Thu, 04 May 2017 11:55:00 -0400</pubDate>
+      <link>http://www.npr.org/2017/05/04/526874786/house-republicans-to-bring-healthcare-overhaul-bill-back-to-the-floor?utm_medium=RSS&amp;utm_campaign=healthcare</link>
+      <guid>http://www.npr.org/2017/05/04/526874786/house-republicans-to-bring-healthcare-overhaul-bill-back-to-the-floor?utm_medium=RSS&amp;utm_campaign=healthcare</guid>
+      <content:encoded><![CDATA[<p>NPR congressional correspondent Sue Davis has the latest on Republican plans to vote on repealing and replace the Affordable Care Act.</p><img src='https://media.npr.org/include/images/tracking/npr-rss-pixel.png?story=526874786' />]]></content:encoded>
+      <dc:creator>Susan Davis</dc:creator>
     </item>
   </channel>
 </rss>

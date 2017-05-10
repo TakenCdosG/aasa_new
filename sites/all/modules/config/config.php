@@ -13,8 +13,8 @@ define('PRODUCT_MEMBERSHIP_RENEWAL_ID', '146');
 //Private Pages
 define('SYSTEM_MAIL', 'aasa1@aasa1.org');
 
-define('ADMIN_MAIL', 'dawn@thinkcreativegroup.com,stephanie.farmer@ucdenver.edu, cmoore62@jhmi.edu, bensonwon88@gmail.com'); //execute change_admin_callback as well
-define('ADMIN_MAIL_TEST', 'dawn@thinkcreativegroup.com, melanie@thinkcreativegroup.com, keeler@surgery.wisc.edu, slkearne@bcm.edu, bwon@ucdavis.edu, adrian.morelos@akendos.com');
+define('ADMIN_MAIL', 'dawn@thinkcreativegroup.com, melanie@thinkcreativegroup.com, keeler@surgery.wisc.edu, vgetz@wakehealth.edu, bensonwon88@gmail.com'); //execute change_admin_callback as well
+define('ADMIN_MAIL_TEST', 'dawn@thinkcreativegroup.com, melanie@thinkcreativegroup.com, colbey.walker@utsouthwestern.edu, Stephanie.Kearney@bcm.edu, aoconnell@surgery.bsd.uchicago.edu, bwon@ucdavis.edu, adrian.morelos@akendos.com');
 //define('ADMIN_MAIL','giovanny.sayas@akendos.com, maicol.lopez@akendos.com, dawn@thinkcreativegroup.com,melanie@thinkcreativegroup.com ');//execute change_admin_callback as well
 
 define('MEMBERSHIP_DIRECTORY_PATH', 'membership-directory'); //View
@@ -52,8 +52,8 @@ define('INACTIVE', '9');
 
 //Header for outgoing Emails
 define('HEADERS', 'From: AASA (' . SYSTEM_MAIL . ')' . "\r\n" .
-        'Reply-To: ' . SYSTEM_MAIL . "\r\n" .
-        'X-Mailer: PHP/' . phpversion());
+  'Reply-To: ' . SYSTEM_MAIL . "\r\n" .
+  'X-Mailer: PHP/' . phpversion());
 
 date_default_timezone_set('UTC');
 
